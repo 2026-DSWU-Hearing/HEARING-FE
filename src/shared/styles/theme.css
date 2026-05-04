@@ -1,0 +1,9 @@
+:root {
+  /*색상*/
+  --color-primary: #3b82f6;
+  --color-background: #f9fafb;
+
+  /* 폰트 */
+  --font-base: 'Pretendard', system-ui, sans-serif;
+  --font-size-base: 16px;
+}

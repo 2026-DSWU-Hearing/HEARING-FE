@@ -1,0 +1,29 @@
+@import 'tailwindcss';
+
+body {
+  font-family: var(--font-base);
+  font-size: var(--font-size-base);
+  background-color: var(--color-background);
+}
+
+/* 엡 컨테이너 */
+.app {
+  /* 웹앱 너비 고정 */
+  width: 100%;
+  max-width: 430px;
+  min-width: 320px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.15);
+}
+
+/* 버튼 */
+button {
+  cursor: pointer;
+}
+
+/* 링크 */
+a {
+  text-decoration: none;
+  color: inherit;
+}
