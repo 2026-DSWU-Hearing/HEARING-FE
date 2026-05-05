@@ -5,9 +5,11 @@ import '@/App.css';
 function App() {
   return (
     <>
-      <Navigation />
-      <AppRouter />
-      <div className="app">{/* 앱 내용 */}</div>
+      <div className="app">
+        {/* 앱 내용 */}
+        <AppRouter />
+        <Navigation />
+      </div>
     </>
   );
 }
