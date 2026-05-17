@@ -5,10 +5,10 @@ import type { Sound } from '../../types/soundFiltering';
 
 interface SoundSectionProps {
   sounds: Sound[];
-  handleBtnAddSound: () => void;
+  onAddSound: () => void;
 }
 
-const SoundSection = ({ sounds, handleBtnAddSound }: SoundSectionProps) => {
+const SoundSection = ({ sounds, onAddSound }: SoundSectionProps) => {
   return (
     <section className="flex flex-col gap-1">
       {/* 소리 섹션 제목 부분 */}
@@ -24,7 +24,7 @@ const SoundSection = ({ sounds, handleBtnAddSound }: SoundSectionProps) => {
           <SoundCard key={sound.id} sound={sound} />
         ))}
       </div>
-      <AddSoundButton onClick={handleBtnAddSound} />
+      <AddSoundButton onClick={onAddSound} />
     </section>
   );
 };

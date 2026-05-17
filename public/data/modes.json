@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "name": "실외",
+    "iconLabel": "가방"
+  },
+  {
+    "id": 2,
+    "name": "가정",
+    "iconLabel": "집"
+  },
+  {
+    "id": 3,
+    "name": "업무",
+    "iconLabel": "카드"
+  }
+]

@@ -4,30 +4,20 @@ import HomeHeader from './components/HomeHeader';
 import ModeSection from './components/mode/ModeSection';
 import AddSoundBottomSheet from './components/sound/AddSoundBottomSheet';
 import SoundSection from './components/sound/SoundSection';
-
-import type { Mode, Sound } from './types/soundFiltering';
-
-const modes: Mode[] = [
-  { id: 'outdoor', name: '실외', iconLabel: '가방' },
-  { id: 'home', name: '가정', iconLabel: '집' },
-  { id: 'work', name: '업무', iconLabel: '카드' },
-];
-
-const containedSounds: Sound[] = [
-  { id: 'baby-cry', name: '아기 울음소리', category: '생활음', iconLabel: '물방울' },
-  { id: 'knock', name: '노크 소리', category: '생활음', iconLabel: '문' },
-  { id: 'fire', name: '화재 경보', category: '긴급', iconLabel: '불' },
-];
+import { useHomeSoundFilteringData } from './hooks/useHomeSoundFilteringData';
 
 const Home = () => {
   const [isAddSoundOpen, setIsAddSoundOpen] = useState(false);
+  const { data, isLoading, error } = useHomeSoundFilteringData();
 
   return (
     <main>
       <HomeHeader />
-      <ModeSection modes={modes} />
+      {isLoading && <p>소리 필터링 정보를 불러오는 중입니다.</p>}
+      {error && <p role="alert">{error.message}</p>}
+      <ModeSection modes={data?.modes ?? []} />
       <SoundSection
-        sounds={containedSounds}
+        sounds={data?.containedSounds ?? []}
         onAddSound={() => setIsAddSoundOpen(true)}
       />
       <AddSoundBottomSheet

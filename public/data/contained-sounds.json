@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "name": "아기 울음소리",
+    "category": "생활음",
+    "iconLabel": "물방울"
+  },
+  {
+    "id": 2,
+    "name": "노크 소리",
+    "category": "생활음",
+    "iconLabel": "문"
+  },
+  {
+    "id": 3,
+    "name": "화재 경보",
+    "category": "긴급",
+    "iconLabel": "불"
+  }
+]

@@ -5,8 +5,8 @@ import type { Sound, SoundCategory } from '../../types/soundFiltering';
 interface SoundCategoryAccordionProps {
   category: SoundCategory;
   sounds: Sound[];
-  selectedSoundIds: string[];
-  onToggleSound: (soundId: string) => void;
+  selectedSoundIds: number[];
+  onToggleSound: (soundId: number) => void;
 }
 
 const SoundCategoryAccordion = ({

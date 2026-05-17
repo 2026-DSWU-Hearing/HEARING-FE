@@ -1,9 +1,12 @@
 const SilentModeButton = () => {
   return (
-    <div className="flex flex-row  items-center justify-center bg-gray-200 rounded-2xl w-35 h-10 m-2 gap-1">
-      <button type="button">방해금지 모드</button>
-      <span>달</span>
-    </div>
+    <button
+      type="button"
+      className="inline-flex h-10 w-fit items-center justify-center self-end rounded-2xl bg-gray-200 px-5 m-2 gap-1"
+    >
+      방해금지 모드
+      <span aria-hidden="true">달</span>
+    </button>
   );
 };
 

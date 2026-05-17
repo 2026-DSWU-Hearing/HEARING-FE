@@ -5,7 +5,7 @@ import type { Sound } from '../../types/soundFiltering';
 interface SelectableSoundRowProps {
   sound: Sound;
   isSelected: boolean;
-  onToggleSound: (soundId: string) => void;
+  onToggleSound: (soundId: number) => void;
 }
 
 const SelectableSoundRow = ({

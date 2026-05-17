@@ -12,3 +12,13 @@ export interface Sound {
   category: SoundCategory;
   iconLabel: string;
 }
+
+export interface HomeSoundFilteringData {
+  modes: Mode[];
+  containedSounds: Sound[];
+}
+
+export interface SoundLibraryData {
+  categories: SoundCategory[];
+  sounds: Sound[];
+}

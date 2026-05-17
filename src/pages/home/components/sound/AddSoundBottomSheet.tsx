@@ -1,34 +1,49 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
+import { useSoundLibraryData } from '../../hooks/useSoundLibraryData';
 import AddSoundCard from './AddSoundCard';
 import CategoryChips from './CategoryChips';
 import SearchBar from './SearchBar';
 
-import type { Sound, SoundCategory } from '../../types/soundFiltering';
+import type { SoundCategory } from '../../types/soundFiltering';
 
 interface AddSoundBottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const categories: SoundCategory[] = ['긴급', '생활음', '길거리', '사람 소리'];
-
-const sounds: Sound[] = [
-  { id: 'baby-cry', name: '아기 울음소리', category: '생활음', iconLabel: '물방울' },
-  { id: 'knock', name: '노크 소리', category: '생활음', iconLabel: '문' },
-  { id: 'fire', name: '화재 경보', category: '긴급', iconLabel: '불' },
-];
-
 const AddSoundBottomSheet = ({ isOpen, onClose }: AddSoundBottomSheetProps) => {
-  const [selectedCategory, setSelectedCategory] = useState<SoundCategory>('긴급');
+  const { data, isLoading, error } = useSoundLibraryData();
+  const [selectedCategory, setSelectedCategory] = useState<SoundCategory | null>(null);
   const [keyword, setKeyword] = useState('');
+  const [selectedSoundIds, setSelectedSoundIds] = useState<number[]>([]);
+
+  const categories = data?.categories ?? [];
+  const sounds = data?.sounds ?? [];
+  const activeCategory = selectedCategory ?? categories[0] ?? null;
+
+  useEffect(() => {
+    if (!isOpen) {
+      setSelectedSoundIds([]);
+      setKeyword('');
+      setSelectedCategory(null);
+    }
+  }, [isOpen]);
 
   if (!isOpen) {
     return null;
   }
 
+  const toggleSound = (soundId: number) => {
+    setSelectedSoundIds((currentSoundIds) =>
+      currentSoundIds.includes(soundId)
+        ? currentSoundIds.filter((id) => id !== soundId)
+        : [...currentSoundIds, soundId],
+    );
+  };
+
   const filteredSounds = sounds.filter((sound) => {
-    const matchesCategory = sound.category === selectedCategory;
+    const matchesCategory = activeCategory ? sound.category === activeCategory : true;
     const matchesKeyword = sound.name.includes(keyword);
 
     return matchesCategory && matchesKeyword;
@@ -41,17 +56,26 @@ const AddSoundBottomSheet = ({ isOpen, onClose }: AddSoundBottomSheetProps) => {
           x
         </button>
         <h2 id="add-sound-title">소리 추가하기</h2>
-        <button type="button">완료</button>
+        <button type="button" onClick={onClose}>완료</button>
       </header>
+      {isLoading && <p>소리 목록을 불러오는 중입니다.</p>}
+      {error && <p role="alert">{error.message}</p>}
       <SearchBar value={keyword} onChange={setKeyword} />
-      <CategoryChips
-        categories={categories}
-        selectedCategory={selectedCategory}
-        onSelectCategory={setSelectedCategory}
-      />
+      {activeCategory && (
+        <CategoryChips
+          categories={categories}
+          selectedCategory={activeCategory}
+          onSelectCategory={setSelectedCategory}
+        />
+      )}
       <div>
         {filteredSounds.map((sound) => (
-          <AddSoundCard key={sound.id} sound={sound} />
+          <AddSoundCard
+            key={sound.id}
+            sound={sound}
+            isSelected={selectedSoundIds.includes(sound.id)}
+            onToggle={toggleSound}
+          />
         ))}
       </div>
     </aside>

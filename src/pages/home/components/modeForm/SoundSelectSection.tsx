@@ -1,33 +1,21 @@
 import { useState } from 'react';
 
+import { useSoundLibraryData } from '../../hooks/useSoundLibraryData';
 import SearchBar from '../sound/SearchBar';
 import SoundCategoryAccordion from './SoundCategoryAccordion';
 
-import type { Sound, SoundCategory } from '../../types/soundFiltering';
+interface SoundSelectSectionProps {
+  selectedSoundIds: number[];
+  onToggleSound: (soundId: number) => void;
+}
 
-const soundsByCategory: Record<SoundCategory, Sound[]> = {
-  긴급: [
-    { id: 'knock', name: '노크 소리', category: '긴급', iconLabel: '문' },
-    { id: 'alarm', name: '화재 경보', category: '긴급', iconLabel: '불' },
-  ],
-  생활음: [],
-  길거리: [],
-  '사람 소리': [],
-};
-
-const SoundSelectSection = () => {
+const SoundSelectSection = ({ selectedSoundIds, onToggleSound }: SoundSelectSectionProps) => {
+  const { data, isLoading, error } = useSoundLibraryData();
   const [keyword, setKeyword] = useState('');
-  const [selectedSoundIds, setSelectedSoundIds] = useState<string[]>([]);
 
+  const categories = data?.categories ?? [];
+  const sounds = data?.sounds ?? [];
   const selectedCount = selectedSoundIds.length;
-
-  const toggleSound = (soundId: string) => {
-    setSelectedSoundIds((currentSoundIds) =>
-      currentSoundIds.includes(soundId)
-        ? currentSoundIds.filter((currentSoundId) => currentSoundId !== soundId)
-        : [...currentSoundIds, soundId],
-    );
-  };
 
   return (
     <section aria-labelledby="sound-select-title">
@@ -35,14 +23,19 @@ const SoundSelectSection = () => {
         <h2 id="sound-select-title">소리 선택</h2>
         <span>{selectedCount}개 선택됨</span>
       </div>
+      {isLoading && <p>소리 목록을 불러오는 중입니다.</p>}
+      {error && <p role="alert">{error.message}</p>}
       <SearchBar value={keyword} onChange={setKeyword} />
-      {Object.entries(soundsByCategory).map(([category, sounds]) => (
+      {categories.map((category) => (
         <SoundCategoryAccordion
           key={category}
-          category={category as SoundCategory}
-          sounds={sounds.filter((sound) => sound.name.includes(keyword))}
+          category={category}
+          sounds={sounds.filter(
+            (sound) =>
+              sound.category === category && sound.name.includes(keyword),
+          )}
           selectedSoundIds={selectedSoundIds}
-          onToggleSound={toggleSound}
+          onToggleSound={onToggleSound}
         />
       ))}
     </section>
