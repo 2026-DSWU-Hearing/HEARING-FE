@@ -1,4 +1,4 @@
-import Navigation from '@/shared/components/layout/Navigation';
+import Navigation from '@/layout/Navigation';
 import AppRouter from '@/routes/AppRouter';
 import '@/App.css';
 
