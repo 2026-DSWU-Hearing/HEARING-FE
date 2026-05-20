@@ -1,17 +1,22 @@
-[
-  {
-    "id": 1,
-    "name": "실외",
-    "iconLabel": "가방"
-  },
-  {
-    "id": 2,
-    "name": "가정",
-    "iconLabel": "집"
-  },
-  {
-    "id": 3,
-    "name": "업무",
-    "iconLabel": "카드"
-  }
-]
+{
+  "modes": [
+    {
+      "mode_id": 1,
+      "name": "실외",
+      "icon": "바깥",
+      "is_active": false
+    },
+    {
+      "mode_id": 2,
+      "name": "가정",
+      "icon": "집",
+      "is_active": true
+    },
+    {
+      "mode_id": 3,
+      "name": "업무",
+      "icon": "직장 가방",
+      "is_active": false
+    }
+  ]
+}

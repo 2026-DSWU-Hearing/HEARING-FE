@@ -5,7 +5,9 @@ import ModeNameField from './ModeNameField';
 import PageHeader from './PageHeader';
 import SoundSelectSection from './SoundSelectSection';
 
-interface ModeFormProps {
+import type { ModeRequestBodyTypes } from '../../types/soundFiltering';
+
+interface ModeFormPropTypes {
   title: string;
   nameLabel: string;
   submitLabel: string;
@@ -19,12 +21,12 @@ const ModeForm = ({
   submitLabel,
   initialName = '',
   showDeleteButton = false,
-}: ModeFormProps) => {
+}: ModeFormPropTypes) => {
   const [modeName, setModeName] = useState(initialName);
   const [selectedIconId, setSelectedIconId] = useState('icon-10');
   const [selectedSoundIds, setSelectedSoundIds] = useState<number[]>([]);
 
-  const toggleSound = (soundId: number) => {
+  const handleToggleSound = (soundId: number) => {
     setSelectedSoundIds((currentSoundIds) =>
       currentSoundIds.includes(soundId)
         ? currentSoundIds.filter((id) => id !== soundId)
@@ -33,13 +35,23 @@ const ModeForm = ({
   };
 
   const handleSubmit = () => {
+    const modeRequestBody: ModeRequestBodyTypes = {
+      name: modeName,
+      icon: selectedIconId,
+      sound_ids: selectedSoundIds,
+    };
+
     // TODO: API 연동 시 구현
-    console.log({ modeName, selectedIconId, selectedSoundIds });
+    console.log(modeRequestBody);
   };
 
   return (
     <main>
-      <PageHeader title={title} submitLabel={submitLabel} onSubmit={handleSubmit} />
+      <PageHeader
+        title={title}
+        submitLabel={submitLabel}
+        onSubmit={handleSubmit}
+      />
       <ModeNameField
         label={nameLabel}
         value={modeName}
@@ -51,11 +63,9 @@ const ModeForm = ({
       />
       <SoundSelectSection
         selectedSoundIds={selectedSoundIds}
-        onToggleSound={toggleSound}
+        onToggleSound={handleToggleSound}
       />
-      {showDeleteButton && (
-        <button type="button">모드 삭제하기</button>
-      )}
+      {showDeleteButton && <button type="button">모드 삭제하기</button>}
     </main>
   );
 };

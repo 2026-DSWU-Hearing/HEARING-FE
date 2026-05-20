@@ -1,0 +1,83 @@
+{
+  "modes": [
+    {
+      "mode_id": 1,
+      "name": "실외",
+      "icon": "바깥",
+      "is_active": false,
+      "sounds": [
+        {
+          "sound_id": 3,
+          "name": "화재 경보",
+          "category": "긴급"
+        },
+        {
+          "sound_id": 4,
+          "name": "총소리",
+          "category": "긴급"
+        },
+        {
+          "sound_id": 5,
+          "name": "대화 소리",
+          "category": "사람 소리"
+        },
+        {
+          "sound_id": 7,
+          "name": "자동차 엔진 소리",
+          "category": "길거리"
+        }
+      ]
+    },
+    {
+      "mode_id": 2,
+      "name": "가정",
+      "icon": "집",
+      "is_active": true,
+      "sounds": [
+        {
+          "sound_id": 1,
+          "name": "아기 울음소리",
+          "category": "사람 소리"
+        },
+        {
+          "sound_id": 2,
+          "name": "노크 소리",
+          "category": "생활음"
+        },
+        {
+          "sound_id": 3,
+          "name": "화재 경보",
+          "category": "긴급"
+        },
+        {
+          "sound_id": 6,
+          "name": "물 끓는 소리",
+          "category": "생활음"
+        }
+      ]
+    },
+    {
+      "mode_id": 3,
+      "name": "업무",
+      "icon": "직장 가방",
+      "is_active": false,
+      "sounds": [
+        {
+          "sound_id": 2,
+          "name": "노크 소리",
+          "category": "생활음"
+        },
+        {
+          "sound_id": 5,
+          "name": "대화 소리",
+          "category": "사람 소리"
+        },
+        {
+          "sound_id": 7,
+          "name": "자동차 엔진 소리",
+          "category": "길거리"
+        }
+      ]
+    }
+  ]
+}

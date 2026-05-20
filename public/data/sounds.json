@@ -1,38 +1,46 @@
-[
-  {
-    "id": 1,
-    "name": "아기 울음소리",
-    "category": "생활음",
-    "iconLabel": "물방울"
-  },
-  {
-    "id": 2,
-    "name": "노크 소리",
-    "category": "생활음",
-    "iconLabel": "문"
-  },
-  {
-    "id": 3,
-    "name": "화재 경보",
-    "category": "긴급",
-    "iconLabel": "불"
-  },
-  {
-    "id": 4,
-    "name": "사이렌 소리",
-    "category": "긴급",
-    "iconLabel": "사이렌"
-  },
-  {
-    "id": 5,
-    "name": "자동차 경적",
-    "category": "길거리",
-    "iconLabel": "자동차"
-  },
-  {
-    "id": 6,
-    "name": "사람 목소리",
-    "category": "사람 소리",
-    "iconLabel": "사람"
-  }
-]
+{
+  "sounds": [
+    {
+      "sound_id": 1,
+      "name": "아기 울음소리",
+      "category_id": 4,
+      "category_name": "사람 소리"
+    },
+    {
+      "sound_id": 2,
+      "name": "노크 소리",
+      "category_id": 2,
+      "category_name": "생활음"
+    },
+    {
+      "sound_id": 3,
+      "name": "화재 경보",
+      "category_id": 1,
+      "category_name": "긴급"
+    },
+    {
+      "sound_id": 4,
+      "name": "총소리",
+      "category_id": 1,
+      "category_name": "긴급"
+    },
+    {
+      "sound_id": 5,
+      "name": "대화 소리",
+      "category_id": 4,
+      "category_name": "사람 소리"
+    },
+    {
+      "sound_id": 6,
+      "name": "물 끓는 소리",
+      "category_id": 2,
+      "category_name": "생활음"
+    },
+    {
+      "sound_id": 7,
+      "name": "자동차 엔진 소리",
+      "category_id": 3,
+      "category_name": "길거리"
+    }
+  ]
+}
