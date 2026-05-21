@@ -1,37 +1,43 @@
-import { useGetModes } from '@/pages/home/hooks/useGetModes';
+import { Link } from 'react-router-dom';
+import { usePatchActivateMode } from '@/pages/home/hooks/usePatchActivateMode';
+import type { ModeTypes } from '@/pages/home/types/modeTypes';
 
-const ModeCard = () => {
-  const { data, isLoading, isError } = useGetModes();
+interface ModeCardPropTypes {
+  mode: ModeTypes;
+}
 
-  if (isLoading) {
-    {
-      /* 이후 로딩 스피너로 변경 */
-    }
-    return <div>불러오는 중...</div>;
-  }
+const ModeCard = ({ mode }: ModeCardPropTypes) => {
+  const { mutate: activateMode } = usePatchActivateMode();
 
-  if (isError) {
-    {
-      /* 이후 에러 페이지로 변경 */
-    }
-    return <div>모드 목록을 불러오지 못했습니다</div>;
-  }
+  const handleActivateModeClick = () => {
+    activateMode(mode.mode_id);
+  };
+
+  const handleMoveModeSettingClick = (
+    event: React.MouseEvent<HTMLAnchorElement>,
+  ) => {
+    event.stopPropagation();
+  };
 
   return (
-    <div className="flex flex-col gap-4">
-      {data?.modes.map((mode) => (
-        <div
-          key={mode.mode_id}
-          className={`flex cursor-pointer flex-col gap-4 rounded-lg ${
-            mode.is_active
-              ? 'bg-amber-500 ring-2 ring-amber-600'
-              : 'bg-gray-300'
-          }`}
+    <div
+      onClick={handleActivateModeClick}
+      className={`flex cursor-pointer flex-col gap-4 rounded-lg p-4 ${
+        mode.is_active ? 'bg-amber-500 ring-2 ring-amber-600' : 'bg-gray-300'
+      }`}
+    >
+      <div className="flex flex-row justify-center gap-10">
+        <span>{mode.icon}</span>
+
+        <Link
+          to={`/modes/${mode.mode_id}`}
+          onClick={handleMoveModeSettingClick}
         >
-          <span>{mode.icon}</span>
-          <span>{mode.name}</span>
-        </div>
-      ))}
+          <span>{'>'}</span>
+        </Link>
+      </div>
+
+      <span className="flex justify-end">{mode.name}</span>
     </div>
   );
 };

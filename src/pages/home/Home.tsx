@@ -1,12 +1,10 @@
-import React from 'react';
-import HomeHeader from './components/HomeHeader';
-import ModeCard from './components/mode/ModeCard';
-
+import HomeHeader from '@/pages/home/components/HomeHeader';
+import ModeList from './components/mode/ModeList';
 const Home = () => {
   return (
     <div>
       <HomeHeader />
-      <ModeCard />
+      <ModeList />
     </div>
   );
 };
