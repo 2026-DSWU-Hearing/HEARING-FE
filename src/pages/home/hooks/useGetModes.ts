@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getModes } from '@/pages/home/apis/modeApi';
+import { getModes } from '@/pages/home/apis/getModes';
 
 export const useGetModes = () => {
   return useQuery({

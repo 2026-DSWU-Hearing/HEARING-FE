@@ -1,14 +1,19 @@
-import React from 'react';
-import { useGetModes } from '../../hooks/useGetModes';
+import { useGetModes } from '@/pages/home/hooks/useGetModes';
 
 const ModeCard = () => {
   const { data, isLoading, isError } = useGetModes();
 
   if (isLoading) {
+    {
+      /* 이후 로딩 스피너로 변경 */
+    }
     return <div>불러오는 중...</div>;
   }
 
   if (isError) {
+    {
+      /* 이후 에러 페이지로 변경 */
+    }
     return <div>모드 목록을 불러오지 못했습니다</div>;
   }
 
