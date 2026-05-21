@@ -4,12 +4,15 @@ import type { ModeTypes } from '@/pages/home/types/modeTypes';
 
 interface ModeCardPropTypes {
   mode: ModeTypes;
+  isSelected: boolean;
+  onModeSelect: (modeId: number) => void;
 }
 
-const ModeCard = ({ mode }: ModeCardPropTypes) => {
+const ModeCard = ({ mode, isSelected, onModeSelect }: ModeCardPropTypes) => {
   const { mutate: activateMode } = usePatchActivateMode();
 
   const handleActivateModeClick = () => {
+    onModeSelect(mode.mode_id);
     activateMode(mode.mode_id);
   };
 
@@ -22,22 +25,22 @@ const ModeCard = ({ mode }: ModeCardPropTypes) => {
   return (
     <div
       onClick={handleActivateModeClick}
-      className={`flex cursor-pointer flex-col gap-4 rounded-lg p-4 ${
-        mode.is_active ? 'bg-amber-500 ring-2 ring-amber-600' : 'bg-gray-300'
+      className={`flex min-h-24 flex-1 cursor-pointer flex-col justify-between rounded-2xl p-4 ${
+        isSelected ? 'border-2 border-black bg-gray-300' : 'bg-gray-300'
       }`}
     >
-      <div className="flex flex-row justify-center gap-10">
+      <div className="flex flex-row justify-between gap-4 text-xl font-bold">
         <span>{mode.icon}</span>
 
         <Link
-          to={`/modes/${mode.mode_id}`}
+          to={`/modes/${mode.mode_id}/settings`}
           onClick={handleMoveModeSettingClick}
         >
           <span>{'>'}</span>
         </Link>
       </div>
 
-      <span className="flex justify-end">{mode.name}</span>
+      <span className="flex justify-end text-xl font-bold">{mode.name}</span>
     </div>
   );
 };

@@ -1,12 +1,6 @@
 import http from '@/shared/apis/axios';
-import {
-  soundCategoriesMock,
-  soundsMock,
-  updateModeSoundsMock,
-} from '@/pages/home/mocks/soundMock';
+import { updateModeSoundsMock } from '@/pages/home/mocks/soundMock';
 import type {
-  GetSoundCategoriesResponseTypes,
-  GetSoundsResponseTypes,
   UpdateModeSoundsRequestTypes,
   UpdateModeSoundsResponseTypes,
 } from '@/pages/home/types/soundTypes';

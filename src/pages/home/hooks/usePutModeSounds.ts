@@ -26,7 +26,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { putModeSounds } from '../apis/putModeSounds';
 import type { GetModeDetailResponseTypes } from '@/pages/home/types/modeTypes';
-import type { UpdateModeSoundsRequestTypes } from '@/pages/home/types/soundTypes';
+import type {
+  GetSoundsResponseTypes,
+  UpdateModeSoundsRequestTypes,
+} from '@/pages/home/types/soundTypes';
 
 export const usePutModeSounds = () => {
   const queryClient = useQueryClient();
@@ -41,6 +44,10 @@ export const usePutModeSounds = () => {
     }) => putModeSounds(modeId, soundsData),
 
     onSuccess: (data) => {
+      const soundsData = queryClient.getQueryData<GetSoundsResponseTypes>([
+        'sounds',
+      ]);
+
       queryClient.setQueryData<GetModeDetailResponseTypes>(
         ['modes', data.mode_id],
         (old) => {
@@ -52,10 +59,13 @@ export const usePutModeSounds = () => {
               const oldSound = old.sounds.find(
                 (item) => item.sound_id === sound.sound_id,
               );
+              const currentSound = soundsData?.sounds.find(
+                (item) => item.sound_id === sound.sound_id,
+              );
 
               return {
                 ...sound,
-                category: oldSound?.category ?? '',
+                category: oldSound?.category ?? currentSound?.category_name ?? '',
               };
             }),
           };
