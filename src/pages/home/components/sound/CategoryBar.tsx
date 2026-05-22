@@ -1,5 +1,5 @@
 import CategoryBlock from '@/pages/home/components/sound/CategoryBlock';
-import { useGetSoundCategories } from '@/pages/home/hooks/useGetSoundCategories';
+import { useCategoryBar } from '@/pages/home/hooks/useCategoryBar';
 
 interface CategoryBarPropTypes {
   selectedCategory: string | null;
@@ -10,15 +10,13 @@ const CategoryBar = ({
   selectedCategory,
   onCategoryChange,
 }: CategoryBarPropTypes) => {
-  const { data, isLoading, isError } = useGetSoundCategories();
-
-  const handleAllCategoryClick = () => {
-    onCategoryChange(null);
-  };
-
-  const handleCategoryChange = (categoryName: string) => {
-    onCategoryChange(categoryName);
-  };
+  const {
+    categories,
+    isLoading,
+    isError,
+    handleAllCategoryClick,
+    handleCategoryChange,
+  } = useCategoryBar({ onCategoryChange });
 
   return (
     <div className="flex gap-3 overflow-x-auto py-1">
@@ -46,7 +44,7 @@ const CategoryBar = ({
         </span>
       )}
 
-      {data?.categories.map((category) => (
+      {categories.map((category) => (
         <CategoryBlock
           key={category.category_id}
           categoryName={category.name}

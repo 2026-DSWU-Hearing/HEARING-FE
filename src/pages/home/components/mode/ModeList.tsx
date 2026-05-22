@@ -1,24 +1,9 @@
-import { useEffect } from 'react';
 import AddBtn from '@/pages/home/components/AddBtn';
 import ModeCard from '@/pages/home/components/mode/ModeCard';
-import { useGetModes } from '@/pages/home/hooks/useGetModes';
+import { useModeList } from '@/pages/home/hooks/useModeList';
 
-interface ModeListPropTypes {
-  selectedModeId: number | null;
-  onModeSelect: (modeId: number) => void;
-}
-
-const ModeList = ({ selectedModeId, onModeSelect }: ModeListPropTypes) => {
-  const { data, isLoading, isError } = useGetModes();
-
-  useEffect(() => {
-    if (!data?.modes.length || selectedModeId !== null) return;
-
-    const activeMode = data.modes.find((mode) => mode.is_active);
-    const defaultMode = activeMode ?? data.modes[0];
-
-    onModeSelect(defaultMode.mode_id);
-  }, [data?.modes, onModeSelect, selectedModeId]);
+const ModeList = () => {
+  const { modes, selectedModeId, isLoading, isError } = useModeList();
 
   if (isLoading) {
     return <div>불러오는 중...</div>;
@@ -31,12 +16,11 @@ const ModeList = ({ selectedModeId, onModeSelect }: ModeListPropTypes) => {
   return (
     <section className="mt-8">
       <div className="flex flex-row justify-between gap-3">
-        {data?.modes.map((mode) => (
+        {modes.map((mode) => (
           <ModeCard
             key={mode.mode_id}
             mode={mode}
             isSelected={mode.mode_id === selectedModeId}
-            onModeSelect={onModeSelect}
           />
         ))}
       </div>

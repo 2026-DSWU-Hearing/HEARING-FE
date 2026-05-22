@@ -1,4 +1,4 @@
-import { useReducer } from 'react';
+import { useCallback, useReducer } from 'react';
 
 interface ModeSoundStateTypes {
   isEditMode: boolean;
@@ -35,6 +35,7 @@ const modeSoundReducer = (
   state: ModeSoundStateTypes,
   action: ModeSoundActionTypes,
 ): ModeSoundStateTypes => {
+  // 편집 모드, 모달, 선택 초기화처럼 서로 연결된 UI 상태를 한곳에서 관리한다.
   switch (action.type) {
     case 'TOGGLE_EDIT_MODE':
       return {
@@ -93,33 +94,33 @@ export const useModeSoundState = () => {
     INITIAL_MODE_SOUND_STATE,
   );
 
-  const toggleEditMode = () => {
+  const toggleEditMode = useCallback(() => {
     dispatch({ type: 'TOGGLE_EDIT_MODE' });
-  };
+  }, []);
 
-  const closeEditMode = () => {
+  const closeEditMode = useCallback(() => {
     dispatch({ type: 'CLOSE_EDIT_MODE' });
-  };
+  }, []);
 
-  const openAddSoundModal = () => {
+  const openAddSoundModal = useCallback(() => {
     dispatch({ type: 'OPEN_ADD_SOUND_MODAL' });
-  };
+  }, []);
 
-  const closeAddSoundModal = () => {
+  const closeAddSoundModal = useCallback(() => {
     dispatch({ type: 'CLOSE_ADD_SOUND_MODAL' });
-  };
+  }, []);
 
-  const toggleRemoveSound = (soundId: number) => {
+  const toggleRemoveSound = useCallback((soundId: number) => {
     dispatch({ type: 'TOGGLE_REMOVE_SOUND', soundId });
-  };
+  }, []);
 
-  const resetRemoveSounds = () => {
+  const resetRemoveSounds = useCallback(() => {
     dispatch({ type: 'RESET_REMOVE_SOUNDS' });
-  };
+  }, []);
 
-  const toggleDisabledSound = (modeId: number, soundId: number) => {
+  const toggleDisabledSound = useCallback((modeId: number, soundId: number) => {
     dispatch({ type: 'TOGGLE_DISABLED_SOUND', modeId, soundId });
-  };
+  }, []);
 
   return {
     state,

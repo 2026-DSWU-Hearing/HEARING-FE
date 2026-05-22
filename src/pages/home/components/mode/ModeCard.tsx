@@ -1,26 +1,16 @@
 import { Link } from 'react-router-dom';
-import { usePatchActivateMode } from '@/pages/home/hooks/usePatchActivateMode';
+import { useModeCard } from '@/pages/home/hooks/useModeCard';
 import type { ModeTypes } from '@/pages/home/types/modeTypes';
 
 interface ModeCardPropTypes {
   mode: ModeTypes;
   isSelected: boolean;
-  onModeSelect: (modeId: number) => void;
 }
 
-const ModeCard = ({ mode, isSelected, onModeSelect }: ModeCardPropTypes) => {
-  const { mutate: activateMode } = usePatchActivateMode();
-
-  const handleActivateModeClick = () => {
-    onModeSelect(mode.mode_id);
-    activateMode(mode.mode_id);
-  };
-
-  const handleMoveModeSettingClick = (
-    event: React.MouseEvent<HTMLAnchorElement>,
-  ) => {
-    event.stopPropagation();
-  };
+const ModeCard = ({ mode, isSelected }: ModeCardPropTypes) => {
+  const { handleActivateModeClick, handleMoveModeSettingClick } = useModeCard({
+    modeId: mode.mode_id,
+  });
 
   return (
     <div

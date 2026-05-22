@@ -1,17 +1,17 @@
-import { useEffect, useState } from 'react';
 import Input from '@/pages/home/components/modeForm/Input';
 import ModeDeleteBtn from '@/pages/home/components/modeForm/ModeDeleteBtn';
+import {
+  ModeFormProvider,
+  useModeFormContext,
+} from '@/pages/home/components/modeForm/ModeFormContext';
 import ModeHeader from '@/pages/home/components/modeForm/ModeHeader';
 import ModeIconPicker from '@/pages/home/components/modeForm/ModeIconPicker';
+import type {
+  ModeFormPageTypes,
+  ModeFormSubmitDataTypes,
+} from '@/pages/home/components/modeForm/ModeFormContext';
 
-type ModeFormPageTypes = 'create' | 'edit';
-
-interface ModeFormSubmitDataTypes {
-  name: string;
-  icon: string;
-}
-
-interface ModeFormPropTypes {
+export interface ModeFormPropTypes {
   pageType: ModeFormPageTypes;
   initialName?: string;
   initialIcon?: string;
@@ -22,41 +22,24 @@ interface ModeFormPropTypes {
   onDelete?: () => void;
 }
 
-const DEFAULT_MODE_ICON = '집';
-
-const ModeForm = ({
-  pageType,
-  initialName = '',
-  initialIcon = DEFAULT_MODE_ICON,
-  errorMessage,
-  isSubmitting = false,
-  isDeleting = false,
-  onSubmit,
-  onDelete,
-}: ModeFormPropTypes) => {
-  const [modeName, setModeName] = useState(initialName);
-  const [selectedIcon, setSelectedIcon] = useState(initialIcon);
-
-  const isEditPage = pageType === 'edit';
-  const headerTitle = isEditPage ? '모드 설정' : '새 모드 만들기';
-  const headerActionLabel = isEditPage ? '완료' : '저장';
-  const modeNameLabel = isEditPage ? '모드 이름 수정' : '모드 이름';
-  const iconTitle = isEditPage ? '아이콘 수정' : '아이콘 선택';
-
-  useEffect(() => {
-    setModeName(initialName);
-  }, [initialName]);
-
-  useEffect(() => {
-    setSelectedIcon(initialIcon);
-  }, [initialIcon]);
-
-  const handleSubmitClick = () => {
-    onSubmit({
-      name: modeName,
-      icon: selectedIcon,
-    });
-  };
+const ModeFormContent = () => {
+  const {
+    modeName,
+    selectedIcon,
+    isEditPage,
+    headerTitle,
+    headerActionLabel,
+    modeNameLabel,
+    iconTitle,
+    errorMessage,
+    isSubmitting,
+    isDeleting,
+    hasDeleteAction,
+    handleModeNameChange,
+    handleIconSelect,
+    handleSubmitClick,
+    handleDeleteClick,
+  } = useModeFormContext();
 
   return (
     <div className="min-h-dvh px-6 py-8">
@@ -72,7 +55,7 @@ const ModeForm = ({
           label={modeNameLabel}
           value={modeName}
           placeholder="예: 주방"
-          onChange={setModeName}
+          onChange={handleModeNameChange}
         />
 
         <section>
@@ -83,7 +66,7 @@ const ModeForm = ({
           <div className="mt-6">
             <ModeIconPicker
               selectedIcon={selectedIcon}
-              onIconSelect={setSelectedIcon}
+              onIconSelect={handleIconSelect}
             />
           </div>
         </section>
@@ -94,13 +77,21 @@ const ModeForm = ({
           </p>
         )}
 
-        {isEditPage && onDelete && (
+        {isEditPage && hasDeleteAction && (
           <div className="flex justify-center">
-            <ModeDeleteBtn onClick={onDelete} disabled={isDeleting} />
+            <ModeDeleteBtn onClick={handleDeleteClick} disabled={isDeleting} />
           </div>
         )}
       </main>
     </div>
+  );
+};
+
+const ModeForm = (props: ModeFormPropTypes) => {
+  return (
+    <ModeFormProvider {...props}>
+      <ModeFormContent />
+    </ModeFormProvider>
   );
 };
 

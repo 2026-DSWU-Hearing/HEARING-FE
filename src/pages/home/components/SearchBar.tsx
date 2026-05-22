@@ -1,6 +1,4 @@
-import { useEffect, useState } from 'react';
-import type { ChangeEvent } from 'react';
-import { useThrottleValue } from '@/shared/hooks/useThrottleValue';
+import { useSearchBar } from '@/pages/home/hooks/useSearchBar';
 
 interface SearchBarPropTypes {
   value: string;
@@ -15,22 +13,11 @@ const SearchBar = ({
   onChange,
   throttleDelay = 300,
 }: SearchBarPropTypes) => {
-  const [inputValue, setInputValue] = useState(value);
-  const throttledInputValue = useThrottleValue(inputValue, throttleDelay);
-
-  useEffect(() => {
-    setInputValue(value);
-  }, [value]);
-
-  useEffect(() => {
-    onChange(throttledInputValue);
-  }, [onChange, throttledInputValue]);
-
-  const handleSearchInputChange = (
-    event: ChangeEvent<HTMLInputElement>,
-  ) => {
-    setInputValue(event.target.value);
-  };
+  const { inputValue, handleSearchInputChange } = useSearchBar({
+    value,
+    throttleDelay,
+    onChange,
+  });
 
   return (
     <label className="flex items-center rounded-full bg-neutral-100 px-4 py-3">
