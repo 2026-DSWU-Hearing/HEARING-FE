@@ -1,9 +1,205 @@
-:root {
+@theme {
   /*색상*/
-  --color-primary: #3b82f6;
   --color-background: #f9fafb;
 
-  /* 폰트 */
-  --font-base: 'Pretendard', system-ui, sans-serif;
-  --font-size-base: 16px;
+  /* radius */
+  --radius-pill: 999px;
+  --radius-2xl: 24px;
+  --radius-xl: 16px;
+  --radius-lg: 12px;
+  --radius-md: 8px;
+  --radius-sm: 4px;
+  --radius-xs: 2px;
+
+  /* Spacing */
+  --spacing-3xl: 3.5rem; /* 56px */
+  --spacing-2xl: 2.5rem; /* 40px */
+  --spacing-xl: 2rem; /* 32px */
+  --spacing-lg: 1.5rem; /* 24px */
+  --spacing-base: 1rem; /* 16px */
+  --spacing-sm: 0.75rem; /* 12px */
+  --spacing-xs: 0.5rem; /* 8px */
+  --spacing-xxs: 0.25rem; /* 4px */
+  --spacing-xxxs: 0.125rem; /* 2px */
+
+  /* Icon Size */
+  --spacing-icon-hero: 1.75rem; /* 28px */
+  --spacing-icon-lg: 1.5rem; /* 24px */
+  --spacing-icon-md: 1.25rem; /* 20px */
+  --spacing-icon-sm: 1rem; /* 16px */
+
+  /* Opacity */
+  --opacity-opaque: 1;
+  --opacity-overlay: 0.8;
+  --opacity-medium: 0.6;
+  --opacity-muted: 0.3;
+  --opacity-subtle: 0.16;
+  --opacity-semi-transparent: 0.08;
+  --opacity-invisible: 0;
+
+  /* Blur */
+  --blur-xl: 40px;
+  --blur-lg: 24px;
+  --blur-md: 12px;
+  --blur-sm: 6px;
+  --blur-xs: 4px;
+}
+
+/* Text Styles*/
+@utility heading-5xl-bold {
+  font-size: 2rem;
+  line-height: 135%;
+  font-weight: 700;
+}
+
+@utility heading-5xl-semibold {
+  font-size: 2rem;
+  line-height: 135%;
+  font-weight: 700;
+}
+@utility heading-4xl-semibold {
+  font-size: 1.75rem;
+  line-height: 135%;
+  font-weight: 600;
+}
+@utility heading-3xl-semibold {
+  font-size: 1.5rem;
+  line-height: 135%;
+  font-weight: 600;
+}
+@utility heading-3xl-bold {
+  font-size: 1.5rem;
+  line-height: 135%;
+  font-weight: 700;
+}
+
+@utility heading-2xl-bold {
+  font-size: 1.25rem;
+  line-height: 140%;
+  font-weight: 700;
+}
+
+@utility heading-2xl-semibold {
+  font-size: 1.25rem;
+  line-height: 140%;
+  font-weight: 600;
+}
+
+@utility heading-xl-bold {
+  font-size: 1.125rem;
+  line-height: 140%;
+  font-weight: 700;
+}
+
+@utility heading-xl-semibold {
+  font-size: 1.125rem;
+  line-height: 140%;
+  font-weight: 600;
+}
+
+@utility heading-lg-bold {
+  font-size: 1rem;
+  line-height: 140%;
+  font-weight: 700;
+}
+
+@utility heading-lg-semibold {
+  font-size: 1rem;
+  line-height: 140%;
+  font-weight: 600;
+}
+
+@utility heading-base-semibold {
+  font-size: 0.875rem;
+  line-height: 150%;
+  font-weight: 600;
+}
+
+@utility body-2xl-regular {
+  font-size: 1.25rem;
+  line-height: 145%;
+  font-weight: 400;
+}
+
+@utility body-xl-regular {
+  font-size: 1.125rem;
+  line-height: 145%;
+  font-weight: 400;
+}
+
+@utility body-lg-medium {
+  font-size: 1rem;
+  line-height: 145%;
+  font-weight: 500;
+}
+
+@utility body-lg-regular {
+  font-size: 1rem;
+  line-height: 145%;
+  font-weight: 400;
+}
+
+@utility body-base-medium {
+  font-size: 0.875rem;
+  line-height: 150%;
+  font-weight: 500;
+}
+
+@utility body-base-regular {
+  font-size: 0.875rem;
+  line-height: 150%;
+  font-weight: 400;
+}
+
+@utility body-sm-regular {
+  font-size: 0.8125rem;
+  line-height: 145%;
+  font-weight: 400;
+}
+
+@utility caption-xs-semibold {
+  font-size: 0.75rem;
+  line-height: 145%;
+  font-weight: 600;
+}
+
+@utility caption-xs-medium {
+  font-size: 0.75rem;
+  line-height: 145%;
+  font-weight: 500;
+}
+
+@utility caption-xxs-regular {
+  font-size: 0.6875rem;
+  line-height: 145%;
+  font-weight: 400;
+}
+
+/* opacity */
+@utility opacity-opaque {
+  opacity: var(--opacity-opaque);
+}
+
+@utility opacity-overlay {
+  opacity: var(--opacity-overlay);
+}
+
+@utility opacity-medium {
+  opacity: var(--opacity-medium);
+}
+
+@utility opacity-muted {
+  opacity: var(--opacity-muted);
+}
+
+@utility opacity-subtle {
+  opacity: var(--opacity-subtle);
+}
+
+@utility opacity-semi-transparent {
+  opacity: var(--opacity-semi-transparent);
+}
+
+@utility opacity-invisible {
+  opacity: var(--opacity-invisible);
 }
