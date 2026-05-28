@@ -2,6 +2,7 @@
   /* 폰트 */
   --font-base: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
   --font-size-base: 1rem;
+
   /* 색상 */
   --color-white: #fcfcfc;
   --color-black: #181818;
@@ -109,6 +110,14 @@
   --blur-md: 12px;
   --blur-sm: 6px;
   --blur-xs: 4px;
+
+  /* Effect */
+  --shadow-light: 0 0 20px 0 rgb(255 249 212 / 50%);
+
+  /* Glass */
+  --glass-tag-background: rgb(255 255 255 / 8%);
+  --glass-tag-border: rgb(255 255 255 / 16%);
+  --glass-tag-blur: 29px;
 }
 
 /* layout */
@@ -279,4 +288,12 @@
 
 @utility opacity-invisible {
   opacity: var(--opacity-invisible);
+}
+
+/* glass effect */
+@utility tag-glass-effect {
+  background-color: var(--glass-tag-background);
+  border: 1px solid var(--glass-tag-border);
+  backdrop-filter: blur(var(--glass-tag-blur));
+  -webkit-backdrop-filter: blur(var(--glass-tag-blur));
 }
