@@ -9,7 +9,7 @@ body {
   margin: 0;
   font-family: var(--font-base);
   font-size: var(--font-size-base);
-  background-color: var(--color-background);
+  background-color: var(--color-background-neutral-base);
 }
 
 /* 앱 컨테이너 */

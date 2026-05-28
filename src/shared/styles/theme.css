@@ -2,8 +2,63 @@
   /* 폰트 */
   --font-base: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
   --font-size-base: 1rem;
-  /*색상*/
-  --color-background: #f9fafb;
+  /* 색상 */
+  --color-white: #fcfcfc;
+  --color-black: #181818;
+  /* primary */
+  --color-primary-50: #fffdf0;
+  --color-primary-100: #fff9d4;
+  --color-primary-200: #fff0a1;
+  --color-primary-300: #ffe26e;
+  --color-primary-400: #ffd142;
+  --color-primary-500: #f2b204;
+  --color-primary-600: #cd9300;
+  --color-primary-700: #a27100;
+  --color-primary-800: #785100;
+  --color-primary-900: #4e3300;
+  --color-primary-950: #2d1d00;
+  /* secondary */
+  --color-secondary-50: #f0f4fc;
+  --color-secondary-100: #d9e4f8;
+  --color-secondary-200: #b3caf2;
+  --color-secondary-300: #80a5e9;
+  --color-secondary-400: #4d7fdf;
+  --color-secondary-500: #1e4fa3;
+  --color-secondary-600: #163d82;
+  --color-secondary-700: #0f2c61;
+  --color-secondary-800: #091b3f;
+  --color-secondary-900: #050f24;
+  --color-secondary-950: #020612;
+  /* neutral */
+  --color-neutral-50: #f8f8f7;
+  --color-neutral-100: #eff0ee;
+  --color-neutral-200: #e2e3e0;
+  --color-neutral-300: #c7c8c5;
+  --color-neutral-400: #a9aaa6;
+  --color-neutral-500: #8c8d89;
+  --color-neutral-600: #6f706c;
+  --color-neutral-700: #535450;
+  --color-neutral-800: #393a36;
+  --color-neutral-900: #21221e;
+  --color-neutral-950: #11120f;
+  /* text */
+  --color-text-primary: #f8f8f7;
+  --color-text-secondary: #e2e3e0;
+  --color-text-tertiary: #a9aaa6;
+  --color-text-disabled: #6f706c;
+  --color-text-inverse: #11120f;
+  /* state */
+  --color-state-disabled: #c7c8c5;
+  --color-state-active: #df9a00;
+  --color-state-hover: #ffd142;
+  --color-state-alert: #f0342f;
+  --color-state-success: #77c419;
+  /* background */
+  --color-background-neutral-base: #21221e;
+  --color-background-neutral-surface-1: #535450;
+  --color-background-neutral-surface-2: #8c8d89;
+  --color-background-neutral-surface-input: #a9aaa6;
+  --color-background-neutral-surface-alert: #a9aaa6;
 
   /* Layout */
   --layout-mobile-column-count: 3;
