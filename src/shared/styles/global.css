@@ -1,13 +1,18 @@
 @import 'tailwindcss';
 @import './theme.css';
 
+* {
+  box-sizing: border-box;
+}
+
 body {
+  margin: 0;
   font-family: var(--font-base);
   font-size: var(--font-size-base);
   background-color: var(--color-background);
 }
 
-/* 엡 컨테이너 */
+/* 앱 컨테이너 */
 .app {
   /* 웹앱 너비 고정 */
   width: 100%;
