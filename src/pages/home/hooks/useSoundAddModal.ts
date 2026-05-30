@@ -1,18 +1,11 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useGetSounds } from '@/pages/home/hooks/useGetSounds';
 import type { SoundTypes } from '@/pages/home/types/soundTypes';
+import { toggleSoundId } from '@/pages/home/utils/toggleSoundId';
 
 interface UseSoundAddModalParamTypes {
   onComplete: (sounds: SoundTypes[]) => void;
 }
-
-const toggleSoundId = (soundIds: number[], soundId: number) => {
-  if (soundIds.includes(soundId)) {
-    return soundIds.filter((selectedSoundId) => selectedSoundId !== soundId);
-  }
-
-  return [...soundIds, soundId];
-};
 
 export const useSoundAddModal = ({
   onComplete,

@@ -1,8 +1,10 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { isAxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
 import type { ModeFormSubmitDataTypes } from '@/pages/home/components/modeForm/ModeFormContext';
+import { MAX_MODE_NAME_LENGTH } from '@/pages/home/components/modeForm/ModeFormContext';
 import { useGetModes } from '@/pages/home/hooks/useGetModes';
+import { useGetSounds } from '@/pages/home/hooks/useGetSounds';
 import { usePostMode } from '@/pages/home/hooks/usePostMode';
 import type { ModeSoundTypes } from '@/pages/home/types/modeTypes';
 
@@ -23,30 +25,42 @@ const getModeCreateErrorMessage = (error: unknown) => {
 export const useModeCreatePage = () => {
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState('');
-  // 소리 선택 UI가 연결되면 폼 리렌더 없이 선택 목록을 보관하기 위한 ref다.
-  const selectedSoundsRef = useRef<ModeSoundTypes[]>([]);
   const { data: modesData } = useGetModes();
+  const { data: soundsData } = useGetSounds();
   const { mutateAsync: createMode, isPending: isCreatingMode } = usePostMode();
 
   const handleModeCreateSubmit = async ({
     name,
     icon,
+    soundIds,
   }: ModeFormSubmitDataTypes) => {
     const trimmedName = name.trim();
-    const selectedSounds = selectedSoundsRef.current;
+    // 선택된 소리 id를 서버 전송용 { sound_id, name } 형태로 변환한다.
+    const allSounds = soundsData?.sounds ?? [];
+    const selectedSounds: ModeSoundTypes[] = allSounds
+      .filter((sound) => soundIds.includes(sound.sound_id))
+      .map((sound) => ({ sound_id: sound.sound_id, name: sound.name }));
 
     if (!trimmedName) {
       setErrorMessage('모드 이름을 입력해주세요');
       return;
     }
 
-    if ((modesData?.modes.length ?? 0) >= 6) {
-      setErrorMessage('모드는 최대 6개까지 만들 수 있습니다');
+    if (trimmedName.length > MAX_MODE_NAME_LENGTH) {
+      setErrorMessage(
+        `모드 이름은 ${MAX_MODE_NAME_LENGTH}글자 이하로 입력해주세요`,
+      );
       return;
     }
 
+    // canSubmit으로 막고 있지만, 핸들러가 직접 호출되는 경로를 방어한다.
     if (selectedSounds.length === 0) {
       setErrorMessage('소리를 1개 이상 선택해주세요');
+      return;
+    }
+
+    if ((modesData?.modes.length ?? 0) >= 6) {
+      setErrorMessage('모드는 최대 6개까지 만들 수 있습니다');
       return;
     }
 

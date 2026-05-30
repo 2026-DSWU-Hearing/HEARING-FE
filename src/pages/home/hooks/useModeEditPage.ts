@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { isAxiosError } from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { ModeFormSubmitDataTypes } from '@/pages/home/components/modeForm/ModeFormContext';
+import { MAX_MODE_NAME_LENGTH } from '@/pages/home/components/modeForm/ModeFormContext';
 import { useDeleteMode } from '@/pages/home/hooks/useDeleteMode';
 import { useGetModeDetail } from '@/pages/home/hooks/useGetModeDetail';
 import { useGetModes } from '@/pages/home/hooks/useGetModes';
 import { usePutMode } from '@/pages/home/hooks/usePutMode';
 
+// 에러 메시지 변환
 const getModeEditErrorMessage = (error: unknown) => {
   if (isAxiosError(error)) {
     if (error.response?.status === 400) {
@@ -25,6 +27,7 @@ const getModeEditErrorMessage = (error: unknown) => {
   return '모드 설정을 처리하지 못했습니다';
 };
 
+// 모드 수정 페이지에서 필요한 데이터 조회 + 수정/삭제 제출 로직을 한 곳에 모은 커스텀 훅
 export const useModeEditPage = () => {
   const { modeId } = useParams();
   const navigate = useNavigate();
@@ -44,6 +47,7 @@ export const useModeEditPage = () => {
   const handleModeUpdateSubmit = async ({
     name,
     icon,
+    // soundIds는 생성 폼 전용이다. 수정 페이지는 기존 소리 목록을 그대로 유지하므로 사용하지 않는다.
   }: ModeFormSubmitDataTypes) => {
     if (!modeDetailData) return;
 
@@ -51,6 +55,13 @@ export const useModeEditPage = () => {
 
     if (!trimmedName) {
       setErrorMessage('모드 이름을 입력해주세요');
+      return;
+    }
+
+    if (trimmedName.length > MAX_MODE_NAME_LENGTH) {
+      setErrorMessage(
+        `모드 이름은 ${MAX_MODE_NAME_LENGTH}글자 이하로 입력해주세요`,
+      );
       return;
     }
 

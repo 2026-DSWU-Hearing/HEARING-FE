@@ -7,12 +7,14 @@ import {
   useState,
 } from 'react';
 import type { ReactNode } from 'react';
+import { toggleSoundId } from '@/pages/home/utils/toggleSoundId';
 
 export type ModeFormPageTypes = 'create' | 'edit';
 
 export interface ModeFormSubmitDataTypes {
   name: string;
   icon: string;
+  soundIds: number[];
 }
 
 interface ModeFormProviderPropTypes {
@@ -30,6 +32,7 @@ interface ModeFormProviderPropTypes {
 interface ModeFormContextTypes {
   modeName: string;
   selectedIcon: string;
+  selectedSoundIds: number[];
   isEditPage: boolean;
   headerTitle: string;
   headerActionLabel: string;
@@ -39,13 +42,17 @@ interface ModeFormContextTypes {
   isSubmitting: boolean;
   isDeleting: boolean;
   hasDeleteAction: boolean;
+  canSubmit: boolean;
+  isModeNameTooLong: boolean;
   handleModeNameChange: (name: string) => void;
   handleIconSelect: (icon: string) => void;
+  handleSoundToggle: (soundId: number) => void;
   handleSubmitClick: () => void;
   handleDeleteClick: () => void;
 }
 
 const DEFAULT_MODE_ICON = '집';
+export const MAX_MODE_NAME_LENGTH = 10;
 
 const ModeFormContext = createContext<ModeFormContextTypes | null>(null);
 
@@ -62,6 +69,7 @@ export const ModeFormProvider = ({
 }: ModeFormProviderPropTypes) => {
   const [modeName, setModeName] = useState(initialName);
   const [selectedIcon, setSelectedIcon] = useState(initialIcon);
+  const [selectedSoundIds, setSelectedSoundIds] = useState<number[]>([]);
 
   const isEditPage = pageType === 'edit';
   const headerTitle = isEditPage ? '모드 설정' : '새 모드 만들기';
@@ -78,6 +86,14 @@ export const ModeFormProvider = ({
     setSelectedIcon(initialIcon);
   }, [initialIcon]);
 
+  const trimmedModeName = modeName.trim();
+  const isModeNameTooLong = trimmedModeName.length > MAX_MODE_NAME_LENGTH;
+  const isModeNameValid =
+    trimmedModeName.length > 0 && !isModeNameTooLong;
+  // 생성 페이지에서는 소리를 최소 1개 골라야 저장 버튼이 활성화된다.
+  const canSubmit =
+    isModeNameValid && (isEditPage || selectedSoundIds.length >= 1);
+
   const handleModeNameChange = useCallback((name: string) => {
     setModeName(name);
   }, []);
@@ -86,12 +102,19 @@ export const ModeFormProvider = ({
     setSelectedIcon(icon);
   }, []);
 
+  const handleSoundToggle = useCallback((soundId: number) => {
+    setSelectedSoundIds((prevSelectedSoundIds) =>
+      toggleSoundId(prevSelectedSoundIds, soundId),
+    );
+  }, []);
+
   const handleSubmitClick = useCallback(() => {
     onSubmit({
       name: modeName,
       icon: selectedIcon,
+      soundIds: selectedSoundIds,
     });
-  }, [modeName, onSubmit, selectedIcon]);
+  }, [modeName, onSubmit, selectedIcon, selectedSoundIds]);
 
   const handleDeleteClick = useCallback(() => {
     onDelete?.();
@@ -101,6 +124,7 @@ export const ModeFormProvider = ({
     () => ({
       modeName,
       selectedIcon,
+      selectedSoundIds,
       isEditPage,
       headerTitle,
       headerActionLabel,
@@ -110,14 +134,18 @@ export const ModeFormProvider = ({
       isSubmitting,
       isDeleting,
       hasDeleteAction: Boolean(onDelete),
+      canSubmit,
+      isModeNameTooLong,
       handleModeNameChange,
       handleIconSelect,
+      handleSoundToggle,
       handleSubmitClick,
       handleDeleteClick,
     }),
     [
       modeName,
       selectedIcon,
+      selectedSoundIds,
       isEditPage,
       headerTitle,
       headerActionLabel,
@@ -129,6 +157,7 @@ export const ModeFormProvider = ({
       onDelete,
       handleModeNameChange,
       handleIconSelect,
+      handleSoundToggle,
       handleSubmitClick,
       handleDeleteClick,
     ],

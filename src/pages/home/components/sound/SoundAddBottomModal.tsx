@@ -28,8 +28,8 @@ const SoundAddBottomModal = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/45">
-      <div className="max-h-[76dvh] w-full max-w-[430px] overflow-y-auto rounded-t-[32px] bg-white px-6 pb-8 pt-6">
-        <div className="mb-8 flex items-center justify-between">
+      <div className="flex h-[76dvh] w-full max-w-[430px] flex-col rounded-t-[32px] bg-white px-6 pb-8 pt-6">
+        <div className="mb-8 flex flex-shrink-0 items-center justify-between">
           <button
             type="button"
             onClick={onClose}
@@ -48,7 +48,7 @@ const SoundAddBottomModal = ({
           </button>
         </div>
 
-        <div className="space-y-5">
+        <div className="flex flex-shrink-0 flex-col gap-5">
           <SearchBar
             value={searchKeyword}
             onChange={handleSearchKeywordChange}
@@ -61,7 +61,9 @@ const SoundAddBottomModal = ({
 
           {isLoading && <p>소리 목록을 불러오는 중...</p>}
           {isError && <p>소리 목록을 불러오지 못했습니다</p>}
+        </div>
 
+        <div className="mt-5 flex-1 overflow-y-auto">
           <div className="grid grid-cols-3 gap-3">
             {filteredSounds.map((sound) => (
               <SoundCard

@@ -1,4 +1,4 @@
-# Projct: Hear:ing (청각장애인 대상 서비스)
+# Projct: Hear:ing (청각장애인 대상 pwa 웹앱)
 
 ## Critical Rules (절대 규칙)
 
@@ -39,7 +39,7 @@ project-root
 
 ## Tech Stack (기술 스택)
 
-- Frontend: React + Vite + TypeScript + pnpm + Tailwind CSS + TanStack Query
+- Frontend: React + Vite + TypeScript + pnpm + Tailwind CSS + TanStack Query + zustand
 - Backend: FastAPI (Python), AWS 클라우드 배포 예정
 - AI: YAMNet (서버에서 소리 분류)
 - DB: PostgreSQL + Redis
@@ -64,4 +64,5 @@ pnpm run dev # start web
 ## 프로젝트 문서
 
 - 코딩 컨벤션: @docs/conventions.md
+- API 문서: @docs/api-spec.md
 - mermaid architecture: @docs/architecture.md

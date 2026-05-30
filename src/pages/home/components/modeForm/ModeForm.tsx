@@ -1,11 +1,13 @@
 import Input from '@/pages/home/components/modeForm/Input';
 import ModeDeleteBtn from '@/pages/home/components/modeForm/ModeDeleteBtn';
 import {
+  MAX_MODE_NAME_LENGTH,
   ModeFormProvider,
   useModeFormContext,
 } from '@/pages/home/components/modeForm/ModeFormContext';
 import ModeHeader from '@/pages/home/components/modeForm/ModeHeader';
 import ModeIconPicker from '@/pages/home/components/modeForm/ModeIconPicker';
+import ModeSoundSelectSection from '@/pages/home/components/modeForm/ModeSoundSelectSection';
 import type {
   ModeFormPageTypes,
   ModeFormSubmitDataTypes,
@@ -35,6 +37,8 @@ const ModeFormContent = () => {
     isSubmitting,
     isDeleting,
     hasDeleteAction,
+    canSubmit,
+    isModeNameTooLong,
     handleModeNameChange,
     handleIconSelect,
     handleSubmitClick,
@@ -47,7 +51,7 @@ const ModeFormContent = () => {
         title={headerTitle}
         actionLabel={headerActionLabel}
         onActionClick={handleSubmitClick}
-        isActionDisabled={isSubmitting}
+        isActionDisabled={isSubmitting || !canSubmit}
       />
 
       <main className="space-y-16">
@@ -56,6 +60,11 @@ const ModeFormContent = () => {
           value={modeName}
           placeholder="예: 주방"
           onChange={handleModeNameChange}
+          errorMessage={
+            isModeNameTooLong
+              ? `모드 이름은 최대 ${MAX_MODE_NAME_LENGTH}글자까지 가능합니다`
+              : undefined
+          }
         />
 
         <section>
@@ -70,6 +79,8 @@ const ModeFormContent = () => {
             />
           </div>
         </section>
+
+        {!isEditPage && <ModeSoundSelectSection />}
 
         {errorMessage && (
           <p className="text-center text-sm font-bold text-red-500">
