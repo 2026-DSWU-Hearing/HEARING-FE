@@ -13,6 +13,7 @@ const ModeCard = ({ mode, isSelected }: ModeCardPropTypes) => {
   });
 
   return (
+    // 화살표 제외 영역은 누르면 활성 비활성
     <div
       onClick={handleActivateModeClick}
       className={`flex min-h-24 flex-1 cursor-pointer flex-col justify-between rounded-2xl p-4 ${
@@ -22,6 +23,7 @@ const ModeCard = ({ mode, isSelected }: ModeCardPropTypes) => {
       <div className="flex flex-row justify-between gap-4 text-xl font-bold">
         <span>{mode.icon}</span>
 
+        {/*모드 설정으로 이동 버튼*/}
         <Link
           to={`/modes/${mode.mode_id}/settings`}
           onClick={handleMoveModeSettingClick}

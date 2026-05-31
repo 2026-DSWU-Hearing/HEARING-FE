@@ -31,6 +31,7 @@ import type {
   UpdateModeSoundsRequestTypes,
 } from '@/pages/home/types/soundTypes';
 
+// 모드에 담긴 소리 목록을 수정/저장하는 mutation 훅
 export const usePutModeSounds = () => {
   const queryClient = useQueryClient();
 
@@ -53,6 +54,8 @@ export const usePutModeSounds = () => {
         (old) => {
           if (!old) return old;
 
+          // 서버 응답(data.sounds)에는 category가 없으므로, 기존 상세 캐시(oldSound) →
+          // 전체 소리 목록 캐시(currentSound) 순서로 category를 복원해 카드 표시가 깨지지 않게 한다.
           return {
             ...old,
             sounds: data.sounds.map((sound) => {
@@ -65,7 +68,8 @@ export const usePutModeSounds = () => {
 
               return {
                 ...sound,
-                category: oldSound?.category ?? currentSound?.category_name ?? '',
+                category:
+                  oldSound?.category ?? currentSound?.category_name ?? '',
               };
             }),
           };

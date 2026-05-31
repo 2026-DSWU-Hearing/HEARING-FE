@@ -33,6 +33,7 @@ import type {
   UpdateModeRequestTypes,
 } from '@/pages/home/types/modeTypes';
 
+// 모드의 이름/아이콘/소리를 수정하는 mutation 훅. 성공 시 목록 캐시와 상세 캐시를 함께 갱신한다.
 export const usePutMode = () => {
   const queryClient = useQueryClient();
 

@@ -73,7 +73,8 @@ const modeSoundReducer = (
         selectedRemoveSoundIds: [],
       };
     case 'TOGGLE_DISABLED_SOUND': {
-      const disabledSoundIds = state.disabledSoundIdsByMode[action.modeId] ?? [];
+      const disabledSoundIds =
+        state.disabledSoundIdsByMode[action.modeId] ?? [];
 
       return {
         ...state,
@@ -88,6 +89,7 @@ const modeSoundReducer = (
   }
 };
 
+// 편집 모드, 모달 열림 상태, 삭제 선택 목록, 비활성 소리 목록 같은 UI 상태를 관리하는 훅
 export const useModeSoundState = () => {
   const [state, dispatch] = useReducer(
     modeSoundReducer,

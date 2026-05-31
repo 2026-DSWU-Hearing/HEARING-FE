@@ -7,6 +7,7 @@ interface UseSoundAddModalParamTypes {
   onComplete: (sounds: SoundTypes[]) => void;
 }
 
+// 소리 추가 모달의 상태를 담당하는 훅. 검색어/카테고리로 소리를 필터링하고, 선택한 소리들을 완료 시 부모로 넘긴다.
 export const useSoundAddModal = ({
   onComplete,
 }: UseSoundAddModalParamTypes) => {

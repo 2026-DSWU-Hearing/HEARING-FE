@@ -23,6 +23,7 @@ import type {
   GetModesResponseTypes,
 } from '@/pages/home/types/modeTypes';
 
+// 새 모드를 생성하는 mutation 훅. 성공 시 생성된 모드를 모드 목록 캐시 끝에 추가한다.
 export const usePostMode = () => {
   const queryClient = useQueryClient();
 

@@ -18,11 +18,13 @@ interface HomeModeContextTypes {
 
 const HomeModeContext = createContext<HomeModeContextTypes | null>(null);
 
+// 현재 선택된 모드 ID를 모드 목록과 소리 섹션이 함께 공유하도록 보관하는 Provider
 export const HomeModeProvider = ({ children }: HomeModeProviderPropTypes) => {
   const [selectedModeId, setSelectedModeId] = useState<number | null>(null);
 
   // 모드 선택 함수 - 선택된 모드는 모드 목록과 소리 섹션이 함께 사용한다
   const handleModeSelect = useCallback((modeId: number) => {
+    console.log(`${modeId}로 바뀜`);
     setSelectedModeId(modeId);
   }, []);
 
@@ -40,7 +42,7 @@ export const HomeModeProvider = ({ children }: HomeModeProviderPropTypes) => {
     </HomeModeContext.Provider>
   );
 };
-
+// 현재 선택된 모드 ID를 여러 컴포넌트가 같이 사용할 수 있게 해주는 Context 파일
 export const useHomeModeContext = () => {
   const context = useContext(HomeModeContext);
 

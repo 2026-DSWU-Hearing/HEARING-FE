@@ -22,6 +22,7 @@ const getModeCreateErrorMessage = (error: unknown) => {
   return '새 모드를 저장하지 못했습니다';
 };
 
+// 모드 생성 페이지의 제출 로직을 모은 훅. 이름/소리/개수를 검증한 뒤 생성 요청을 보내고 성공 시 홈으로 이동한다.
 export const useModeCreatePage = () => {
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState('');

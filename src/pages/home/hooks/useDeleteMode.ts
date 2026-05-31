@@ -17,6 +17,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteMode } from '@/pages/home/apis/deleteMode';
 import type { GetModesResponseTypes } from '@/pages/home/types/modeTypes';
 
+// 모드를 삭제하는 mutation 훅. 성공 시 목록 캐시에서 제거하고 해당 모드의 상세 캐시도 비운다.
 export const useDeleteMode = () => {
   const queryClient = useQueryClient();
 

@@ -17,6 +17,7 @@ import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { patchActivateMode } from '@/pages/home/apis/patchActivateMode';
 import type { GetModesResponseTypes } from '@/pages/home/types/modeTypes';
 
+// 모드를 활성화하는 mutation 훅. 성공 시 캐시의 모든 모드에서 선택된 모드만 is_active로 갱신한다.
 export const usePatchActivateMode = () => {
   const queryClient = useQueryClient();
 

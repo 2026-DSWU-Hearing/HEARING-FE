@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useGetModes } from '@/pages/home/hooks/useGetModes';
 import { useHomeModeContext } from '@/pages/home/hooks/useHomeModeContext';
 
+// 홈 화면 모드 목록의 데이터/상태를 묶는 훅. 첫 진입 시 활성 모드(없으면 첫 모드)를 기본 선택해준다.
 export const useModeList = () => {
   const { selectedModeId, handleModeSelect } = useHomeModeContext();
   const { data, isLoading, isError } = useGetModes();

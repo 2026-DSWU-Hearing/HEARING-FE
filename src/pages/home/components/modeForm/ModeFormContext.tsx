@@ -56,6 +56,8 @@ export const MAX_MODE_NAME_LENGTH = 10;
 
 const ModeFormContext = createContext<ModeFormContextTypes | null>(null);
 
+// 모드 생성/수정 폼의 입력 상태(이름·아이콘·소리)와 파생 값(라벨, 제출 가능 여부)을 한곳에서 관리하는 Provider.
+// 같은 ModeForm UI를 create/edit 두 페이지가 pageType만 바꿔 재사용한다.
 export const ModeFormProvider = ({
   children,
   pageType,
@@ -170,6 +172,7 @@ export const ModeFormProvider = ({
   );
 };
 
+// ModeFormProvider가 제공하는 폼 상태와 핸들러를 꺼내 쓰는 훅. Provider 밖에서 쓰면 에러를 던진다.
 export const useModeFormContext = () => {
   const context = useContext(ModeFormContext);
 

@@ -8,6 +8,7 @@ interface UseSearchBarParamTypes {
   onChange: (value: string) => void;
 }
 
+// 검색 입력 바를 담당하는 훅. 입력창은 즉시 반영하되 부모로 올리는 값에는 throttle을 적용해 잦은 검색을 줄인다.
 export const useSearchBar = ({
   value,
   throttleDelay,
