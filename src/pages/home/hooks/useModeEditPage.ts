@@ -68,14 +68,10 @@ export const useModeEditPage = () => {
     try {
       await updateMode({
         modeId: parsedModeId,
+        // 백엔드 PATCH /modes/{id} 는 이름/아이콘만 받는다. 소리 목록은 별도 엔드포인트로 관리한다.
         modeData: {
           name: trimmedName,
           icon,
-          // 이름과 아이콘만 수정해도 기존 소리 목록은 함께 보내서 서버 상태를 유지한다.
-          sounds: modeDetailData.sounds.map((sound) => ({
-            sound_id: sound.sound_id,
-            name: sound.name,
-          })),
         },
       });
       navigate('/');
@@ -87,7 +83,7 @@ export const useModeEditPage = () => {
   const handleModeDeleteClick = async () => {
     if (!modeDetailData) return;
 
-    if ((modesData?.modes.length ?? 0) <= 1) {
+    if ((modesData?.length ?? 0) <= 1) {
       setErrorMessage('모드는 최소 1개 이상 유지해야 합니다');
       return;
     }

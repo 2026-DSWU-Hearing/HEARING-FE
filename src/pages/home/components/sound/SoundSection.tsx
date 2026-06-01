@@ -65,11 +65,11 @@ const SoundSection = () => {
       <div className="grid grid-cols-3 gap-3">
         {sounds.map((sound) => (
           <SoundCard
-            key={sound.sound_id}
+            key={sound.id}
             sound={sound}
             isEditMode={isEditMode}
-            isDisabled={disabledSoundIds.includes(sound.sound_id)}
-            isSelected={selectedRemoveSoundIds.includes(sound.sound_id)}
+            isDisabled={disabledSoundIds.includes(sound.id)}
+            isSelected={selectedRemoveSoundIds.includes(sound.id)}
             onClick={handleSoundCardClick}
           />
         ))}

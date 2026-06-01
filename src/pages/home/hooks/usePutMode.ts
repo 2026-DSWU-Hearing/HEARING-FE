@@ -33,7 +33,7 @@ import type {
   UpdateModeRequestTypes,
 } from '@/pages/home/types/modeTypes';
 
-// 모드의 이름/아이콘/소리를 수정하는 mutation 훅. 성공 시 목록 캐시와 상세 캐시를 함께 갱신한다.
+// 모드의 이름/아이콘을 수정하는 mutation 훅. 성공 시 서버 응답으로 목록/상세 캐시를 갱신한다.
 export const usePutMode = () => {
   const queryClient = useQueryClient();
 
@@ -47,48 +47,17 @@ export const usePutMode = () => {
     }) => putMode(modeId, modeData),
 
     onSuccess: (data) => {
+      // 서버 응답(data)이 완전한 모드 객체이므로 목록/상세 캐시 모두 그대로 반영한다.
       queryClient.setQueryData<GetModesResponseTypes>(['modes'], (old) => {
         if (!old) return old;
 
-        return {
-          modes: old.modes.map((mode) =>
-            mode.mode_id === data.mode_id
-              ? {
-                  ...mode,
-                  name: data.name,
-                  icon: data.icon,
-                }
-              : mode,
-          ),
-        };
+        return old.map((mode) => (mode.id === data.id ? data : mode));
       });
 
       queryClient.setQueryData<GetModeDetailResponseTypes>(
-        ['modes', data.mode_id],
-        (old) => {
-          if (!old) return old;
-
-          return {
-            ...old,
-            name: data.name,
-            icon: data.icon,
-            sounds: data.sounds.map((sound) => {
-              const oldSound = old.sounds.find(
-                (item) => item.sound_id === sound.sound_id,
-              );
-
-              return {
-                ...sound,
-                category: oldSound?.category ?? '',
-              };
-            }),
-          };
-        },
+        ['modes', data.id],
+        data,
       );
-
-      // 실제 서버 연결 후에는 아래 방식으로 변경 가능
-      // queryClient.invalidateQueries({ queryKey: ['modes'] });
-      // queryClient.invalidateQueries({ queryKey: ['modes', data.mode_id] });
     },
   });
 };

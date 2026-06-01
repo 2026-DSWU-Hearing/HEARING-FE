@@ -26,12 +26,10 @@ export const usePatchActivateMode = () => {
     onSuccess: (data) => {
       queryClient.setQueryData<GetModesResponseTypes>(['modes'], (old) => {
         if (!old) return old;
-        return {
-          modes: old.modes.map((mode) => ({
-            ...mode,
-            is_active: mode.mode_id === data.mode_id,
-          })),
-        };
+        return old.map((mode) => ({
+          ...mode,
+          is_active: mode.id === data.id,
+        }));
       });
     },
   });

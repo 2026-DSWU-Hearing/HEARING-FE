@@ -28,15 +28,10 @@ export const useDeleteMode = () => {
       queryClient.setQueryData<GetModesResponseTypes>(['modes'], (old) => {
         if (!old) return old;
 
-        return {
-          modes: old.modes.filter((mode) => mode.mode_id !== modeId),
-        };
+        return old.filter((mode) => mode.id !== modeId);
       });
 
       queryClient.removeQueries({ queryKey: ['modes', modeId] });
-
-      // 실제 서버 연결 후에는 아래 방식으로 변경 가능
-      // queryClient.invalidateQueries({ queryKey: ['modes'] });
     },
   });
 };

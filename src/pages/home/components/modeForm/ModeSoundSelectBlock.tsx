@@ -12,7 +12,7 @@ const ModeSoundSelectBlock = ({
   onToggle,
 }: ModeSoundSelectBlockPropTypes) => {
   const handleSoundToggleClick = () => {
-    onToggle(sound.sound_id);
+    onToggle(sound.id);
   };
 
   return (
@@ -22,7 +22,7 @@ const ModeSoundSelectBlock = ({
       aria-pressed={isSelected}
     >
       <span>{sound.name}</span>
-      <span>{sound.category_name}</span>
+      <span>{sound.category.name}</span>
       <span>{isSelected ? '선택됨' : '선택 안 됨'}</span>
     </button>
   );
