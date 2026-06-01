@@ -1,0 +1,2 @@
+- [ ] (보류) context API 사용한 부분을 zustand로 바꾸는 게 좋을지 검토하기 → 검토 결과 현 시점 비권장. 페이지 간 상태 공유나 영속화(persist) 필요 시 재검토. (보고서: ~/.claude/plans/zustand-migration-review.md)
+- [ ] (보류) home에서 모드 블럭 화살표 버튼 눌러서 모드 설정 들어갔을 때 모드 이름 수정 부분과 아이콘 수정에서 해당 모드 정보가 아니라 "실외"와 "바깥"이 뜨고 있음. → mock 데이터 한계(getModeDetail이 mode_id만 교체, name/icon 고정 반환). IS_MOCK=false 서버 연동 시 자동 해결. 서버 연동까지 보류.
