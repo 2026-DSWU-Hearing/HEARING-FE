@@ -1,0 +1,41 @@
+{
+  "conversation": {
+    "id": 1,
+    "title": "새 대화",
+    "locationName": "성북구",
+    "startedAt": "2026-05-17 18:30",
+    "bubbles": [
+      {
+        "id": 1,
+        "direction": "left",
+        "inputType": "stt",
+        "content": "안녕하세요. 길 좀 물어봐도 될까요?"
+      },
+      {
+        "id": 2,
+        "direction": "right",
+        "inputType": "text",
+        "content": "네, 괜찮습니다."
+      }
+    ]
+  },
+  "favoriteAnswers": [
+    {
+      "id": 1,
+      "content": "잠시만 기다려 주세요."
+    },
+    {
+      "id": 2,
+      "content": "다시 한 번 말씀해 주세요."
+    }
+  ],
+  "conversationHistories": [
+    {
+      "id": 1,
+      "title": "길 안내 대화",
+      "locationName": "성북구",
+      "startedAt": "2026-05-17 18:30",
+      "endedAt": "2026-05-17 18:40"
+    }
+  ]
+}
