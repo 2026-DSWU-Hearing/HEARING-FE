@@ -4,7 +4,7 @@ import communicationIcon from '@/shared/assets/icons/navigation/bottom_navigatio
 import liveSoundIcon from '@/shared/assets/icons/navigation/bottom_navigation_livesound.svg';
 import settingIcon from '@/shared/assets/icons/navigation/bottom_navigation_setting.svg';
 
-const Navigation = () => {
+const BottomNavigation = () => {
   return (
     <nav className="fixed bottom-0  z-10 flex h-[5.1875rem] w-full max-w-[430px] justify-around bg-background-neutral-base px-3 items-center">
       <NavLink to="/" end>
@@ -38,4 +38,4 @@ const Navigation = () => {
   );
 };
 
-export default Navigation;
+export default BottomNavigation;
