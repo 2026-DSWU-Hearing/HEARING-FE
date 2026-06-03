@@ -66,3 +66,6 @@ pnpm run dev # start web
 - 코딩 컨벤션: @docs/conventions.md
 - API 문서: @docs/api-spec.md
 - mermaid architecture: @docs/architecture.md
+- PR 템플릿: .github\PULL_REQUEST_TEMPLATE.md
+- 이슈 템플릿: .github\ISSUE_TEMPLATE\✏️-이슈-생성---작업.md
+- 버그 템플릿: .github\ISSUE_TEMPLATE\🐛-버그-리포트.md
