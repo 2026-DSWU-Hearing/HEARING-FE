@@ -17,7 +17,6 @@ export interface ModeFormPropTypes {
   pageType: ModeFormPageTypes;
   initialName?: string;
   initialIcon?: string;
-  errorMessage?: string;
   isSubmitting?: boolean;
   isDeleting?: boolean;
   onSubmit: (formData: ModeFormSubmitDataTypes) => void;
@@ -33,7 +32,6 @@ const ModeFormContent = () => {
     headerActionLabel,
     modeNameLabel,
     iconTitle,
-    errorMessage,
     isSubmitting,
     isDeleting,
     hasDeleteAction,
@@ -81,12 +79,6 @@ const ModeFormContent = () => {
         </section>
 
         {!isEditPage && <ModeSoundSelectSection />}
-
-        {errorMessage && (
-          <p className="text-center text-sm font-bold text-red-500">
-            {errorMessage}
-          </p>
-        )}
 
         {isEditPage && hasDeleteAction && (
           <div className="flex justify-center">
