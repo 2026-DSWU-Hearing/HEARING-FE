@@ -255,7 +255,7 @@
   font-weight: 500;
 }
 
-@utility caption-xxs-regular {
+@utility caption-xs-regular {
   font-size: 0.6875rem;
   line-height: 145%;
   font-weight: 400;

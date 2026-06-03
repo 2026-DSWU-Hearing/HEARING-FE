@@ -2,7 +2,6 @@ import AddBtn from '@/pages/home/components/AddBtn';
 import SoundAddBottomModal from '@/pages/home/components/sound/SoundAddBottomModal';
 import SoundCard from '@/pages/home/components/sound/SoundCard';
 import { useSoundSection } from '@/pages/home/hooks/useSoundSection';
-import LoadingSpinner from '@/shared/components/LoadingSpinner';
 
 const SoundSection = () => {
   const {
