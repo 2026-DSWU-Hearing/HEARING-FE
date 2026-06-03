@@ -43,11 +43,11 @@
   --color-neutral-900: #21221e;
   --color-neutral-950: #11120f;
   /* text */
-  --color-text-primary: #f8f8f7;
-  --color-text-secondary: #e2e3e0;
-  --color-text-tertiary: #a9aaa6;
-  --color-text-disabled: #6f706c;
-  --color-text-inverse: #11120f;
+  --color-primary: #f8f8f7;
+  --color-secondary: #e2e3e0;
+  --color-tertiary: #a9aaa6;
+  --color-disabled: #6f706c;
+  --color-inverse: #11120f;
   /* state */
   --color-state-disabled: #c7c8c5;
   --color-state-active: #df9a00;
