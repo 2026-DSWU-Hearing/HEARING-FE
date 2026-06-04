@@ -24,6 +24,7 @@ const AlertModal = ({ isOpen, message, onClose }: AlertModalPropTypes) => {
       <div
         role="alertdialog"
         aria-modal="true"
+        aria-label="알림"
         aria-describedby={messageId}
         className="flex w-[16.875rem] flex-col gap-2 rounded-xl pt-sm pb-lg px-lg bg-neutral-800  shadow-[0px_0px_4px_0px_rgba(0,0,0,0.25)]"
         onClick={(event) => event.stopPropagation()}

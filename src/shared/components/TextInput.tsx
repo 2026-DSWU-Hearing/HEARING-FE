@@ -36,6 +36,7 @@ const TextInput = ({
         {label}
       </span>
       <input
+        type="text"
         value={value}
         onChange={handleInputChange}
         placeholder={placeholder}

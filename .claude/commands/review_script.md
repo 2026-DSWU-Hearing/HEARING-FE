@@ -10,8 +10,8 @@
 ## 1단계 — 변경사항 파악
 
 \`\`\`bash
-git diff dev...HEAD --name-only # 변경 파일 목록
-git diff dev...HEAD # 전체 diff
+git diff develop...HEAD --name-only # 변경 파일 목록
+git diff develop...HEAD # 전체 diff
 \`\`\`
 
 ## 2단계 — Claude 리뷰 체크리스트
@@ -22,7 +22,7 @@ git diff dev...HEAD # 전체 diff
 
 컨벤션을 준수하는지 확인
 
-- 코딩 컨벤션 파일: docs\conventions.md
+- 코딩 컨벤션 파일: docs/conventions.md
 
 ### 폴더 구조 준수
 

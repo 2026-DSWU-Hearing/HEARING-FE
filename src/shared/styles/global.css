@@ -10,7 +10,7 @@ body {
   font-family: var(--font-base);
   font-size: var(--font-size-base);
   background-color: var(--color-black);
-  color: var(--color-text-primary);
+  color: var(--color-primary);
 }
 
 /* 앱 컨테이너 */

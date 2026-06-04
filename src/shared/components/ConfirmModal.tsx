@@ -47,13 +47,14 @@ const ConfirmModal = ({
       <div
         role="dialog"
         aria-modal="true"
+        aria-label="확인"
         aria-describedby={messageId}
         className="flex w-[17rem] flex-col items-center justify-center gap-4 rounded-2xl bg-neutral-800 p-lg shadow-[0px_0px_4px_0px_rgba(0,0,0,0.25)]"
         onClick={(event) => event.stopPropagation()}
       >
         <p
           id={messageId}
-          className="mb-1 body-base-medium w-full whitespace-pre-line text-center text-white"
+          className="mb-base body-base-medium w-full whitespace-pre-line text-center text-white"
         >
           {message}
         </p>

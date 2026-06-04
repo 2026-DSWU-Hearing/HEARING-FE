@@ -1,2 +1,3 @@
 - [ ] (보류) context API 사용한 부분을 zustand로 바꾸는 게 좋을지 검토하기 → 검토 결과 현 시점 비권장. 페이지 간 상태 공유나 영속화(persist) 필요 시 재검토. (보고서: ~/.claude/plans/zustand-migration-review.md)
 - [ ] (보류) home에서 모드 블럭 화살표 버튼 눌러서 모드 설정 들어갔을 때 모드 이름 수정 부분과 아이콘 수정에서 해당 모드 정보가 아니라 "실외"와 "바깥"이 뜨고 있음. → mock 데이터 한계(getModeDetail이 mode_id만 교체, name/icon 고정 반환). IS_MOCK=false 서버 연동 시 자동 해결. 서버 연동까지 보류.
+- [ ] (보류) 모달(ConfirmModal/AlertModal) 키보드 접근성 - 포커스 트랩 적용. 모달이 열려도 Tab으로 뒤쪽 ModeForm까지 포커스가 빠져나감. 필요: ①초기 포커스(열릴 때 모달 내부로) ②포커스 트랩(Tab 순환을 모달 안에 가둠) ③닫을 때 포커스 복원. → useFocusTrap 훅 + ModalShell 공통 컴포넌트로 시도했으나 Tab이 여전히 배경까지 이동(모달이 Portal 미사용이라 DOM상 ModeForm과 형제 → 브라우저 기본 Tab 순서 유지됨이 원인 추정). 제대로 하려면 배경에 inert 속성 부여 또는 React Portal + 배경 aria-hidden 처리 필요. 추후 재작업.

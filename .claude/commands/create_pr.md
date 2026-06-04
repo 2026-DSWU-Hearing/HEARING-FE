@@ -8,8 +8,8 @@
 
 1. 현재 브랜치와 변경사항 확인
    - `git branch --show-current`
-   - `git log dev..HEAD --oneline`
-   - `git diff dev...HEAD --stat`
+   - `git log develop..HEAD --oneline`
+   - `git diff develop...HEAD --stat`
 
 2. 변경사항을 분석해서 PR 제목 생성
    - 형식: `[type]: 한 줄 요약`
@@ -26,12 +26,12 @@
 
 3. 아래 템플릿으로 PR 본문 생성
 
-4. `gh pr create --base dev --title "..." --body "..."` 실행
+4. `gh pr create --base develop --title "..." --body "..."` 실행
    - draft 여부는 실행 전에 물어본다
 
 ## PR 본문 템플릿
 
-- PR 템플릿: .github\PULL_REQUEST_TEMPLATE.md
+- PR 템플릿: .github/PULL_REQUEST_TEMPLATE.md
 
 ## 주의사항
 
