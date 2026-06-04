@@ -18,8 +18,11 @@ const LoadingSpinner = () => {
 
   return (
     <div className="bg-gradient-to-b from-[#11120f] from-[73.077%] relative size-full to-[#21221e]">
-      {/* 글로우 애니메이션 */}
-      <div className="absolute left-1/2 top-[334px] -translate-x-1/2">
+      {/* 글로우 애니메이션 - 순수 장식이므로 스크린 리더에서 숨김 */}
+      <div
+        aria-hidden="true"
+        className="absolute left-1/2 top-[334px] -translate-x-1/2"
+      >
         {/* 첫 번째 글로우 - 항상 표시 (.) */}
         <motion.div
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-[104px]"
@@ -224,10 +227,18 @@ const LoadingSpinner = () => {
         </AnimatePresence>
       </div>
 
-      {/* 로딩 텍스트 */}
-      <p className="-translate-x-1/2 absolute heading-lg-semibold leading-[1.4] left-1/2 not-italic text-primary-400 text-[16px] text-center top-[496px] whitespace-nowrap">
+      {/* 로딩 텍스트 - 시각용 애니메이션이므로 스크린 리더에서 숨김 */}
+      <p
+        aria-hidden="true"
+        className="-translate-x-1/2 absolute heading-lg-semibold leading-[1.4] left-1/2 not-italic text-primary-400 text-[16px] text-center top-[496px] whitespace-nowrap"
+      >
         loading {currentDots}
       </p>
+
+      {/* 스크린 리더 전용 정적 안내 (role="status"가 aria-live=polite를 내포) */}
+      <span role="status" className="sr-only">
+        로딩 중입니다.
+      </span>
     </div>
   );
 };
