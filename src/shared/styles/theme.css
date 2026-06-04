@@ -112,12 +112,32 @@
   --blur-xs: 4px;
 
   /* Effect */
-  --shadow-light: 0 0 20px 0 rgb(255 249 212 / 50%);
+  --shadow-light-20: 0 0 20px 0 rgb(255 249 212 / 50%);
+  --shadow-light-10: 0 0 10px 0 rgb(255 249 212 / 50%);
+  --shadow-chip: 0 0 4px 0 rgb(0 0 0 / 25%);
 
   /* Glass */
   --glass-tag-background: rgb(255 255 255 / 8%);
   --glass-tag-border: rgb(255 255 255 / 16%);
   --glass-tag-blur: 29px;
+
+  /* Gradient */
+  --gradient-card-false: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--color-neutral-900) 30%, transparent) 0%,
+    color-mix(in srgb, var(--color-neutral-400) 30%, transparent) 100%
+  );
+  --gradient-card-true: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--color-primary-500) 30%, transparent) 0%,
+    color-mix(in srgb, var(--color-primary-400) 30%, transparent) 100%
+  );
+  --gradient-card-true-bottomsheet: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--color-primary-300) 30%, transparent) 0%,
+    color-mix(in srgb, var(--color-neutral-50) 30%, transparent) 100%
+  );
+  --gradient-default: linear-gradient(to bottom, #fdd043 0%, #82a6e6 100%);
 }
 
 /* layout */
@@ -296,4 +316,34 @@
   border: 1px solid var(--glass-tag-border);
   backdrop-filter: blur(var(--glass-tag-blur));
   -webkit-backdrop-filter: blur(var(--glass-tag-blur));
+}
+
+/* gradient */
+@utility card-false {
+  background-image: var(--gradient-card-false);
+}
+
+@utility card-true {
+  background-image: var(--gradient-card-true);
+}
+
+@utility card-true-bottomsheet {
+  background-image: var(--gradient-card-true-bottomsheet);
+}
+
+@utility gradient-default {
+  background-image: var(--gradient-default);
+}
+
+/* shadow */
+@utility shadow-chip {
+  box-shadow: var(--shadow-chip);
+}
+
+@utility shadow-light-20 {
+  box-shadow: var(--shadow-light-20);
+}
+
+@utility shadow-light-10 {
+  box-shadow: var(--shadow-light-10);
 }
