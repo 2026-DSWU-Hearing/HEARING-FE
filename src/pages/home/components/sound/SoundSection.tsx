@@ -59,7 +59,7 @@ const SoundSection = () => {
         )}
       </div>
 
-      {isLoading && <p>소리 목록을 불러오는 중...</p>}
+      {isLoading && <p>소리를 불러오는 중입니다...</p>}
       {isError && <p>모드에 담긴 소리를 불러오지 못했습니다</p>}
 
       <div className="grid grid-cols-3 gap-3">

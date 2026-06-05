@@ -23,10 +23,15 @@
     ]
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^7.2.0",
+    "@fortawesome/free-brands-svg-icons": "^7.2.0",
+    "@fortawesome/free-solid-svg-icons": "^7.2.0",
+    "@fortawesome/react-fontawesome": "^3.3.1",
     "@tailwindcss/vite": "^4.2.4",
     "@tanstack/react-query": "^5.100.8",
     "@tanstack/react-query-devtools": "^5.100.8",
     "axios": "^1.16.0",
+    "motion": "^12.40.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-router-dom": "^7.14.2",

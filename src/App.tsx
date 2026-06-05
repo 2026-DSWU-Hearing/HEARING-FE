@@ -1,6 +1,6 @@
 import { useLocation } from 'react-router-dom';
 
-import Navigation from '@/layout/Navigation';
+import BottomNavigation from '@/layout/BottomNavigation';
 import AppRouter from '@/routes/AppRouter';
 import '@/App.css';
 
@@ -12,7 +12,7 @@ function App() {
   return (
     <div className="app">
       <AppRouter />
-      {!hideNavigation && <Navigation />}
+      {!hideNavigation && <BottomNavigation />}
     </div>
   );
 }

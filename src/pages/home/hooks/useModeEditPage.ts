@@ -3,28 +3,33 @@ import { isAxiosError } from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { ModeFormSubmitDataTypes } from '@/pages/home/components/modeForm/ModeFormContext';
 import { MAX_MODE_NAME_LENGTH } from '@/pages/home/components/modeForm/ModeFormContext';
+import {
+  MODE_EDIT_ERROR_MESSAGE,
+  MODE_MESSAGE,
+} from '@/pages/home/constants/modeMessages';
 import { useDeleteMode } from '@/pages/home/hooks/useDeleteMode';
 import { useGetModeDetail } from '@/pages/home/hooks/useGetModeDetail';
 import { useGetModes } from '@/pages/home/hooks/useGetModes';
 import { usePutMode } from '@/pages/home/hooks/usePutMode';
+import { useModal } from '@/shared/hooks/useModal';
 
 // 에러 메시지 변환
 const getModeEditErrorMessage = (error: unknown) => {
   if (isAxiosError(error)) {
     if (error.response?.status === 400) {
-      return '입력한 모드 정보를 다시 확인해주세요';
+      return MODE_EDIT_ERROR_MESSAGE.BAD_REQUEST;
     }
 
     if (error.response?.status === 404) {
-      return '존재하지 않는 모드입니다';
+      return MODE_EDIT_ERROR_MESSAGE.NOT_FOUND;
     }
 
     if (error.response?.status === 409) {
-      return '이미 사용 중인 모드 이름입니다';
+      return MODE_EDIT_ERROR_MESSAGE.CONFLICT;
     }
   }
 
-  return '모드 설정을 처리하지 못했습니다';
+  return MODE_EDIT_ERROR_MESSAGE.DEFAULT;
 };
 
 // 모드 수정 페이지에서 필요한 데이터 조회 + 수정/삭제 제출 로직을 한 곳에 모은 커스텀 훅
@@ -34,6 +39,8 @@ export const useModeEditPage = () => {
   const parsedModeId = Number(modeId);
   const isValidModeId = Number.isInteger(parsedModeId);
   const [errorMessage, setErrorMessage] = useState('');
+  // 삭제 확인 모달의 열림/닫힘 상태
+  const deleteConfirmModal = useModal();
   const {
     data: modeDetailData,
     isLoading: isModeDetailLoading,
@@ -54,14 +61,12 @@ export const useModeEditPage = () => {
     const trimmedName = name.trim();
 
     if (!trimmedName) {
-      setErrorMessage('모드 이름을 입력해주세요');
+      setErrorMessage(MODE_MESSAGE.EMPTY_NAME);
       return;
     }
 
     if (trimmedName.length > MAX_MODE_NAME_LENGTH) {
-      setErrorMessage(
-        `모드 이름은 ${MAX_MODE_NAME_LENGTH}글자 이하로 입력해주세요`,
-      );
+      setErrorMessage(MODE_MESSAGE.TOO_LONG_NAME);
       return;
     }
 
@@ -84,18 +89,20 @@ export const useModeEditPage = () => {
     }
   };
 
-  const handleModeDeleteClick = async () => {
+  // 삭제 버튼 클릭: 최소 개수 검증 후 확인 모달을 연다.
+  const handleModeDeleteClick = () => {
     if (!modeDetailData) return;
 
     if ((modesData?.modes.length ?? 0) <= 1) {
-      setErrorMessage('모드는 최소 1개 이상 유지해야 합니다');
+      setErrorMessage(MODE_MESSAGE.MIN_MODE_COUNT);
       return;
     }
 
-    const shouldDeleteMode = window.confirm('모드를 삭제할까요?');
+    deleteConfirmModal.open();
+  };
 
-    if (!shouldDeleteMode) return;
-
+  // 확인 모달에서 "확인"을 눌렀을 때 실제 삭제를 수행한다.
+  const handleModeDeleteConfirm = async () => {
     try {
       await deleteMode(parsedModeId);
       navigate('/');
@@ -103,6 +110,8 @@ export const useModeEditPage = () => {
       setErrorMessage(getModeEditErrorMessage(error));
     }
   };
+
+  const clearErrorMessage = () => setErrorMessage('');
 
   return {
     modeDetailData,
@@ -112,7 +121,11 @@ export const useModeEditPage = () => {
     isModeDetailError,
     isUpdatingMode,
     isDeletingMode,
+    isDeleteConfirmOpen: deleteConfirmModal.isOpen,
     handleModeUpdateSubmit,
     handleModeDeleteClick,
+    handleModeDeleteConfirm,
+    closeDeleteConfirm: deleteConfirmModal.close,
+    clearErrorMessage,
   };
 };

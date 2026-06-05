@@ -1,5 +1,8 @@
 import ModeForm from '@/pages/home/components/modeForm/ModeForm';
+import { MODE_MESSAGE } from '@/pages/home/constants/modeMessages';
 import { useModeEditPage } from '@/pages/home/hooks/useModeEditPage';
+import AlertModal from '@/shared/components/AlertModal';
+import ConfirmModal from '@/shared/components/ConfirmModal';
 
 const ModeEditPage = () => {
   const {
@@ -10,8 +13,12 @@ const ModeEditPage = () => {
     isModeDetailError,
     isUpdatingMode,
     isDeletingMode,
+    isDeleteConfirmOpen,
     handleModeUpdateSubmit,
     handleModeDeleteClick,
+    handleModeDeleteConfirm,
+    closeDeleteConfirm,
+    clearErrorMessage,
   } = useModeEditPage();
 
   if (!isValidModeId) {
@@ -27,16 +34,29 @@ const ModeEditPage = () => {
   }
 
   return (
-    <ModeForm
-      pageType="edit"
-      initialName={modeDetailData.name}
-      initialIcon={modeDetailData.icon}
-      errorMessage={errorMessage}
-      isSubmitting={isUpdatingMode}
-      isDeleting={isDeletingMode}
-      onSubmit={handleModeUpdateSubmit}
-      onDelete={handleModeDeleteClick}
-    />
+    <>
+      <ModeForm
+        pageType="edit"
+        initialName={modeDetailData.name}
+        initialIcon={modeDetailData.icon}
+        isSubmitting={isUpdatingMode}
+        isDeleting={isDeletingMode}
+        onSubmit={handleModeUpdateSubmit}
+        onDelete={handleModeDeleteClick}
+      />
+      <ConfirmModal
+        isOpen={isDeleteConfirmOpen}
+        message={MODE_MESSAGE.DELETE_CONFIRM}
+        onConfirm={handleModeDeleteConfirm}
+        onCancel={() => {}}
+        onClose={closeDeleteConfirm}
+      />
+      <AlertModal
+        isOpen={Boolean(errorMessage)}
+        message={errorMessage}
+        onClose={clearErrorMessage}
+      />
+    </>
   );
 };
 
