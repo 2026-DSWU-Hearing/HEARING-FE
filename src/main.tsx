@@ -6,6 +6,7 @@ import { queryClient } from '@/shared/apis/queryClient.ts';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { registerSW } from 'virtual:pwa-register';
+import '@/shared/firebase/settingFCM';
 
 registerSW({
   immediate: true,
