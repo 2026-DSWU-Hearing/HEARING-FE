@@ -19,18 +19,13 @@ const CategoryBar = ({
   } = useCategoryBar({ onCategoryChange });
 
   return (
-    <div className="flex gap-3 overflow-x-auto py-1">
-      <button
-        type="button"
+    <div className="flex gap-xs overflow-x-auto py-1 touch-pan-x [&>*]:shrink-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+      <CategoryBlock
+        categoryName="전체"
+        variant="filter"
+        isSelected={selectedCategory === null}
         onClick={handleAllCategoryClick}
-        className={`whitespace-nowrap rounded-full border px-5 py-2 text-sm font-bold ${
-          selectedCategory === null
-            ? 'border-neutral-900 bg-neutral-900 text-white'
-            : 'border-neutral-500 text-neutral-700'
-        }`}
-      >
-        전체
-      </button>
+      />
 
       {isLoading && (
         <span className="whitespace-nowrap text-sm text-neutral-400">
@@ -46,10 +41,10 @@ const CategoryBar = ({
 
       {categories.map((category) => (
         <CategoryBlock
-          key={category.id}
+          key={category.category_id}
           categoryName={category.name}
+          variant="filter"
           isSelected={selectedCategory === category.name}
-          size="medium"
           onClick={handleCategoryChange}
         />
       ))}

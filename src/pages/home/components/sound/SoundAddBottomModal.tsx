@@ -2,11 +2,13 @@ import SearchBar from '@/pages/home/components/SearchBar';
 import CategoryBar from '@/pages/home/components/sound/CategoryBar';
 import SoundCard from '@/pages/home/components/sound/SoundCard';
 import { useSoundAddModal } from '@/pages/home/hooks/useSoundAddModal';
-import type { SoundTypes } from '@/pages/home/types/soundTypes';
+import type { SoundListItemTypes } from '@/pages/home/types/soundTypes';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface SoundAddBottomModalPropTypes {
   onClose: () => void;
-  onComplete: (sounds: SoundTypes[]) => void;
+  onComplete: (sounds: SoundListItemTypes[]) => void;
 }
 
 const SoundAddBottomModal = ({
@@ -28,21 +30,21 @@ const SoundAddBottomModal = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/45">
-      <div className="flex h-[76dvh] w-full max-w-[430px] flex-col rounded-t-[32px] bg-white px-6 pb-8 pt-6">
+      <div className="flex h-[76dvh] w-full max-w-[430px] flex-col rounded-t-[32px] bg-neutral-800 p-xl">
         <div className="mb-8 flex flex-shrink-0 items-center justify-between">
           <button
             type="button"
             onClick={onClose}
-            className="text-4xl leading-none"
+            className="w-[1.5rem] leading-none"
             aria-label="소리 추가 닫기"
           >
-            ×
+            <FontAwesomeIcon icon={faXmark} />
           </button>
-          <h2 className="text-xl font-bold">소리 추가하기</h2>
+          <h2 className="heading-base-semibold">소리 추가하기</h2>
           <button
             type="button"
             onClick={handleCompleteClick}
-            className="text-base font-bold"
+            className="heading-base-semibold"
           >
             완료
           </button>
@@ -67,10 +69,12 @@ const SoundAddBottomModal = ({
           <div className="grid grid-cols-3 gap-3">
             {filteredSounds.map((sound) => (
               <SoundCard
-                key={sound.id}
-                sound={sound}
+                key={sound.sound_id}
+                soundId={sound.sound_id}
+                name={sound.name}
+                categoryName={sound.category_name}
                 isEditMode
-                isSelected={selectedSoundIds.includes(sound.id)}
+                isChecked={selectedSoundIds.includes(sound.sound_id)}
                 onClick={handleSoundSelect}
               />
             ))}
