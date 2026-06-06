@@ -34,8 +34,12 @@ const http = axios.create({
 - **요청 인터셉터**: 요청 직전 `localStorage`의 `'token'`을 꺼내 `Authorization: Bearer ...` 헤더에 자동 주입.
 - **응답 인터셉터**: 401이면 원래 `/login`으로 리다이렉트. (⚠️ 백엔드 auth 복구 전까지 **임시 비활성화** 상태 — 파일 내 TODO 참고)
 
-> `baseURL` 덕분에 API 함수는 `'/modes'`처럼 짧은 경로만 적으면 `http://localhost:8000/modes`로 요청된다.
+> `baseURL`은 `http://localhost:8000`(prefix 없음)이라 users/devices/notifications 등은 `/users/me`처럼 짧게 적으면 된다.
 > 로그인 시 `localStorage`에 `'token'`만 저장하면 이후 모든 요청에 토큰이 자동으로 실린다.
+
+> ⚠️ **modes/sounds 만 임시 prefix(`/api/v1`)가 필요**하다. baseURL 에 `/api/v1` 을 붙이면 prefix 없는 도메인이 깨지므로,
+> modes/sounds 경로는 `apis/endpoints.ts` 에서 `VITE_API_PREFIX`(.env)를 붙여 조립한다.
+> 서버가 prefix 를 제거하면 `.env` 의 `VITE_API_PREFIX` 만 `""` 로 바꾸면 끝.
 
 ## 2. 핵심: 프론트 "추측 모양" vs 백엔드 "진짜 모양"
 
@@ -44,27 +48,29 @@ const http = axios.create({
 ### 모드(Mode)
 
 ```
-❌ 프론트 추측                       ✅ 백엔드 실제 (Swagger)
-{ modes: [                          [                       ← 배열을 직접 반환
-    { mode_id: 1, ... }               { id: 1,              ← id (mode_id 아님)
-] }                                     name, icon, is_active,
-                                        sounds: [...] }      ← 소리도 함께 옴
-                                    ]
+✅ 백엔드 실제 (openapi.json)
+GET /modes  → { modes: [ { mode_id, name, icon, is_active } ] }   ← 객체로 감싸고, sounds 없음
+GET /modes/{id} → { mode_id, name, icon, is_active,
+                    sounds: [ { sound_id, name, category } ] }     ← 상세에만 sounds(category 는 문자열)
 ```
+
+> ⚠️ 응답이 동작마다 다르다. 생성·수정은 `{ mode_id, name, icon, sounds:[{sound_id,name}] }`(is_active 없음),
+> 활성화는 `{ mode_id, is_active }`(name/icon/sounds 없음), 소리교체는 `{ mode_id, sounds:[{sound_id,name}] }`.
 
 ### 소리(Sound)
 
 ```
-❌ 프론트 추측                       ✅ 백엔드 실제
-{ sound_id: 1,                      { id: 1,                ← id
-  category_name: "위험" }             name, risk_level, icon_url,
-                                      category: { id, name } } ← 중첩 객체
+✅ 백엔드 실제
+GET /sounds  → { sounds: [ { sound_id, name, category_id, category_name } ] }   ← 목록은 플랫
+GET /sounds/categories → { categories: [ { category_id, name } ] }
+GET /sounds/{id} → { id, name, risk_level, icon_url, category: { id, name } }   ← 단건만 id + 중첩
 ```
 
-**기억할 3가지 차이**
-1. `mode_id` / `sound_id` → 전부 **`id`**
-2. 목록 응답이 `{ modes: [...] }` 객체가 아니라 **배열 직접**
-3. 카테고리가 `category_name` 문자열이 아니라 **`category: { id, name }` 객체**
+**기억할 4가지**
+1. 식별자는 대부분 **`mode_id` / `sound_id` / `category_id`**(snake). 단, `GET /sounds/{id}` 단건만 예외적으로 `id`.
+2. 목록은 **객체로 감싼다**: `{ modes: [] }`, `{ sounds: [] }`, `{ categories: [] }`.
+3. 소리 목록은 **플랫**(`category_name`), 단건만 **중첩**(`category: { id, name }`).
+4. 모드 응답은 **동작별로 다른 스키마**다. 단일 `ModeResponse` 가정 금지.
 
 > 이 차이를 `types/modeTypes.ts`, `types/soundTypes.ts`에 정확히 적어두면, 어긋난 나머지 코드를
 > TypeScript가 컴파일 에러로 잡아준다. → "타입부터 고치고 빌드 에러 따라가기" 전략.
@@ -73,24 +79,29 @@ const http = axios.create({
 
 `src/pages/home/apis/`
 
+> ⚠️ 경로 prefix: 현재 서버는 modes/sounds 에 임시로 `/api/v1` 을 붙인다. 코드는 `apis/endpoints.ts` 에서
+> `VITE_API_PREFIX`(.env) 로 prefix 를 조립하므로, 서버가 prefix 를 떼면 `.env` 한 줄만 `""` 로 바꾸면 된다.
+
 | 동작 | 함수 | 메서드 + 경로 | 비고 |
 |------|------|--------------|------|
-| 모드 목록 조회 | `getModes` | `GET /modes` | 배열 반환 |
-| 모드 상세 조회 | `getModeDetail` | `GET /modes/{id}` | 목록과 같은 모양 |
-| 모드 생성 | `postMode` | `POST /modes` | 본문 `{ name, icon, sound_ids: [] }` |
-| 모드 수정 | `putMode` | **`PATCH`** `/modes/{id}` | ⚠️ PUT 아님. 이름/아이콘만 |
-| 모드 활성화 | `patchActivateMode` | **`POST`** `/modes/{id}/activate` | ⚠️ PATCH 아님 |
+| 모드 목록 조회 | `getModes` | `GET /modes` | `{ modes: [] }` |
+| 모드 상세 조회 | `getModeDetail` | `GET /modes/{id}` | 상세는 sounds 포함 |
+| 모드 생성 | `postMode` | `POST /modes` | 본문 `{ name, icon, sounds: [{sound_id, name?}] }` |
+| 모드 수정 | `putMode` | **`PUT`** `/modes/{id}` | ⚠️ 전체 교체(name·icon·sounds 모두 보냄) |
+| 모드 활성화 | `patchActivateMode` | **`PATCH`** `/modes/{id}/activate` | 응답 `{ mode_id, is_active }` |
 | 모드 삭제 | `deleteMode` | `DELETE /modes/{id}` | |
-| 소리 목록 교체 | `putModeSounds` | `PUT /modes/{id}/sounds` | 본문 `{ sound_ids: [] }` |
-| 소리 1개 삭제 | `deleteModeSound` | ⚠️ **전용 API 없음** | "남길 id들로 전체 교체"로 우회 |
-| 전체 소리 조회 | `getSounds` | `GET /sounds` | 배열 |
-| 카테고리 조회 | `getSoundCategories` | `GET /sounds/categories` | 배열 |
+| 소리 목록 교체 | `putModeSounds` | `PUT /modes/{id}/sounds` | 본문 `{ sounds: [{sound_id, name?}] }` |
+| 소리 1개 삭제 | `deleteModeSound` | `DELETE /modes/{id}/sounds/{soundId}` | ✅ 전용 API 있음 |
+| 전체 소리 조회 | `getSounds` | `GET /sounds` | `{ sounds: [] }` |
+| 카테고리 조회 | `getSoundCategories` | `GET /sounds/categories` | `{ categories: [] }` |
 
-> **메서드 함정**: 함수 이름은 `putMode`인데 백엔드는 `PATCH`를 받는다. 이름만 보고 PUT을 보내면 405가 난다.
-> 함수명은 유지하고 내부 메서드만 정정했다.
+> **메서드**: 수정은 **PUT**, 활성화는 **PATCH**. (이전 문서가 반대로 적었던 부분을 정정함.)
 >
-> **`deleteModeSound` 우회**: 백엔드엔 "소리 1개만 빼기" API가 없다. 그래서 "지금 담긴 소리 중 1개를 빼려면,
-> 남길 나머지 id들을 `PUT /modes/{id}/sounds`로 통째로 보낸다." (부분 삭제 대신 전체 교체)
+> **모드 수정(PUT)은 전체 교체**다. 이름/아이콘만 바꿀 때도 `sounds` 를 함께 보내야 하므로, 수정 페이지는
+> 기존 상세의 소리를 `{ sound_id, name }` 로 변환해 그대로 실어 보낸다.
+>
+> **소리 삭제**: 전용 엔드포인트로 `soundId` 하나만 넘긴다. 단, 서버는 "모드당 소리 최소 1개" 규칙이 있어
+> 마지막 1개를 지우면 422(`At least 1 sound required`)가 난다.
 
 ## 4. 커스텀 훅 층
 
@@ -118,8 +129,11 @@ export const usePostMode = () => {
   return useMutation({
     mutationFn: postMode,
     onSuccess: (data) => {
-      // 서버가 돌려준 새 모드를 ['modes'] 캐시 배열 끝에 추가
-      queryClient.setQueryData(['modes'], (old) => [...old, data]);
+      // 캐시는 { modes: [...] } 객체다. 생성 응답엔 is_active 가 없으니 목록 원소 모양으로 재구성해 추가한다.
+      const newItem = { mode_id: data.mode_id, name: data.name, icon: data.icon, is_active: false };
+      queryClient.setQueryData(['modes'], (old) =>
+        old ? { modes: [...old.modes, newItem] } : { modes: [newItem] },
+      );
     },
   });
 };
@@ -127,25 +141,28 @@ export const usePostMode = () => {
 
 - `queryKey: ['modes']`는 "이 데이터의 주소". 조회 훅이 이 키로 저장하면, 변경 훅이 같은 키 캐시를 직접 수정 → 재요청 없이 화면 갱신.
 - 상세 캐시는 `['modes', id]`처럼 id를 붙여 모드별로 따로 저장한다.
-- 백엔드가 **완전한 모드 객체**(sounds 포함)를 주므로, 캐시 갱신이 `setQueryData(['modes', id], data)` 한 줄로 단순해졌다. (예전의 category 복원 병합 로직 제거)
+- ⚠️ **응답이 동작별로 부분적**이라 캐시를 통째 교체하면 안 된다. 활성화 응답엔 name/icon 이, 수정 응답엔 is_active 가 없다.
+  - 활성화/수정: 기존 캐시에 **변경분만 병합**(`{ ...old, ...일부필드 }`).
+  - 소리교체/소리삭제: 상세 응답이 목록 상세(category 포함)와 모양이 달라, 그냥 `invalidateQueries(['modes', id])` 로 재요청한다.
 
 ## 5. 사용 예: "새 모드 만들기" 전체 흐름
 
 ```
 1. 사용자가 폼 작성 → "저장" 클릭
 2. useModeCreatePage:
-   - 선택한 소리들을 sound_ids 배열로 변환  ← 백엔드가 원하는 모양
-   - createMode({ name, icon, sound_ids })
+   - 선택한 소리들을 sounds 배열로 변환  ← 백엔드가 원하는 모양 [{ sound_id, name }]
+   - createMode({ name, icon, sounds })
 3. usePostMode (useMutation) → postMode 실행
-4. postMode: axios가 POST http://localhost:8000/modes
-5. 백엔드가 생성된 모드(완전한 객체) 반환
-6. onSuccess: ['modes'] 캐시 배열에 추가
+4. postMode: axios가 POST {prefix}/modes
+5. 백엔드가 생성된 모드(ModeWriteResponse) 반환
+6. onSuccess: ['modes'] 캐시({ modes: [] })에 목록 원소 모양으로 추가
 7. useGetModes를 쓰는 ModeList 자동 리렌더 → 새 모드 등장
 8. navigate('/')로 홈 이동
 ```
 
-> **데이터 변환 지점(2번)**: 화면에서는 소리를 `{ id, name, category }` 객체로 다루지만,
-> 생성 API는 `sound_ids: [1,2,3]`처럼 id만 원한다. 폼 제출 훅에서 `selectedSounds.map(s => s.id)`로 변환한다.
+> **데이터 변환 지점(2번)**: 화면(소리 목록)에서는 소리를 `{ sound_id, name, category_id, category_name }` 로 다루지만,
+> 생성 API는 `sounds: [{ sound_id, name }]` 객체 배열을 원한다. 폼 제출 훅에서
+> `selectedSounds.map(s => ({ sound_id: s.sound_id, name: s.name }))` 로 변환한다.
 > "화면용 모양"과 "전송용 모양"이 다를 때 훅이 다리 역할을 한다.
 
 ## 한 줄 요약

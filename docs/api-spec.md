@@ -41,26 +41,40 @@
 
 ## Modes (`/modes`)
 
+> 경로 표기는 prefix 없는 최종 형태(`/modes/...`) 기준이다. **현재 서버는 임시로 `/api/v1` prefix를 사용 중**이며, 서버에서 곧 제거할 예정이다.
+
 | 메서드 | 경로 | 요청 본문 | 응답 |
 |--------|------|----------|------|
-| GET | `/modes` | — | `ModeResponse[]` |
-| POST | `/modes` | `ModeCreate` | `ModeResponse` |
-| PATCH | `/modes/{mode_id}` | `ModeUpdate` | `ModeResponse` |
+| GET | `/modes` | — | `ModeListResponse` |
+| POST | `/modes` | `ModeCreateRequest` | `ModeWriteResponse` |
+| GET | `/modes/{mode_id}` | — | `ModeDetailResponse` |
+| PUT | `/modes/{mode_id}` | `ModeUpdateRequest` | `ModeWriteResponse` |
 | DELETE | `/modes/{mode_id}` | — | `{}` |
-| POST | `/modes/{mode_id}/activate` | — | `ModeResponse` |
-| PUT | `/modes/{mode_id}/sounds` | `ModeSoundsUpdate` | `ModeResponse` |
+| PATCH | `/modes/{mode_id}/activate` | — | `ModeActivateResponse` |
+| PUT | `/modes/{mode_id}/sounds` | `ModeSoundsUpdateRequest` | `ModeSoundsResponse` |
+| DELETE | `/modes/{mode_id}/sounds/{sound_id}` | — | `{}` |
 
-> ⚠️ 모드 수정은 **PATCH**(PUT 아님), 활성화는 **POST**(PATCH 아님). 개별 소리 삭제 엔드포인트는 없고 `PUT /modes/{id}/sounds`로 전체 교체한다.
+> ⚠️ 모드 수정은 **PUT**(PATCH 아님), 활성화는 **PATCH**(POST 아님).
+> ⚠️ 응답이 동작마다 다른 스키마다(목록/상세/생성·수정/활성화/소리교체). 단일 `ModeResponse`가 아니다.
+> ⚠️ 식별자는 **`mode_id` / `sound_id`**(스네이크). 목록 응답은 `{ modes: [...] }`로 감싼다.
+> ✅ 개별 소리 삭제 전용 엔드포인트가 **있다**(`DELETE /modes/{mode_id}/sounds/{sound_id}`).
 
 ---
 
 ## Sounds (`/sounds`)
 
+> 경로 표기는 prefix 없는 최종 형태 기준. 현재 서버는 임시로 `/api/v1` prefix 사용 중(곧 제거 예정).
+
 | 메서드 | 경로 | 쿼리/본문 | 응답 |
 |--------|------|----------|------|
-| GET | `/sounds/categories` | — | `SoundCategoryResponse[]` |
-| GET | `/sounds` | `category_id?`, `keyword?`, `page=1`, `size=50` (max 200) | `SoundResponse[]` |
+| GET | `/sounds/categories` | — | `CategoryListResponse` |
+| GET | `/sounds` | `category_id?`, `keyword?`, `page=1`, `size=50` (max 200) | `SoundListResponse` |
 | GET | `/sounds/{sound_id}` | — | `SoundResponse` |
+
+> ⚠️ 목록(`SoundListResponse`)과 단건(`SoundResponse`)의 모양이 다르다.
+> - 목록 원소(`SoundItem`)는 **플랫**: `{ sound_id, name, category_id, category_name }` (risk_level·icon_url 없음).
+> - 단건(`SoundResponse`)은 **중첩 + `id`**: `{ id, name, risk_level, icon_url, category: { id, name } }`.
+> ⚠️ 목록은 `{ sounds: [...] }`, 카테고리는 `{ categories: [...] }`로 감싼다.
 
 ---
 
@@ -120,23 +134,44 @@ AgreementUpdate      = { terms_agreed }
 ### Mode
 
 ```ts
-ModeResponse = {
-  id, name, icon, is_active,
-  sounds: SoundResponse[]   // default []
-}
-ModeCreate       = { name, icon, sound_ids: number[] }
-ModeUpdate       = { name?, icon? }
-ModeSoundsUpdate = { sound_ids: number[] }
+// ── 요청 ──
+// sounds 배열의 원소는 id 숫자가 아니라 객체다(name 은 optional).
+ModeSoundInput          = { sound_id: number, name?: string|null }
+ModeCreateRequest       = { name, icon, sounds: ModeSoundInput[] }   // 세 필드 모두 required
+ModeUpdateRequest       = { name, icon, sounds: ModeSoundInput[] }   // PUT — 전체 교체, 세 필드 모두 required
+ModeSoundsUpdateRequest = { sounds: ModeSoundInput[] }
+
+// ── 응답 (동작마다 다름) ──
+ModeListItem    = { mode_id, name, icon, is_active }                 // 목록 원소 (sounds 없음)
+ModeListResponse = { modes: ModeListItem[] }                        // GET /modes
+
+ModeDetailSoundItem = { sound_id, name, category }                  // category 는 문자열
+ModeDetailResponse  = { mode_id, name, icon, is_active, sounds: ModeDetailSoundItem[] }  // GET /modes/{id}
+
+ModeSoundItem    = { sound_id, name }                               // 쓰기 응답의 소리 원소(가벼움)
+ModeWriteResponse = { mode_id, name, icon, sounds: ModeSoundItem[] }  // POST·PUT /modes (is_active 없음)
+
+ModeActivateResponse = { mode_id, is_active }                       // PATCH activate (name/icon/sounds 없음!)
+ModeSoundsResponse   = { mode_id, sounds: ModeSoundItem[] }         // PUT /modes/{id}/sounds
 ```
 
 ### Sound
 
 ```ts
+// 목록 — 플랫, sound_id / category_id / category_name (snake)
+SoundItem         = { sound_id, name, category_id, category_name }
+SoundListResponse = { sounds: SoundItem[] }                        // GET /sounds
+
+// 카테고리 목록 — category_id (snake)
+CategoryItem         = { category_id, name }
+CategoryListResponse = { categories: CategoryItem[] }              // GET /sounds/categories
+
+// 단건 — 중첩 + id (예외적으로 snake 아님)
 SoundCategoryResponse = { id, name }
 SoundResponse = {
   id, name, risk_level, icon_url|null,
   category: SoundCategoryResponse   // 중첩 객체
-}
+}                                                                  // GET /sounds/{id}
 ```
 
 ### Device / Detection
