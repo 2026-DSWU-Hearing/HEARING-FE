@@ -21,7 +21,7 @@ const AddButton = ({
   disabled = false,
 }: AddButtonPropTypes) => {
   // 버튼 스타일링
-  const buttonClassName = `inline-flex items-center gap-[0.625rem] rounded-pill bg-[#5354504D]/30 px-sm py-xs h-[1.6rem] text-secondary caption-xs-medium border-1 border-neutral-700 ${className}`;
+  const buttonClassName = `inline-flex items-center gap-[0.625rem] rounded-pill bg-[#5354504D]/30 px-sm py-xs h-[1.6rem] text-secondary caption-xs-medium border-[1px] border-neutral-700 ${className}`;
   const content = (
     <>
       <span>{label}</span>

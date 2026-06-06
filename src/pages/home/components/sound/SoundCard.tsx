@@ -49,7 +49,7 @@ const getSoundCardStyle = ({
   // 바닥 배경: 방해금지는 더 어두운 회색, 그 외(금색 포함)는 어두운 유리 위에 그라데이션이 덮인다.
   const base = isDoNotDisturb
     ? 'bg-neutral-900'
-    : 'bg-neutral-800 border-1 border-neutral-600 tag-glass-effect';
+    : 'bg-neutral-800 border-[1px] border-neutral-600 tag-glass-effect';
 
   return {
     base,
