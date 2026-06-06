@@ -10,6 +10,10 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      // dev 환경에서도 PWA SW를 활성화해 FCM SW와의 2-SW 공존을 검증할 수 있게 한다.
+      devOptions: { enabled: true, type: 'module' },
+      // FCM 전용 SW는 PWA precache 대상에서 제외한다(별도 scope로 직접 등록하므로).
+      workbox: { globIgnores: ['**/firebase-messaging-sw.js'] },
       manifest: {
         name: 'Hearing',
         short_name: 'Hearing',

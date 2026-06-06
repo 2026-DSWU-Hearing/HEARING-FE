@@ -22,7 +22,6 @@ interface ModeFormProviderPropTypes {
   pageType: ModeFormPageTypes;
   initialName?: string;
   initialIcon?: string;
-  errorMessage?: string;
   isSubmitting?: boolean;
   isDeleting?: boolean;
   onSubmit: (formData: ModeFormSubmitDataTypes) => void;
@@ -38,7 +37,6 @@ interface ModeFormContextTypes {
   headerActionLabel: string;
   modeNameLabel: string;
   iconTitle: string;
-  errorMessage?: string;
   isSubmitting: boolean;
   isDeleting: boolean;
   hasDeleteAction: boolean;
@@ -63,7 +61,6 @@ export const ModeFormProvider = ({
   pageType,
   initialName = '',
   initialIcon = DEFAULT_MODE_ICON,
-  errorMessage,
   isSubmitting = false,
   isDeleting = false,
   onSubmit,
@@ -132,7 +129,6 @@ export const ModeFormProvider = ({
       headerActionLabel,
       modeNameLabel,
       iconTitle,
-      errorMessage,
       isSubmitting,
       isDeleting,
       hasDeleteAction: Boolean(onDelete),
@@ -153,7 +149,6 @@ export const ModeFormProvider = ({
       headerActionLabel,
       modeNameLabel,
       iconTitle,
-      errorMessage,
       isSubmitting,
       isDeleting,
       onDelete,
