@@ -1,4 +1,4 @@
-import AddBtn from '@/pages/home/components/AddBtn';
+import AddButton from '@/pages/home/components/AddButton';
 import ModeCard from '@/pages/home/components/mode/ModeCard';
 import { useModeList } from '@/pages/home/hooks/useModeList';
 
@@ -26,7 +26,7 @@ const ModeList = () => {
       </div>
 
       <div className="mt-lg mb-[1.38rem] flex justify-center">
-        <AddBtn label="새 모드 추가하기" to="/modes/new" />
+        <AddButton label="새 모드 추가하기" to="/modes/new" />
       </div>
     </section>
   );
