@@ -1,4 +1,4 @@
-import AddBtn from '@/pages/home/components/AddBtn';
+import AddBtn from '@/pages/home/components/AddButton';
 import SoundAddBottomModal from '@/pages/home/components/sound/SoundAddBottomModal';
 import SoundCard from '@/pages/home/components/sound/SoundCard';
 import { useSoundSection } from '@/pages/home/hooks/useSoundSection';
