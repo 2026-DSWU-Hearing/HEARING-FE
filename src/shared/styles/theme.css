@@ -134,8 +134,8 @@
   );
   --gradient-card-true-bottomsheet: linear-gradient(
     to top,
-    color-mix(in srgb, var(--color-primary-300) 30%, transparent) 0%,
-    color-mix(in srgb, var(--color-neutral-50) 30%, transparent) 100%
+    color-mix(in srgb, var(--color-primary-300) 50%, transparent) 0%,
+    color-mix(in srgb, var(--color-primary-100) 50%, transparent) 100%
   );
   --gradient-default: linear-gradient(to bottom, #fdd043 0%, #82a6e6 100%);
 }
@@ -235,7 +235,7 @@
 
 @utility body-lg-medium {
   font-size: 1rem;
-  line-height: 145%;
+  font-style: normal;
   font-weight: 500;
 }
 
@@ -253,7 +253,7 @@
 
 @utility body-base-regular {
   font-size: 0.875rem;
-  line-height: 150%;
+  font-style: normal;
   font-weight: 400;
 }
 
