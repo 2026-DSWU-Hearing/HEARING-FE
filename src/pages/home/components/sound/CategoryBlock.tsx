@@ -1,33 +1,76 @@
+import { getCategoryColor } from '@/pages/home/constants/categoryColors';
+
+// variant 로 "어디에 쓰이는 블럭인지"를 구분한다.
+// - tag: 소리 카드 안의 카테고리 태그. 카테고리 고유색을 쓴다(기본값).
+// - filter: 소리 추가 모달 상단의 카테고리 필터 바. 선택/미선택만 일관된 색으로 표현한다.
+type CategoryBlockVariantTypes = 'tag' | 'filter';
+
 interface CategoryBlockPropTypes {
   categoryName: string;
+  variant?: CategoryBlockVariantTypes;
   isSelected?: boolean;
-  size?: 'small' | 'medium';
+  isDisabled?: boolean;
   onClick?: (categoryName: string) => void;
 }
 
-const getCategoryColorClassName = (categoryName: string) => {
-  if (categoryName.includes('긴급') || categoryName.includes('위험')) {
-    return 'border-red-500 text-red-500';
+// 필터 바(variant=filter): 카테고리 고유색을 쓰지 않고 선택 여부로만 색이 갈린다.
+// - 선택됨: 옅은 노란 배경 + 노란(primary) 테두리/글자.
+// - 미선택: 회색 배경 + 회색 글자.
+// (레이아웃/패딩은 공통 className 에서 처리하고, 여기서는 색만 반환한다.)
+const getFilterColor = (isSelected: boolean) =>
+  isSelected
+    ? 'bg-primary-500/10 border border-primary-500 text-primary-500'
+    : 'bg-neutral-700 text-secondary';
+
+// 태그(variant=tag) 색 우선순위: 비활성(방해금지) > 카테고리 고유색.
+// (태그는 "선택" 개념이 없어 isSelected 를 보지 않는다.)
+const getTagColor = ({
+  categoryName,
+  isDisabled,
+}: {
+  categoryName: string;
+  isDisabled: boolean;
+}) => {
+  if (isDisabled) {
+    return 'bg-neutral-700 text-secondary';
   }
 
-  return 'border-blue-400 text-blue-400';
+  return getCategoryColor(categoryName);
+};
+
+const getCategoryBlockColor = ({
+  categoryName,
+  variant,
+  isSelected,
+  isDisabled,
+}: {
+  categoryName: string;
+  variant: CategoryBlockVariantTypes;
+  isSelected: boolean;
+  isDisabled: boolean;
+}) => {
+  if (variant === 'filter') {
+    return getFilterColor(isSelected);
+  }
+
+  return getTagColor({ categoryName, isDisabled });
 };
 
 const CategoryBlock = ({
   categoryName,
+  variant = 'tag',
   isSelected = false,
-  size = 'small',
+  isDisabled = false,
   onClick,
 }: CategoryBlockPropTypes) => {
-  const sizeClassName =
-    size === 'medium'
-      ? 'px-5 py-2 text-sm'
-      : 'px-3 py-0.5 text-xs';
-  const selectedClassName = isSelected
-    ? 'border-neutral-900 bg-neutral-900 text-white'
-    : getCategoryColorClassName(categoryName);
+  const colorClassName = getCategoryBlockColor({
+    categoryName,
+    variant,
+    isSelected,
+    isDisabled,
+  });
 
-  const className = `whitespace-nowrap rounded-full border font-bold ${sizeClassName} ${selectedClassName}`;
+  const className = `caption-xs-medium whitespace-nowrap rounded-full px-xs py-xxs w-[4.25rem]  ${colorClassName}`;
 
   if (onClick) {
     const handleCategoryBlockClick = () => {
