@@ -32,7 +32,7 @@ const ModeCard = ({ mode, isSelected }: ModeCardPropTypes) => {
       />
 
       <span
-        className={`relative z-10 flex items-center justify-center w-[3rem] h-[3rem]  rounded-full p-2 transition-colors duration-300 ease-in-out ${isSelected ? 'text-white bg-primary-500/20 text-primary-500' : 'bg-neutral-700 text-tertiary'}`}
+        className={`relative z-10 flex items-center justify-center w-[3rem] h-[3rem]  rounded-full p-2 transition-colors duration-300 ease-in-out ${isSelected ? 'bg-primary-500/20 text-primary-500' : 'bg-neutral-700 text-tertiary'}`}
       >
         {mode.icon}
       </span>
