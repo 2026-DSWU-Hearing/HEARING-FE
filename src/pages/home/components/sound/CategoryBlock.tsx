@@ -20,7 +20,7 @@ interface CategoryBlockPropTypes {
 const getFilterColor = (isSelected: boolean) =>
   isSelected
     ? 'bg-primary-500/10 border border-primary-500 text-primary-500'
-    : 'bg-neutral-700 text-secondary';
+    : 'bg-neutral-700 text-secondary border border-transparent';
 
 // 태그(variant=tag) 색 우선순위: 비활성(방해금지) > 카테고리 고유색.
 // (태그는 "선택" 개념이 없어 isSelected 를 보지 않는다.)
