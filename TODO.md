@@ -4,6 +4,7 @@
 
 - [ ] (보류) context API 사용한 부분을 zustand로 바꾸는 게 좋을지 검토하기 → 검토 결과 현 시점 비권장. 페이지 간 상태 공유나 영속화(persist) 필요 시 재검토. (보고서: ~/.claude/plans/zustand-migration-review.md)
 - [ ] (보류) home에서 모드 블럭 화살표 버튼 눌러서 모드 설정 들어갔을 때 모드 이름 수정 부분과 아이콘 수정에서 해당 모드 정보가 아니라 "실외"와 "바깥"이 뜨고 있음. → mock 데이터 한계(getModeDetail이 mode_id만 교체, name/icon 고정 반환). IS_MOCK=false 서버 연동 시 자동 해결. 서버 연동까지 보류.
+- [ ] **방해금지 버튼 추가** (home): 누르면 활성 모드/소리를 전부 비활성화하는 방식(방향 A). → **푸시 알림 쪽 추가 구현 없음**: 활성 모드가 없으면 백엔드 소리 필터링(`notification_service.py`)에서 매칭 안 돼 푸시 미발송. 우리 SW/onMessage 수신 코드 그대로. 단, 구현 전 합의할 점 ①방해금지 해제 시 이전 모드 복원 여부(UX) ②백엔드에 이미 있는 `do_not_disturb` 필드+`PATCH /users/me/do-not-disturb` API와 중복 → "모드 비활성화 방식 vs do_not_disturb 플래그 방식" 팀 합의 필요(백엔드는 플래그를 의도했을 수 있음) ③하드웨어 진동(위험 소리 자체 판단)은 별개 → 방해금지가 웹 푸시만 끄는지 진동까지 끄는지 정의.
 
 # 푸시 알림
 
