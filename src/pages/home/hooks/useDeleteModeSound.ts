@@ -17,35 +17,36 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteModeSound } from '../apis/deleteModeSound';
-import type { GetModeDetailResponseTypes } from '@/pages/home/types/modeTypes';
+import type {
+  GetModeDetailResponseTypes,
+  GetModesResponseTypes,
+} from '@/pages/home/types/modeTypes';
 
-// 모드에 담긴 특정 소리를 삭제하는 mutation 훅
+// 모드에 담긴 소리를 삭제하는 mutation 훅. 개별 삭제 API가 없어 "남길 소리 id 목록"으로 전체 교체한다.
 export const useDeleteModeSound = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ modeId, soundId }: { modeId: number; soundId: number }) =>
-      deleteModeSound(modeId, soundId),
+    mutationFn: ({
+      modeId,
+      remainingSoundIds,
+    }: {
+      modeId: number;
+      remainingSoundIds: number[];
+    }) => deleteModeSound(modeId, remainingSoundIds),
 
-    onSuccess: (_, variables) => {
+    onSuccess: (data) => {
+      // 서버 응답(data)이 갱신된 완전한 모드 객체이므로 상세/목록 캐시에 그대로 반영한다.
       queryClient.setQueryData<GetModeDetailResponseTypes>(
-        ['modes', variables.modeId],
-        (old) => {
-          if (!old) return old;
-
-          return {
-            ...old,
-            sounds: old.sounds.filter(
-              (sound) => sound.sound_id !== variables.soundId,
-            ),
-          };
-        },
+        ['modes', data.id],
+        data,
       );
 
-      // 실제 서버 연결 후에는 아래 방식으로 변경 가능
-      // queryClient.invalidateQueries({
-      //   queryKey: ['modes', variables.modeId],
-      // });
+      queryClient.setQueryData<GetModesResponseTypes>(['modes'], (old) => {
+        if (!old) return old;
+
+        return old.map((mode) => (mode.id === data.id ? data : mode));
+      });
     },
   });
 };

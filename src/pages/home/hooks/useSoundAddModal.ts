@@ -17,16 +17,16 @@ export const useSoundAddModal = ({
   const [selectedSoundIds, setSelectedSoundIds] = useState<number[]>([]);
 
   const filteredSounds = useMemo(() => {
-    const sounds = data?.sounds ?? [];
+    const sounds = data ?? [];
 
     return sounds.filter((sound) => {
       const isMatchedKeyword = sound.name.includes(searchKeyword);
       const isMatchedCategory =
-        selectedCategory === null || sound.category_name === selectedCategory;
+        selectedCategory === null || sound.category.name === selectedCategory;
 
       return isMatchedKeyword && isMatchedCategory;
     });
-  }, [data?.sounds, searchKeyword, selectedCategory]);
+  }, [data, searchKeyword, selectedCategory]);
 
   const handleSearchKeywordChange = useCallback((keyword: string) => {
     setSearchKeyword(keyword);
@@ -44,12 +44,10 @@ export const useSoundAddModal = ({
 
   const handleCompleteClick = useCallback(() => {
     const selectedSounds =
-      data?.sounds.filter((sound) =>
-        selectedSoundIds.includes(sound.sound_id),
-      ) ?? [];
+      data?.filter((sound) => selectedSoundIds.includes(sound.id)) ?? [];
 
     onComplete(selectedSounds);
-  }, [data?.sounds, onComplete, selectedSoundIds]);
+  }, [data, onComplete, selectedSoundIds]);
 
   return {
     searchKeyword,

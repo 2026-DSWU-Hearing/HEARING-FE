@@ -1,14 +1,8 @@
 import CategoryBlock from '@/pages/home/components/sound/CategoryBlock';
-
-interface SoundCardSoundTypes {
-  sound_id: number;
-  name: string;
-  category?: string;
-  category_name?: string;
-}
+import type { SoundTypes } from '@/pages/home/types/soundTypes';
 
 interface SoundCardPropTypes {
-  sound: SoundCardSoundTypes;
+  sound: SoundTypes;
   isDisabled?: boolean;
   isSelected?: boolean;
   isEditMode?: boolean;
@@ -34,10 +28,10 @@ const SoundCard = ({
   isEditMode = false,
   onClick,
 }: SoundCardPropTypes) => {
-  const categoryName = sound.category ?? sound.category_name ?? '기타';
+  const categoryName = sound.category?.name ?? '기타';
 
   const handleSoundCardClick = () => {
-    onClick?.(sound.sound_id);
+    onClick?.(sound.id);
   };
 
   const cardStyle = isEditMode

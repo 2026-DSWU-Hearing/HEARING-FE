@@ -67,10 +67,10 @@ const SoundAddBottomModal = ({
           <div className="grid grid-cols-3 gap-3">
             {filteredSounds.map((sound) => (
               <SoundCard
-                key={sound.sound_id}
+                key={sound.id}
                 sound={sound}
                 isEditMode
-                isSelected={selectedSoundIds.includes(sound.sound_id)}
+                isSelected={selectedSoundIds.includes(sound.id)}
                 onClick={handleSoundSelect}
               />
             ))}

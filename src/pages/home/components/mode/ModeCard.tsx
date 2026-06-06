@@ -9,7 +9,7 @@ interface ModeCardPropTypes {
 
 const ModeCard = ({ mode, isSelected }: ModeCardPropTypes) => {
   const { handleActivateModeClick, handleMoveModeSettingClick } = useModeCard({
-    modeId: mode.mode_id,
+    modeId: mode.id,
   });
 
   return (
@@ -25,7 +25,7 @@ const ModeCard = ({ mode, isSelected }: ModeCardPropTypes) => {
 
         {/*모드 설정으로 이동 버튼*/}
         <Link
-          to={`/modes/${mode.mode_id}/settings`}
+          to={`/modes/${mode.id}/settings`}
           onClick={handleMoveModeSettingClick}
         >
           <span>{'>'}</span>

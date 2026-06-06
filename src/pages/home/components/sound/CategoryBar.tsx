@@ -46,7 +46,7 @@ const CategoryBar = ({
 
       {categories.map((category) => (
         <CategoryBlock
-          key={category.category_id}
+          key={category.id}
           categoryName={category.name}
           isSelected={selectedCategory === category.name}
           size="medium"

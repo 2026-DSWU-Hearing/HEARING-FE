@@ -44,52 +44,46 @@ export const useSoundSection = () => {
     [selectedModeId, state.isEditMode, toggleDisabledSound, toggleRemoveSound],
   );
 
-  // 선택된 소리 삭제 함수
+  // 선택된 소리 삭제 함수 — 개별 삭제 API가 없으므로 "남길 소리 id 목록"으로 전체 교체한다.
   const handleRemoveSelectedSoundsClick = useCallback(async () => {
     if (selectedModeId === null || state.selectedRemoveSoundIds.length === 0) {
       return;
     }
 
-    await Promise.all(
-      state.selectedRemoveSoundIds.map((soundId) =>
-        deleteModeSound({ modeId: selectedModeId, soundId }),
-      ),
-    );
+    const remainingSoundIds = (data?.sounds ?? [])
+      .map((sound) => sound.id)
+      .filter((soundId) => !state.selectedRemoveSoundIds.includes(soundId));
+
+    await deleteModeSound({
+      modeId: selectedModeId,
+      remainingSoundIds,
+    });
 
     resetRemoveSounds();
     closeEditMode();
   }, [
     closeEditMode,
+    data,
     deleteModeSound,
     resetRemoveSounds,
     selectedModeId,
     state.selectedRemoveSoundIds,
   ]);
 
-  // 소리 추가 완료 함수
+  // 소리 추가 완료 함수 — 기존 소리와 새 소리의 id 합집합으로 전체 교체한다.
   const handleAddSoundsComplete = useCallback(
     (selectedSounds: SoundTypes[]) => {
       if (selectedModeId === null || !data) return;
 
-      const currentSounds = data.sounds.map((sound) => ({
-        sound_id: sound.sound_id,
-        name: sound.name,
-      }));
-      const newSounds = selectedSounds.map((sound) => ({
-        sound_id: sound.sound_id,
-        name: sound.name,
-      }));
+      const currentSoundIds = data.sounds.map((sound) => sound.id);
+      const newSoundIds = selectedSounds.map((sound) => sound.id);
       // 이미 담긴 소리와 새로 선택한 소리가 겹치면 한 번만 전송한다.
-      const nextSounds = [...currentSounds, ...newSounds].filter(
-        (sound, index, sounds) =>
-          sounds.findIndex((item) => item.sound_id === sound.sound_id) ===
-          index,
-      );
+      const nextSoundIds = [...new Set([...currentSoundIds, ...newSoundIds])];
 
       putModeSounds({
         modeId: selectedModeId,
         soundsData: {
-          sounds: nextSounds,
+          sound_ids: nextSoundIds,
         },
       });
       closeAddSoundModal();

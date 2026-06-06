@@ -18,9 +18,9 @@ const ModeList = () => {
       <div className="flex flex-row justify-between gap-3">
         {modes.map((mode) => (
           <ModeCard
-            key={mode.mode_id}
+            key={mode.id}
             mode={mode}
-            isSelected={mode.mode_id === selectedModeId}
+            isSelected={mode.id === selectedModeId}
           />
         ))}
       </div>
