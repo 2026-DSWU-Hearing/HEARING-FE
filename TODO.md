@@ -21,6 +21,12 @@
 
 - [ ] (보류) FCM foreground 알림 표시 - `title` 없는 메시지 대응. 현재 `useFcmToken.ts`의 `onForegroundMessage` 핸들러가 `if (... && title)` 조건이라 `notification.title`이 없으면 알림이 안 뜸. → 서버 연동 시 `data`-only 페이로드를 쓰면 `notification.title`이 비어 알림이 누락될 수 있음. `new Notification(title ?? '알림', ...)` 형태의 fallback 필요. 서버 페이로드 구조(`data` 키) 확정 후 background SW(`firebase-messaging-sw.js`)와 함께 반영.
 
+### PR #35 코드 리뷰 보류 항목 (Gemini/CodeRabbit)
+
+- [ ] (보류) **토큰 서버 전송 실패 사용자 피드백 + useMutation 전환**: 현재 `useFcmToken.ts`에서 `postFcmToken` 실패 시 `console.error`만 함 → 사용자는 등록 실패를 인지 못함. 토스트/Alert로 피드백 필요. 동시에 프로젝트 컨벤션상 서버 상태는 TanStack Query를 써야 하므로 `useMutation(postFcmToken)`으로 래핑해 로딩/에러 상태 관리. (토스트 UI 정비 + 두 작업 함께 진행 권장)
+- [ ] (보류) **foreground 알림 리스너 전역화**: `onForegroundMessage` 리스너가 `useFcmToken`(Setting 페이지 전용) 안에 있어, 설정 페이지를 벗어나면 다른 페이지(홈 등)에서 foreground 알림을 못 받음. → 리스너 등록을 `App.tsx` 또는 전역 Provider로 이동. FCM 초기화 시점 설계와 얽히므로 로그인/디바이스 연결 플로우 정비 시 함께.
+- [ ] (보류, 낮음) **firebase-messaging-sw.js config 환경별 분리**: 현재 SW에 Firebase config 하드코딩. 환경(dev/staging/prod)별 다른 Firebase 프로젝트를 쓰게 되면, SW 등록 URL에 쿼리스트링으로 config를 전달하고 SW 내부에서 파싱하는 방식 고려. 현재는 프로젝트 1개라 불필요(공개값이라 보안 이슈도 아님). 환경 분리 시점에 재검토.
+
 # 커스텀 모달
 
 - [ ] (보류) 모달(ConfirmModal/AlertModal) 키보드 접근성 - 포커스 트랩 적용. 모달이 열려도 Tab으로 뒤쪽 ModeForm까지 포커스가 빠져나감. 필요: ①초기 포커스(열릴 때 모달 내부로) ②포커스 트랩(Tab 순환을 모달 안에 가둠) ③닫을 때 포커스 복원. → useFocusTrap 훅 + ModalShell 공통 컴포넌트로 시도했으나 Tab이 여전히 배경까지 이동(모달이 Portal 미사용이라 DOM상 ModeForm과 형제 → 브라우저 기본 Tab 순서 유지됨이 원인 추정). 제대로 하려면 배경에 inert 속성 부여 또는 React Portal + 배경 aria-hidden 처리 필요. 추후 재작업.

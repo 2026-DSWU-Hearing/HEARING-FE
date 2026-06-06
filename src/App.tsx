@@ -2,7 +2,6 @@ import { useLocation } from 'react-router-dom';
 
 import BottomNavigation from '@/layout/BottomNavigation';
 import AppRouter from '@/routes/AppRouter';
-import '@/shared/firebase/settingFCM';
 import '@/App.css';
 
 function App() {

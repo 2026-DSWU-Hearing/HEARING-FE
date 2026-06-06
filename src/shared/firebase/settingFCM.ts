@@ -24,6 +24,20 @@ export const messaging = getMessaging(app);
 // Firebase 콘솔 > Cloud Messaging > 웹 푸시 인증서에서 발급한 공개키
 const VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY;
 
+// 특정 Service Worker가 activated 상태가 될 때까지 기다린다.
+// navigator.serviceWorker.ready는 scope '/'의 PWA SW만 보장하므로,
+// 별도 scope로 등록한 FCM SW의 활성화는 이 registration의 SW를 직접 추적해야 한다.
+const waitForServiceWorkerActivation = (registration: ServiceWorkerRegistration) => {
+  const serviceWorker = registration.installing ?? registration.waiting ?? registration.active;
+  if (!serviceWorker || serviceWorker.state === 'activated') return Promise.resolve();
+
+  return new Promise<void>((resolve) => {
+    serviceWorker.addEventListener('statechange', (event) => {
+      if ((event.target as ServiceWorker).state === 'activated') resolve();
+    });
+  });
+};
+
 // FCM 백그라운드 알림용 Service Worker를 PWA용 sw.js와 다른 scope로 등록한다.
 // scope를 분리해야 vite-plugin-pwa가 만든 sw.js(scope '/')와 충돌하지 않는다.
 const registerFcmServiceWorker = async () => {
@@ -35,7 +49,7 @@ const registerFcmServiceWorker = async () => {
 
   // register()는 등록만 보장하고 활성화는 보장하지 않는다.
   // getToken의 push 구독은 active SW가 필요하므로 활성화될 때까지 기다린다.
-  await navigator.serviceWorker.ready;
+  await waitForServiceWorkerActivation(registration);
   return registration;
 };
 
