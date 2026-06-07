@@ -15,7 +15,11 @@ const ModeCard = ({
   isSelected,
   isDoNotDisturb,
 }: ModeCardPropTypes) => {
-  const { handleActivateModeClick, handleMoveModeSettingClick } = useModeCard({
+  const {
+    handleActivateModeClick,
+    handleActivateModeKeyDown,
+    handleMoveModeSettingClick,
+  } = useModeCard({
     modeId: mode.mode_id,
     isDoNotDisturb,
   });
@@ -35,7 +39,10 @@ const ModeCard = ({
   return (
     // 화살표 제외 영역은 누르면 활성 비활성
     <div
+      role="button"
+      tabIndex={isDoNotDisturb ? -1 : 0}
       onClick={handleActivateModeClick}
+      onKeyDown={handleActivateModeKeyDown}
       aria-disabled={isDoNotDisturb}
       className={`relative flex h-full w-full flex-col justify-between overflow-hidden rounded-xl p-sm tag-glass-effect card-false transition-colors duration-300 ease-in-out ${modeCardStyle}`}
     >

@@ -12,7 +12,8 @@ export const useSoundSection = () => {
   const { selectedModeId, isDoNotDisturb } = useHomeModeContext();
   const { data, isLoading, isError } = useGetModeDetail(selectedModeId);
   const { mutateAsync: deleteModeSound } = useDeleteModeSound();
-  const { mutate: patchModeSoundActive } = usePatchModeSoundActive();
+  const { mutate: patchModeSoundActive, isPending: isPatchModeSoundActivePending } =
+    usePatchModeSoundActive();
   const { mutate: putModeSounds } = usePutModeSounds();
   const {
     state,
@@ -34,6 +35,9 @@ export const useSoundSection = () => {
         return;
       }
 
+      // on/off PATCH가 진행 중이면 연타로 인한 중복 요청을 막는다.
+      if (isPatchModeSoundActivePending) return;
+
       const selectedSound = data?.sounds.find(
         (sound) => sound.sound_id === soundId,
       );
@@ -48,6 +52,7 @@ export const useSoundSection = () => {
     [
       data?.sounds,
       isDoNotDisturb,
+      isPatchModeSoundActivePending,
       patchModeSoundActive,
       selectedModeId,
       state.isEditMode,

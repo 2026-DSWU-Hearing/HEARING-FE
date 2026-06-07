@@ -338,6 +338,15 @@
   background-image: var(--gradient-default);
 }
 
+/* icon size - --icon-* 토큰을 width, height 유틸리티로 노출한다 */
+@utility w-icon-* {
+  width: --value(--icon- *);
+}
+
+@utility h-icon-* {
+  height: --value(--icon- *);
+}
+
 /* shadow */
 @utility shadow-chip {
   box-shadow: var(--shadow-chip);

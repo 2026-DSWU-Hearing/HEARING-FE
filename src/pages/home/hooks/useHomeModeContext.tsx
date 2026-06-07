@@ -31,20 +31,23 @@ export const HomeModeProvider = ({ children }: HomeModeProviderPropTypes) => {
 
   // 모드 선택 함수 - 선택된 모드는 모드 목록과 소리 섹션이 함께 사용한다
   const handleModeSelect = useCallback((modeId: number) => {
-    console.log(`${modeId}로 바뀜`);
     setSelectedModeId(modeId);
   }, []);
 
   const handleDoNotDisturbToggle = useCallback(() => {
-    const nextIsDoNotDisturb = !isDoNotDisturb;
+    setIsDoNotDisturb((prevIsDoNotDisturb) => {
+      const nextIsDoNotDisturb = !prevIsDoNotDisturb;
 
-    setIsDoNotDisturb(nextIsDoNotDisturb);
-    updateDoNotDisturb(nextIsDoNotDisturb, {
-      onError: () => {
-        setIsDoNotDisturb(isDoNotDisturb);
-      },
+      // 화면은 즉시 토글하고, 서버 반영에 실패하면 이전 상태로 되돌린다.
+      updateDoNotDisturb(nextIsDoNotDisturb, {
+        onError: () => {
+          setIsDoNotDisturb(prevIsDoNotDisturb);
+        },
+      });
+
+      return nextIsDoNotDisturb;
     });
-  }, [isDoNotDisturb, updateDoNotDisturb]);
+  }, [updateDoNotDisturb]);
 
   const contextValue = useMemo(
     () => ({

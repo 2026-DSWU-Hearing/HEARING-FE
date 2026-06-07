@@ -41,6 +41,7 @@ export const useModeSoundSelectSection = () => {
   const [openedCategoryId, setOpenedCategoryId] = useState<number | null>(null);
 
   const sounds = useMemo(() => soundsData?.sounds ?? [], [soundsData?.sounds]);
+  const hasSounds = sounds.length > 0;
   const categories = useMemo(
     () => categoriesData?.categories ?? createCategoriesFromSounds(sounds),
     [categoriesData?.categories, sounds],
@@ -81,8 +82,10 @@ export const useModeSoundSelectSection = () => {
   return {
     categorySoundGroups,
     hasNoSearchResult,
-    isError: isSoundsError || isCategoriesError,
-    isLoading: isSoundsLoading || isCategoriesLoading,
+    // 소리 목록만 있으면 카테고리는 합성 폴백으로 대체되므로,
+    // 소리가 없을 때에만 카테고리 에러/로딩을 섹션 차단 사유로 본다.
+    isError: isSoundsError || (!hasSounds && isCategoriesError),
+    isLoading: isSoundsLoading || (!hasSounds && isCategoriesLoading),
     isSearching,
     openedCategoryId,
     searchKeyword,
