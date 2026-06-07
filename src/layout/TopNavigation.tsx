@@ -32,9 +32,9 @@ const TopNavigation = ({
         type="button"
         onClick={handleBackClick}
         aria-label="이전 페이지로 이동"
-        className="text-primary"
+        className="text-primary h-[1.5rem] w-[1.5rem]"
       >
-        <FontAwesomeIcon icon={faAngleLeft} className="h-[1.5rem] w-[1.5rem]" />
+        <FontAwesomeIcon icon={faAngleLeft} />
       </button>
 
       <h1 className="heading-lg-semibold text-primary">{title}</h1>
