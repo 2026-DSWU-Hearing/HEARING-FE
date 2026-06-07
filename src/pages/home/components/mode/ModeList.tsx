@@ -1,4 +1,4 @@
-import AddBtn from '@/pages/home/components/AddBtn';
+import AddBtn from '@/pages/home/components/AddButton';
 import ModeCard from '@/pages/home/components/mode/ModeCard';
 import { useModeList } from '@/pages/home/hooks/useModeList';
 
