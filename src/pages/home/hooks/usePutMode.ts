@@ -80,6 +80,7 @@ export const usePutMode = () => {
               return {
                 ...sound,
                 category: oldSound?.category ?? '',
+                is_active: oldSound?.is_active ?? true,
               };
             }),
           };

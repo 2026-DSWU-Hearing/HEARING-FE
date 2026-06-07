@@ -13,7 +13,6 @@ const SoundSection = () => {
     isEditMode,
     isAddSoundModalOpen,
     selectedRemoveSoundIds,
-    disabledSoundIds,
     toggleEditMode,
     closeEditMode,
     openAddSoundModal,
@@ -32,18 +31,18 @@ const SoundSection = () => {
       <div className="mb-5 flex items-center justify-between">
         <h2 className="text-xl font-bold">담은 소리</h2>
         {isEditMode ? (
-          <div className="flex gap-3">
+          <div className="flex gap-base">
             <button
               type="button"
               onClick={closeEditMode}
-              className="text-sm font-bold text-neutral-500"
+              className="body-base-regular text-secondary"
             >
               취소
             </button>
             <button
               type="button"
               onClick={handleRemoveSelectedSoundsClick}
-              className="text-sm font-bold text-neutral-900 disabled:text-neutral-300"
+              className="body-base-regular text-state-alert"
               disabled={isDoNotDisturb || selectedRemoveSoundIds.length === 0}
             >
               삭제
@@ -53,7 +52,7 @@ const SoundSection = () => {
           <button
             type="button"
             onClick={toggleEditMode}
-            className="text-sm font-bold text-neutral-400 disabled:text-neutral-600"
+            className="body-base-regular text-tertiary"
             disabled={isDoNotDisturb}
           >
             편집
@@ -69,14 +68,11 @@ const SoundSection = () => {
           <SoundCard
             key={sound.sound_id}
             sound={sound}
-            isEditMode={isEditMode}
-            isDisabled={
-              isDoNotDisturb || disabledSoundIds.includes(sound.sound_id)
-            }
+            isActive={sound.is_active}
             isDoNotDisturb={isDoNotDisturb}
+            isEditMode={isEditMode}
             isSelected={
-              !isDoNotDisturb &&
-              selectedRemoveSoundIds.includes(sound.sound_id)
+              !isDoNotDisturb && selectedRemoveSoundIds.includes(sound.sound_id)
             }
             onClick={handleSoundCardClick}
           />

@@ -39,11 +39,13 @@ export const modeDetailMock: GetModeDetailResponseTypes = {
       sound_id: 1,
       name: '자동차 경적',
       category: '교통',
+      is_active: true,
     },
     {
       sound_id: 2,
       name: '사이렌',
       category: '위험',
+      is_active: false,
     },
   ],
 };

@@ -3,6 +3,7 @@ import { useDeleteModeSound } from '@/pages/home/hooks/useDeleteModeSound';
 import { useGetModeDetail } from '@/pages/home/hooks/useGetModeDetail';
 import { useHomeModeContext } from '@/pages/home/hooks/useHomeModeContext';
 import { useModeSoundState } from '@/pages/home/hooks/useModeSoundState';
+import { usePatchModeSoundActive } from '@/pages/home/hooks/usePatchModeSoundActive';
 import { usePutModeSounds } from '@/pages/home/hooks/usePutModeSounds';
 import type { SoundTypes } from '@/pages/home/types/soundTypes';
 
@@ -11,6 +12,7 @@ export const useSoundSection = () => {
   const { selectedModeId, isDoNotDisturb } = useHomeModeContext();
   const { data, isLoading, isError } = useGetModeDetail(selectedModeId);
   const { mutateAsync: deleteModeSound } = useDeleteModeSound();
+  const { mutate: patchModeSoundActive } = usePatchModeSoundActive();
   const { mutate: putModeSounds } = usePutModeSounds();
   const {
     state,
@@ -20,14 +22,7 @@ export const useSoundSection = () => {
     closeAddSoundModal,
     toggleRemoveSound,
     resetRemoveSounds,
-    toggleDisabledSound,
   } = useModeSoundState();
-
-  // 비활성 표시는 모드별로 따로 유지해 모드 전환 후에도 UI 선택을 보존한다.
-  const disabledSoundIds =
-    selectedModeId === null
-      ? []
-      : (state.disabledSoundIdsByMode[selectedModeId] ?? []);
 
   // 소리 카드 클릭 함수
   const handleSoundCardClick = useCallback(
@@ -39,13 +34,23 @@ export const useSoundSection = () => {
         return;
       }
 
-      toggleDisabledSound(selectedModeId, soundId);
+      const selectedSound = data?.sounds.find(
+        (sound) => sound.sound_id === soundId,
+      );
+      if (!selectedSound) return;
+
+      patchModeSoundActive({
+        modeId: selectedModeId,
+        soundId,
+        isActive: !selectedSound.is_active,
+      });
     },
     [
+      data?.sounds,
       isDoNotDisturb,
+      patchModeSoundActive,
       selectedModeId,
       state.isEditMode,
-      toggleDisabledSound,
       toggleRemoveSound,
     ],
   );
@@ -117,7 +122,6 @@ export const useSoundSection = () => {
     isEditMode: state.isEditMode,
     isAddSoundModalOpen: state.isAddSoundModalOpen,
     selectedRemoveSoundIds: state.selectedRemoveSoundIds,
-    disabledSoundIds,
     toggleEditMode,
     closeEditMode,
     openAddSoundModal,
