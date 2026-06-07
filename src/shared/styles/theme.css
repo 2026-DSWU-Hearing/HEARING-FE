@@ -134,8 +134,8 @@
   );
   --gradient-card-true-bottomsheet: linear-gradient(
     to top,
-    color-mix(in srgb, var(--color-primary-300) 30%, transparent) 0%,
-    color-mix(in srgb, var(--color-neutral-50) 30%, transparent) 100%
+    color-mix(in srgb, var(--color-primary-300) 50%, transparent) 0%,
+    color-mix(in srgb, var(--color-neutral-50) 50%, transparent) 100%
   );
   --gradient-default: linear-gradient(to bottom, #fdd043 0%, #82a6e6 100%);
 }
