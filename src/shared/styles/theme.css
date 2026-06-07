@@ -90,10 +90,13 @@
   --spacing-xxxs: 0.125rem; /* 2px */
 
   /* Icon Size */
-  --spacing-icon-hero: 1.75rem; /* 28px */
-  --spacing-icon-lg: 1.5rem; /* 24px */
-  --spacing-icon-md: 1.25rem; /* 20px */
-  --spacing-icon-sm: 1rem; /* 16px */
+  --icon-sm: 1rem; /* 16px */
+  --icon-md: 1.5rem; /* 24px */
+  --icon-lg: 1.75rem; /* 28px */
+  --icon-xl: 2rem; /* 32px */
+  --icon-2xl: 2.25rem; /* 36px */
+  --icon-3xl: 3rem; /* 48px */
+  --icon-4xl: 3.5rem; /* 56px */
 
   /* Opacity */
   --opacity-opaque: 1;
@@ -333,6 +336,15 @@
 
 @utility gradient-default {
   background-image: var(--gradient-default);
+}
+
+/* icon size - --icon-* 토큰을 width, height 유틸리티로 노출한다 */
+@utility w-icon-* {
+  width: --value(--icon- *);
+}
+
+@utility h-icon-* {
+  height: --value(--icon- *);
 }
 
 /* shadow */

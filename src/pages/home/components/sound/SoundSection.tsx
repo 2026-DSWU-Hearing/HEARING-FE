@@ -6,13 +6,13 @@ import { useSoundSection } from '@/pages/home/hooks/useSoundSection';
 const SoundSection = () => {
   const {
     selectedModeId,
+    isDoNotDisturb,
     sounds,
     isLoading,
     isError,
     isEditMode,
     isAddSoundModalOpen,
     selectedRemoveSoundIds,
-    disabledSoundIds,
     toggleEditMode,
     closeEditMode,
     openAddSoundModal,
@@ -31,19 +31,19 @@ const SoundSection = () => {
       <div className="mb-5 flex items-center justify-between">
         <h2 className="text-xl font-bold">담은 소리</h2>
         {isEditMode ? (
-          <div className="flex gap-3">
+          <div className="flex gap-base">
             <button
               type="button"
               onClick={closeEditMode}
-              className="text-sm font-bold text-neutral-500"
+              className="body-base-regular text-secondary"
             >
               취소
             </button>
             <button
               type="button"
               onClick={handleRemoveSelectedSoundsClick}
-              className="text-sm font-bold text-neutral-900 disabled:text-neutral-300"
-              disabled={selectedRemoveSoundIds.length === 0}
+              className="body-base-regular text-state-alert"
+              disabled={isDoNotDisturb || selectedRemoveSoundIds.length === 0}
             >
               삭제
             </button>
@@ -52,7 +52,8 @@ const SoundSection = () => {
           <button
             type="button"
             onClick={toggleEditMode}
-            className="text-sm font-bold text-neutral-400"
+            className="body-base-regular text-tertiary"
+            disabled={isDoNotDisturb}
           >
             편집
           </button>
@@ -67,16 +68,26 @@ const SoundSection = () => {
           <SoundCard
             key={sound.sound_id}
             sound={sound}
+            isActive={sound.is_active}
+            isDoNotDisturb={isDoNotDisturb}
             isEditMode={isEditMode}
-            isDisabled={disabledSoundIds.includes(sound.sound_id)}
-            isSelected={selectedRemoveSoundIds.includes(sound.sound_id)}
+            isSelected={
+              !isDoNotDisturb && selectedRemoveSoundIds.includes(sound.sound_id)
+            }
             onClick={handleSoundCardClick}
           />
         ))}
       </div>
 
       <div className="mt-5 flex justify-center">
-        <AddBtn label="소리 추가하기" onClick={openAddSoundModal} />
+        <AddBtn
+          label="소리 추가하기"
+          onClick={openAddSoundModal}
+          disabled={isDoNotDisturb}
+          className={
+            isDoNotDisturb ? 'cursor-not-allowed opacity-60' : undefined
+          }
+        />
       </div>
 
       {isAddSoundModalOpen && (

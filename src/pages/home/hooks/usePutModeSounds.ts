@@ -70,6 +70,7 @@ export const usePutModeSounds = () => {
                 ...sound,
                 category:
                   oldSound?.category ?? currentSound?.category_name ?? '',
+                is_active: oldSound?.is_active ?? true,
               };
             }),
           };

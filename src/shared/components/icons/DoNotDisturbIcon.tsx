@@ -1,8 +1,8 @@
-interface SilentModeIconPropTypes {
+interface DoNotDisturbIconPropTypes {
   className?: string;
 }
 
-const SilentModeIcon = ({ className }: SilentModeIconPropTypes) => (
+const DoNotDisturbIcon = ({ className }: DoNotDisturbIconPropTypes) => (
   <svg
     viewBox="0 0 16 18"
     fill="none"
@@ -16,4 +16,4 @@ const SilentModeIcon = ({ className }: SilentModeIconPropTypes) => (
   </svg>
 );
 
-export default SilentModeIcon;
+export default DoNotDisturbIcon;
