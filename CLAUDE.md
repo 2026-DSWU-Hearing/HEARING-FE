@@ -65,5 +65,4 @@ pnpm run dev # start web
 
 - 코딩 컨벤션: @docs/conventions.md
 - API 문서: @docs/api-spec.md
-- modes/sounds API 로직 가이드: @docs/modes-api-guide.md
 - mermaid architecture: @docs/architecture.md

@@ -31,7 +31,7 @@ const IconPicker = ({
   onIconSelect,
 }: ModeIconPickerPropTypes) => {
   return (
-    <div className="mx-auto grid max-w-[320px] grid-cols-6 gap-sm">
+    <div className="mx-auto grid max-w-[320px] grid-cols-6 gap-3">
       {MODE_ICON_OPTIONS.map((icon) => (
         <ModeIcon
           key={icon}

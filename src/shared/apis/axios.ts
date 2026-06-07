@@ -21,11 +21,10 @@ http.interceptors.request.use((config) => {
 http.interceptors.response.use(
   (response) => response,
   (error) => {
-    // TODO(임시): 백엔드 인증 정상화 전까지 로컬 테스트를 위해 401 → /login 리다이렉트를 비활성화함.
-    //            백엔드 auth(register/login) 복구 후 아래 블록 주석 해제하여 원복할 것.
-    // if (error.response?.status === 401) {
-    //   window.location.href = '/login'; // 로그인 페이지로 리다이렉션
-    // }
+    // 에러 처리
+    if (error.response?.status === 401) {
+      window.location.href = '/login'; // 로그인 페이지로 리다이렉션
+    }
     return Promise.reject(error); // 에러를 호출한 곳으로 전달
   },
 );

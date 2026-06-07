@@ -1,4 +1,4 @@
-import AddBtn from '@/pages/home/components/AddButton';
+import AddBtn from '@/pages/home/components/AddBtn';
 import SoundAddBottomModal from '@/pages/home/components/sound/SoundAddBottomModal';
 import SoundCard from '@/pages/home/components/sound/SoundCard';
 import { useSoundSection } from '@/pages/home/hooks/useSoundSection';
@@ -10,10 +10,9 @@ const SoundSection = () => {
     isLoading,
     isError,
     isEditMode,
-    isDoNotDisturb,
     isAddSoundModalOpen,
     selectedRemoveSoundIds,
-    offSoundIds,
+    disabledSoundIds,
     toggleEditMode,
     closeEditMode,
     openAddSoundModal,
@@ -28,22 +27,22 @@ const SoundSection = () => {
   }
 
   return (
-    <section>
-      <div className="mb-[1.5rem] flex items-center justify-between">
-        <h2 className="heading-base-semibold text-primary">담은 소리</h2>
+    <section className="mt-14">
+      <div className="mb-5 flex items-center justify-between">
+        <h2 className="text-xl font-bold">담은 소리</h2>
         {isEditMode ? (
-          <div className="flex gap-base">
+          <div className="flex gap-3">
             <button
               type="button"
               onClick={closeEditMode}
-              className="body-base-regular text-secondary"
+              className="text-sm font-bold text-neutral-500"
             >
               취소
             </button>
             <button
               type="button"
               onClick={handleRemoveSelectedSoundsClick}
-              className="body-base-regular text-state-alert"
+              className="text-sm font-bold text-neutral-900 disabled:text-neutral-300"
               disabled={selectedRemoveSoundIds.length === 0}
             >
               삭제
@@ -53,7 +52,7 @@ const SoundSection = () => {
           <button
             type="button"
             onClick={toggleEditMode}
-            className="body-base-regular text-tertiary"
+            className="text-sm font-bold text-neutral-400"
           >
             편집
           </button>
@@ -63,17 +62,14 @@ const SoundSection = () => {
       {isLoading && <p>소리를 불러오는 중입니다...</p>}
       {isError && <p>모드에 담긴 소리를 불러오지 못했습니다</p>}
 
-      <div className="grid grid-cols-3 gap-base">
+      <div className="grid grid-cols-3 gap-3">
         {sounds.map((sound) => (
           <SoundCard
             key={sound.sound_id}
-            soundId={sound.sound_id}
-            name={sound.name}
-            categoryName={sound.category}
-            isDoNotDisturb={isDoNotDisturb}
+            sound={sound}
             isEditMode={isEditMode}
-            isChecked={selectedRemoveSoundIds.includes(sound.sound_id)}
-            isOn={!offSoundIds.includes(sound.sound_id)}
+            isDisabled={disabledSoundIds.includes(sound.sound_id)}
+            isSelected={selectedRemoveSoundIds.includes(sound.sound_id)}
             onClick={handleSoundCardClick}
           />
         ))}

@@ -1,14 +1,27 @@
 import http from '@/shared/apis/axios';
-import type { UpdateModeSoundsResponseTypes } from '@/pages/home/types/modeTypes';
-import type { UpdateModeSoundsRequestTypes } from '@/pages/home/types/soundTypes';
+import { updateModeSoundsMock } from '@/pages/home/mocks/soundMock';
+import type {
+  UpdateModeSoundsRequestTypes,
+  UpdateModeSoundsResponseTypes,
+} from '@/pages/home/types/soundTypes';
 
-// 모드에 담긴 소리 목록 전체 교체 — PUT /modes/{id}/sounds, 본문 { sound_ids }
+// 나중에 실제 서버랑 연동 시 false로 설정하면 됨 - 현재 mock 데이터 보여주는 용도
+const IS_MOCK = true;
+
 export const putModeSounds = async (
   modeId: number,
   soundsData: UpdateModeSoundsRequestTypes,
 ): Promise<UpdateModeSoundsResponseTypes> => {
+  if (IS_MOCK) {
+    return {
+      ...updateModeSoundsMock,
+      mode_id: modeId,
+      sounds: soundsData.sounds,
+    };
+  }
+
   const response = await http.put<UpdateModeSoundsResponseTypes>(
-    `/modes/${modeId}/sounds`,
+    `/api/v1/modes/${modeId}/sounds`,
     soundsData,
   );
 

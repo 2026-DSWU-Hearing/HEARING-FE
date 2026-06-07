@@ -1,10 +1,16 @@
-import { putModeSounds } from '@/pages/home/apis/putModeSounds';
-import type { UpdateModeSoundsResponseTypes } from '@/pages/home/types/modeTypes';
+import http from '@/shared/apis/axios';
 
-// 백엔드에는 소리 개별 삭제 엔드포인트가 없으므로, 남길 소리 id 목록으로 전체 교체(PUT)하여 삭제를 구현한다.
+// 나중에 실제 서버랑 연동 시 false로 설정하면 됨 - 현재 mock 데이터 보여주는 용도
+const IS_MOCK = true;
+
 export const deleteModeSound = async (
   modeId: number,
-  remainingSoundIds: number[],
-): Promise<UpdateModeSoundsResponseTypes> => {
-  return putModeSounds(modeId, { sound_ids: remainingSoundIds });
+  soundId: number,
+): Promise<void> => {
+  if (IS_MOCK) {
+    console.log(`${modeId}번 모드에서 ${soundId}번 소리 삭제`);
+    return;
+  }
+
+  await http.delete(`/api/v1/modes/${modeId}/sounds/${soundId}`);
 };

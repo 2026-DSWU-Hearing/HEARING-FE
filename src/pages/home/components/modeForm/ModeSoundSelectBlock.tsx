@@ -1,7 +1,7 @@
-import type { SoundListItemTypes } from '@/pages/home/types/soundTypes';
+import type { SoundTypes } from '@/pages/home/types/soundTypes';
 
 interface ModeSoundSelectBlockPropTypes {
-  sound: SoundListItemTypes;
+  sound: SoundTypes;
   isSelected: boolean;
   onToggle: (soundId: number) => void;
 }
@@ -20,11 +20,10 @@ const ModeSoundSelectBlock = ({
       type="button"
       onClick={handleSoundToggleClick}
       aria-pressed={isSelected}
-      className={`p-2`}
     >
-      <p>{sound.name}</p>
-      <p>{sound.category_name}</p>
-      <p>{isSelected ? '선택됨' : '선택 안 됨'}</p>
+      <span>{sound.name}</span>
+      <span>{sound.category_name}</span>
+      <span>{isSelected ? '선택됨' : '선택 안 됨'}</span>
     </button>
   );
 };

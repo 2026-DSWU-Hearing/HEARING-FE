@@ -1,8 +1,7 @@
 import type { ButtonHTMLAttributes } from 'react';
 import { Link } from 'react-router-dom';
-import AddIcon from '@/shared/components/icons/AddIcon';
 
-interface AddButtonPropTypes extends Pick<
+interface AddBtnPropTypes extends Pick<
   ButtonHTMLAttributes<HTMLButtonElement>,
   'type' | 'disabled'
 > {
@@ -12,20 +11,20 @@ interface AddButtonPropTypes extends Pick<
   className?: string;
 }
 // 추가하기 버튼 공통 컴포넌트
-const AddButton = ({
+const AddBtn = ({
   label,
   to,
   onClick,
   className = '',
   type = 'button',
   disabled = false,
-}: AddButtonPropTypes) => {
+}: AddBtnPropTypes) => {
   // 버튼 스타일링
-  const buttonClassName = `inline-flex items-center gap-[0.625rem] rounded-pill bg-[#5354504D]/30 px-sm py-xs h-[1.6rem] text-secondary caption-xs-medium border-[1px] border-neutral-700 ${className}`;
+  const buttonClassName = `inline-flex items-center gap-4 rounded-xl bg-gray-300 px-5 py-3 text-base font-bold text-neutral-800 ${className}`;
   const content = (
     <>
       <span>{label}</span>
-      <AddIcon className="h-[1rem] w-[1rem]" />
+      <span className="text-2xl leading-none">+</span>
     </>
   );
 
@@ -49,4 +48,4 @@ const AddButton = ({
   );
 };
 
-export default AddButton;
+export default AddBtn;

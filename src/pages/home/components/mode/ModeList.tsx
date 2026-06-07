@@ -1,4 +1,4 @@
-import AddButton from '@/pages/home/components/AddButton';
+import AddBtn from '@/pages/home/components/AddBtn';
 import ModeCard from '@/pages/home/components/mode/ModeCard';
 import { useModeList } from '@/pages/home/hooks/useModeList';
 
@@ -15,7 +15,7 @@ const ModeList = () => {
 
   return (
     <section className="mt-8">
-      <div className="grid grid-cols-3 gap-base">
+      <div className="flex flex-row justify-between gap-3">
         {modes.map((mode) => (
           <ModeCard
             key={mode.mode_id}
@@ -25,8 +25,8 @@ const ModeList = () => {
         ))}
       </div>
 
-      <div className="mt-lg mb-[1.38rem] flex justify-center">
-        <AddButton label="새 모드 추가하기" to="/modes/new" />
+      <div className="mt-4 flex justify-center">
+        <AddBtn label="새 모드 추가하기" to="/modes/new" />
       </div>
     </section>
   );

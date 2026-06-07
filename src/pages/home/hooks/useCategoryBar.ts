@@ -23,7 +23,7 @@ export const useCategoryBar = ({
   );
 
   return {
-    categories: data ?? [],
+    categories: data?.categories ?? [],
     isLoading,
     isError,
     handleAllCategoryClick,

@@ -6,7 +6,7 @@ const ModeSoundSelectSection = () => {
   const { data, isLoading, isError } = useGetSounds();
   const { selectedSoundIds, handleSoundToggle } = useModeFormContext();
 
-  const sounds = data ?? [];
+  const sounds = data?.sounds ?? [];
 
   return (
     <section aria-labelledby="sound-select-heading">
@@ -18,9 +18,9 @@ const ModeSoundSelectSection = () => {
       <div>
         {sounds.map((sound) => (
           <ModeSoundSelectBlock
-            key={sound.id}
+            key={sound.sound_id}
             sound={sound}
-            isSelected={selectedSoundIds.includes(sound.id)}
+            isSelected={selectedSoundIds.includes(sound.sound_id)}
             onToggle={handleSoundToggle}
           />
         ))}

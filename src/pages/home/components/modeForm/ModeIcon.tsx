@@ -13,8 +13,8 @@ const ModeIcon = ({ icon, isSelected, onClick }: ModeIconPropTypes) => {
     <button
       type="button"
       onClick={handleModeIconClick}
-      className={`flex aspect-square items-center justify-center rounded-pill body-base-medium ${
-        isSelected ? 'bg-[#FFE26E]/60' : 'bg-neutral-700'
+      className={`flex aspect-square items-center justify-center rounded-xl text-xl font-bold ${
+        isSelected ? 'bg-[#f8c3a4]' : 'bg-gray-300'
       }`}
       aria-pressed={isSelected}
     >

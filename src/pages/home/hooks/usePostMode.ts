@@ -31,12 +31,27 @@ export const usePostMode = () => {
     mutationFn: (modeData: CreateModeRequestTypes) => postMode(modeData),
 
     onSuccess: (data) => {
-      // 서버 응답(data)이 완전한 모드 객체이므로 그대로 목록 캐시 끝에 추가한다.
       queryClient.setQueryData<GetModesResponseTypes>(['modes'], (old) => {
-        if (!old) return [data];
+        const newMode = {
+          mode_id: data.mode_id,
+          name: data.name,
+          icon: data.icon,
+          is_active: false,
+        };
 
-        return [...old, data];
+        if (!old) {
+          return {
+            modes: [newMode],
+          };
+        }
+
+        return {
+          modes: [...old.modes, newMode],
+        };
       });
+
+      // 실제 서버 연결 후에는 아래 방식으로 변경 가능
+      // queryClient.invalidateQueries({ queryKey: ['modes'] });
     },
   });
 };

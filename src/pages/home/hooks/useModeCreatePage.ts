@@ -10,6 +10,7 @@ import {
 import { useGetModes } from '@/pages/home/hooks/useGetModes';
 import { useGetSounds } from '@/pages/home/hooks/useGetSounds';
 import { usePostMode } from '@/pages/home/hooks/usePostMode';
+import type { ModeSoundTypes } from '@/pages/home/types/modeTypes';
 
 const getModeCreateErrorMessage = (error: unknown) => {
   if (isAxiosError(error)) {
@@ -39,11 +40,11 @@ export const useModeCreatePage = () => {
     soundIds,
   }: ModeFormSubmitDataTypes) => {
     const trimmedName = name.trim();
-    // 선택된 소리 중 실제로 존재하는 id만 추려 서버 전송용 number[] 로 만든다.
-    const allSounds = soundsData ?? [];
-    const selectedSoundIds = allSounds
-      .filter((sound) => soundIds.includes(sound.id))
-      .map((sound) => sound.id);
+    // 선택된 소리 id를 서버 전송용 { sound_id, name } 형태로 변환한다.
+    const allSounds = soundsData?.sounds ?? [];
+    const selectedSounds: ModeSoundTypes[] = allSounds
+      .filter((sound) => soundIds.includes(sound.sound_id))
+      .map((sound) => ({ sound_id: sound.sound_id, name: sound.name }));
 
     if (!trimmedName) {
       setErrorMessage(MODE_MESSAGE.EMPTY_NAME);
@@ -70,7 +71,7 @@ export const useModeCreatePage = () => {
       await createMode({
         name: trimmedName,
         icon,
-        sound_ids: selectedSoundIds,
+        sounds: selectedSounds,
       });
       navigate('/');
     } catch (error) {
