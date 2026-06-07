@@ -3,6 +3,8 @@ import CategoryBar from '@/pages/home/components/sound/CategoryBar';
 import SoundCard from '@/pages/home/components/sound/SoundCard';
 import { useSoundAddModal } from '@/pages/home/hooks/useSoundAddModal';
 import type { SoundTypes } from '@/pages/home/types/soundTypes';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface SoundAddBottomModalPropTypes {
   onClose: () => void;
@@ -28,21 +30,21 @@ const SoundAddBottomModal = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/45">
-      <div className="flex h-[76dvh] w-full max-w-[430px] flex-col rounded-t-[32px] bg-white px-6 pb-8 pt-6">
+      <div className="flex h-[76dvh] w-full max-w-[430px] flex-col rounded-t-[32px] bg-neutral-800 p-xl">
         <div className="mb-8 flex flex-shrink-0 items-center justify-between">
           <button
             type="button"
             onClick={onClose}
-            className="text-4xl leading-none"
+            className="w-[1.5rem] leading-none"
             aria-label="소리 추가 닫기"
           >
-            ×
+            <FontAwesomeIcon icon={faXmark} />
           </button>
-          <h2 className="text-xl font-bold">소리 추가하기</h2>
+          <h2 className="heading-base-semibold">소리 추가하기</h2>
           <button
             type="button"
             onClick={handleCompleteClick}
-            className="text-base font-bold"
+            className="heading-base-semibold"
           >
             완료
           </button>
