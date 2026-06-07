@@ -9,10 +9,10 @@ interface SoundCardSoundTypes {
 
 interface SoundCardPropTypes {
   sound: SoundCardSoundTypes;
-  isDisabled?: boolean;
+  isActive?: boolean;
   isDoNotDisturb?: boolean;
-  isSelected?: boolean;
   isEditMode?: boolean;
+  isSelected?: boolean;
   onClick?: (soundId: number) => void;
 }
 
@@ -30,10 +30,10 @@ const getSoundIcon = (categoryName: string) => {
 
 const SoundCard = ({
   sound,
-  isDisabled = false,
+  isActive = true,
   isDoNotDisturb = false,
-  isSelected = false,
   isEditMode = false,
+  isSelected = false,
   onClick,
 }: SoundCardPropTypes) => {
   const categoryName = sound.category ?? sound.category_name ?? '기타';
@@ -42,28 +42,32 @@ const SoundCard = ({
     onClick?.(sound.sound_id);
   };
 
-  const cardStyle = isEditMode
-    ? 'bg-gray-300'
-    : isDisabled
-      ? 'bg-gray-300 opacity-70'
-      : 'bg-[#f8c3a4]';
+  const isOnStyle = isEditMode ? isSelected : isActive;
+
+  const cardStyle = isDoNotDisturb
+    ? 'bg-neutral-900 text-neutral-700'
+    : isOnStyle
+      ? 'card-true-bottomsheet tag-glass-effect text-primary'
+      : 'bg-neutral-800 text-primary border-[1px] solid border-neutral-600';
 
   return (
     <button
       type="button"
       aria-disabled={isDoNotDisturb}
       onClick={handleSoundCardClick}
-      className={`aspect-square rounded-3xl border-2 p-3 text-center ${
-        isDoNotDisturb ? 'cursor-not-allowed' : 'cursor-pointer'
-      } ${cardStyle} ${
-        isSelected ? 'border-black' : 'border-transparent'
-      }`}
+      className={`aspect-square rounded-xl p-sm text-center transition-all duration-500 ease-out ${
+        isDoNotDisturb
+          ? 'cursor-not-allowed'
+          : 'cursor-pointer active:scale-[0.97]'
+      } ${cardStyle} `}
     >
-      <div className="flex h-full flex-col items-center justify-center gap-3">
-        <span className="text-4xl font-black leading-none">
+      <div className="flex h-full flex-col items-center justify-center gap-xs transition-colors duration-300 ease-out">
+        <span className="w-icon-2xl h-icon-2xl font-black leading-none transition-transform duration-300 ease-out">
           {getSoundIcon(categoryName)}
         </span>
-        <span className="text-base font-bold">{sound.name}</span>
+        <span className="heading-base-semibold transition-colors duration-300 ease-out">
+          {sound.name}
+        </span>
         <CategoryBlock categoryName={categoryName} />
       </div>
     </button>
