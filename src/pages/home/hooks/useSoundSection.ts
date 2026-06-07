@@ -8,7 +8,7 @@ import type { SoundTypes } from '@/pages/home/types/soundTypes';
 
 // 선택된 모드의 "담은 소리" 섹션 전체를 총괄하는 훅. 상세 조회 + 편집/모달 UI 상태 + 소리 추가/삭제 로직을 한곳에 모은다.
 export const useSoundSection = () => {
-  const { selectedModeId } = useHomeModeContext();
+  const { selectedModeId, isDoNotDisturb } = useHomeModeContext();
   const { data, isLoading, isError } = useGetModeDetail(selectedModeId);
   const { mutateAsync: deleteModeSound } = useDeleteModeSound();
   const { mutate: putModeSounds } = usePutModeSounds();
@@ -32,7 +32,7 @@ export const useSoundSection = () => {
   // 소리 카드 클릭 함수
   const handleSoundCardClick = useCallback(
     (soundId: number) => {
-      if (selectedModeId === null) return;
+      if (selectedModeId === null || isDoNotDisturb) return;
 
       if (state.isEditMode) {
         toggleRemoveSound(soundId);
@@ -41,12 +41,22 @@ export const useSoundSection = () => {
 
       toggleDisabledSound(selectedModeId, soundId);
     },
-    [selectedModeId, state.isEditMode, toggleDisabledSound, toggleRemoveSound],
+    [
+      isDoNotDisturb,
+      selectedModeId,
+      state.isEditMode,
+      toggleDisabledSound,
+      toggleRemoveSound,
+    ],
   );
 
   // 선택된 소리 삭제 함수
   const handleRemoveSelectedSoundsClick = useCallback(async () => {
-    if (selectedModeId === null || state.selectedRemoveSoundIds.length === 0) {
+    if (
+      selectedModeId === null ||
+      isDoNotDisturb ||
+      state.selectedRemoveSoundIds.length === 0
+    ) {
       return;
     }
 
@@ -61,6 +71,7 @@ export const useSoundSection = () => {
   }, [
     closeEditMode,
     deleteModeSound,
+    isDoNotDisturb,
     resetRemoveSounds,
     selectedModeId,
     state.selectedRemoveSoundIds,
@@ -69,7 +80,7 @@ export const useSoundSection = () => {
   // 소리 추가 완료 함수
   const handleAddSoundsComplete = useCallback(
     (selectedSounds: SoundTypes[]) => {
-      if (selectedModeId === null || !data) return;
+      if (selectedModeId === null || isDoNotDisturb || !data) return;
 
       const currentSounds = data.sounds.map((sound) => ({
         sound_id: sound.sound_id,
@@ -94,11 +105,12 @@ export const useSoundSection = () => {
       });
       closeAddSoundModal();
     },
-    [closeAddSoundModal, data, putModeSounds, selectedModeId],
+    [closeAddSoundModal, data, isDoNotDisturb, putModeSounds, selectedModeId],
   );
 
   return {
     selectedModeId,
+    isDoNotDisturb,
     sounds: data?.sounds ?? [],
     isLoading,
     isError,

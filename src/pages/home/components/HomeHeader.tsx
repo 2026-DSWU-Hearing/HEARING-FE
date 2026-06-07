@@ -1,23 +1,11 @@
-import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell } from '@fortawesome/free-solid-svg-icons';
-import SilentModeButton from '@/pages/home/components/mode/SilentModeButton';
-import { usePatchDoNotDisturb } from '@/shared/hooks/usePatchDoNotDisturb';
+import DoNotDisturbButton from '@/pages/home/components/mode/DoNotDisturbButton';
+import { useHomeModeContext } from '@/pages/home/hooks/useHomeModeContext';
 
 const HomeHeader = () => {
-  const { mutate: updateDoNotDisturb, isPending } = usePatchDoNotDisturb();
-  const [isDoNotDisturb, setIsDoNotDisturb] = useState(false);
-
-  const handleSilentToggle = () => {
-    const nextIsDoNotDisturb = !isDoNotDisturb;
-
-    setIsDoNotDisturb(nextIsDoNotDisturb);
-    updateDoNotDisturb(nextIsDoNotDisturb, {
-      onError: () => {
-        setIsDoNotDisturb(isDoNotDisturb);
-      },
-    });
-  };
+  const { isDoNotDisturb, isDoNotDisturbPending, handleDoNotDisturbToggle } =
+    useHomeModeContext();
 
   return (
     <header className="mt-[2.75rem] mb-[2.5rem] flex flex-col gap-[1.5rem]">
@@ -39,10 +27,10 @@ const HomeHeader = () => {
           <br />
           환경에 맞는 모드를 선택하세요
         </p>
-        <SilentModeButton
-          isSilent={isDoNotDisturb}
-          isDisabled={isPending}
-          onToggle={handleSilentToggle}
+        <DoNotDisturbButton
+          isDoNotDisturb={isDoNotDisturb}
+          isDisabled={isDoNotDisturbPending}
+          onToggle={handleDoNotDisturbToggle}
         />
       </div>
     </header>

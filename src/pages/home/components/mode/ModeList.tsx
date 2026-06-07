@@ -3,7 +3,8 @@ import ModeCard from '@/pages/home/components/mode/ModeCard';
 import { useModeList } from '@/pages/home/hooks/useModeList';
 
 const ModeList = () => {
-  const { modes, selectedModeId, isLoading, isError } = useModeList();
+  const { modes, selectedModeId, isDoNotDisturb, isLoading, isError } =
+    useModeList();
 
   if (isLoading) {
     return <div>불러오는 중...</div>;
@@ -21,6 +22,7 @@ const ModeList = () => {
             key={mode.mode_id}
             mode={mode}
             isSelected={mode.mode_id === selectedModeId}
+            isDoNotDisturb={isDoNotDisturb}
           />
         ))}
       </div>

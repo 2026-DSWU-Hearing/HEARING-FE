@@ -6,6 +6,7 @@ import { useSoundSection } from '@/pages/home/hooks/useSoundSection';
 const SoundSection = () => {
   const {
     selectedModeId,
+    isDoNotDisturb,
     sounds,
     isLoading,
     isError,
@@ -43,7 +44,7 @@ const SoundSection = () => {
               type="button"
               onClick={handleRemoveSelectedSoundsClick}
               className="text-sm font-bold text-neutral-900 disabled:text-neutral-300"
-              disabled={selectedRemoveSoundIds.length === 0}
+              disabled={isDoNotDisturb || selectedRemoveSoundIds.length === 0}
             >
               삭제
             </button>
@@ -52,7 +53,8 @@ const SoundSection = () => {
           <button
             type="button"
             onClick={toggleEditMode}
-            className="text-sm font-bold text-neutral-400"
+            className="text-sm font-bold text-neutral-400 disabled:text-neutral-600"
+            disabled={isDoNotDisturb}
           >
             편집
           </button>
@@ -68,15 +70,28 @@ const SoundSection = () => {
             key={sound.sound_id}
             sound={sound}
             isEditMode={isEditMode}
-            isDisabled={disabledSoundIds.includes(sound.sound_id)}
-            isSelected={selectedRemoveSoundIds.includes(sound.sound_id)}
+            isDisabled={
+              isDoNotDisturb || disabledSoundIds.includes(sound.sound_id)
+            }
+            isDoNotDisturb={isDoNotDisturb}
+            isSelected={
+              !isDoNotDisturb &&
+              selectedRemoveSoundIds.includes(sound.sound_id)
+            }
             onClick={handleSoundCardClick}
           />
         ))}
       </div>
 
       <div className="mt-5 flex justify-center">
-        <AddBtn label="소리 추가하기" onClick={openAddSoundModal} />
+        <AddBtn
+          label="소리 추가하기"
+          onClick={openAddSoundModal}
+          disabled={isDoNotDisturb}
+          className={
+            isDoNotDisturb ? 'cursor-not-allowed opacity-60' : undefined
+          }
+        />
       </div>
 
       {isAddSoundModalOpen && (

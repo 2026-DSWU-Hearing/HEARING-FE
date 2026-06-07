@@ -6,6 +6,7 @@ import {
   useState,
 } from 'react';
 import type { ReactNode } from 'react';
+import { usePatchDoNotDisturb } from '@/shared/hooks/usePatchDoNotDisturb';
 
 interface HomeModeProviderPropTypes {
   children: ReactNode;
@@ -13,7 +14,10 @@ interface HomeModeProviderPropTypes {
 
 interface HomeModeContextTypes {
   selectedModeId: number | null;
+  isDoNotDisturb: boolean;
+  isDoNotDisturbPending: boolean;
   handleModeSelect: (modeId: number) => void;
+  handleDoNotDisturbToggle: () => void;
 }
 
 const HomeModeContext = createContext<HomeModeContextTypes | null>(null);
@@ -21,6 +25,9 @@ const HomeModeContext = createContext<HomeModeContextTypes | null>(null);
 // 현재 선택된 모드 ID를 모드 목록과 소리 섹션이 함께 공유하도록 보관하는 Provider
 export const HomeModeProvider = ({ children }: HomeModeProviderPropTypes) => {
   const [selectedModeId, setSelectedModeId] = useState<number | null>(null);
+  const [isDoNotDisturb, setIsDoNotDisturb] = useState(false);
+  const { mutate: updateDoNotDisturb, isPending: isDoNotDisturbPending } =
+    usePatchDoNotDisturb();
 
   // 모드 선택 함수 - 선택된 모드는 모드 목록과 소리 섹션이 함께 사용한다
   const handleModeSelect = useCallback((modeId: number) => {
@@ -28,12 +35,32 @@ export const HomeModeProvider = ({ children }: HomeModeProviderPropTypes) => {
     setSelectedModeId(modeId);
   }, []);
 
+  const handleDoNotDisturbToggle = useCallback(() => {
+    const nextIsDoNotDisturb = !isDoNotDisturb;
+
+    setIsDoNotDisturb(nextIsDoNotDisturb);
+    updateDoNotDisturb(nextIsDoNotDisturb, {
+      onError: () => {
+        setIsDoNotDisturb(isDoNotDisturb);
+      },
+    });
+  }, [isDoNotDisturb, updateDoNotDisturb]);
+
   const contextValue = useMemo(
     () => ({
       selectedModeId,
+      isDoNotDisturb,
+      isDoNotDisturbPending,
       handleModeSelect,
+      handleDoNotDisturbToggle,
     }),
-    [handleModeSelect, selectedModeId],
+    [
+      handleDoNotDisturbToggle,
+      handleModeSelect,
+      isDoNotDisturb,
+      isDoNotDisturbPending,
+      selectedModeId,
+    ],
   );
 
   return (

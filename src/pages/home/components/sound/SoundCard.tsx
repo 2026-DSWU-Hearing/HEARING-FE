@@ -10,6 +10,7 @@ interface SoundCardSoundTypes {
 interface SoundCardPropTypes {
   sound: SoundCardSoundTypes;
   isDisabled?: boolean;
+  isDoNotDisturb?: boolean;
   isSelected?: boolean;
   isEditMode?: boolean;
   onClick?: (soundId: number) => void;
@@ -30,6 +31,7 @@ const getSoundIcon = (categoryName: string) => {
 const SoundCard = ({
   sound,
   isDisabled = false,
+  isDoNotDisturb = false,
   isSelected = false,
   isEditMode = false,
   onClick,
@@ -49,8 +51,11 @@ const SoundCard = ({
   return (
     <button
       type="button"
+      aria-disabled={isDoNotDisturb}
       onClick={handleSoundCardClick}
-      className={`aspect-square rounded-3xl border-2 p-3 text-center ${cardStyle} ${
+      className={`aspect-square rounded-3xl border-2 p-3 text-center ${
+        isDoNotDisturb ? 'cursor-not-allowed' : 'cursor-pointer'
+      } ${cardStyle} ${
         isSelected ? 'border-black' : 'border-transparent'
       }`}
     >
