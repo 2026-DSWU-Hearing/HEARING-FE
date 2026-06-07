@@ -44,7 +44,7 @@ const ModeFormContent = () => {
   } = useModeFormContext();
 
   return (
-    <div className="min-h-dvh px-[1.03rem]">
+    <div className="min-h-dvh px-[1.03rem] ">
       <ModeHeader
         title={headerTitle}
         actionLabel={headerActionLabel}
