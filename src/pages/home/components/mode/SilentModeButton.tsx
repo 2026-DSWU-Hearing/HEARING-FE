@@ -2,11 +2,13 @@ import SilentModeIcon from '@/shared/components/icons/SilentModeIcon';
 
 interface SilentModeButtonPropTypes {
   isSilent: boolean;
+  isDisabled?: boolean;
   onToggle: () => void;
 }
 
 const SilentModeButton = ({
   isSilent,
+  isDisabled = false,
   onToggle,
 }: SilentModeButtonPropTypes) => {
   return (
@@ -15,8 +17,9 @@ const SilentModeButton = ({
       role="switch"
       aria-checked={isSilent}
       aria-label="방해금지 모드"
+      disabled={isDisabled}
       onClick={onToggle}
-      className="p-xxs relative h-[2.75rem] w-[8rem] border-[0.5px] border-neutral-500 rounded-pill bg-black"
+      className="p-xxs relative h-[2.75rem] w-[8rem] border-[0.5px] border-neutral-500 rounded-pill bg-black disabled:cursor-not-allowed disabled:opacity-60"
     >
       {/* 텍스트: thumb 반대편에 고정 */}
       <span

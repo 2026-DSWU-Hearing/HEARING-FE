@@ -2,13 +2,21 @@ import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell } from '@fortawesome/free-solid-svg-icons';
 import SilentModeButton from '@/pages/home/components/mode/SilentModeButton';
+import { usePatchDoNotDisturb } from '@/shared/hooks/usePatchDoNotDisturb';
 
 const HomeHeader = () => {
-  // 방해금지 모드 토글 (UI 상태만 — 실제 동작은 추후 연동)
-  const [isSilent, setIsSilent] = useState(false);
+  const { mutate: updateDoNotDisturb, isPending } = usePatchDoNotDisturb();
+  const [isDoNotDisturb, setIsDoNotDisturb] = useState(false);
 
   const handleSilentToggle = () => {
-    setIsSilent((prev) => !prev);
+    const nextIsDoNotDisturb = !isDoNotDisturb;
+
+    setIsDoNotDisturb(nextIsDoNotDisturb);
+    updateDoNotDisturb(nextIsDoNotDisturb, {
+      onError: () => {
+        setIsDoNotDisturb(isDoNotDisturb);
+      },
+    });
   };
 
   return (
@@ -31,7 +39,11 @@ const HomeHeader = () => {
           <br />
           환경에 맞는 모드를 선택하세요
         </p>
-        <SilentModeButton isSilent={isSilent} onToggle={handleSilentToggle} />
+        <SilentModeButton
+          isSilent={isDoNotDisturb}
+          isDisabled={isPending}
+          onToggle={handleSilentToggle}
+        />
       </div>
     </header>
   );
