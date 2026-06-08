@@ -6,7 +6,7 @@ import EmergencyIcon from '@/shared/components/icons/modes/EmergencyIcon';
 import ExerciseIcon from '@/shared/components/icons/modes/ExerciseIcon';
 import GoingOutIcon from '@/shared/components/icons/modes/GoingOutIcon';
 import HospitalIcon from '@/shared/components/icons/modes/HospitalIcon';
-import MeetingIcon from '@/shared/components/icons/modes/MeetingIcon';
+import HomeIcon from '@/shared/components/icons/modes/HomeIcon';
 import NatureIcon from '@/shared/components/icons/modes/NatureIcon';
 import SchoolIcon from '@/shared/components/icons/modes/SchoolIcon';
 import SleepIcon from '@/shared/components/icons/modes/SleepIcon';
@@ -30,7 +30,7 @@ export type ModeIconKeyTypes =
   | 'ic_transportation'
   | 'ic_goingOut'
   | 'ic_sleep'
-  | 'ic_meeting'
+  | 'ic_home'
   | 'ic_school'
   | 'ic_study';
 
@@ -58,7 +58,7 @@ export const MODE_ICON_MAP: Record<ModeIconKeyTypes, ModeIconComponentTypes> = {
   ic_transportation: TransportationIcon,
   ic_goingOut: GoingOutIcon,
   ic_sleep: SleepIcon,
-  ic_meeting: MeetingIcon,
+  ic_home: HomeIcon,
   ic_school: SchoolIcon,
   ic_study: StudyIcon,
 };
@@ -76,7 +76,7 @@ const KOREAN_MODE_ICON_KEY_MAP: Record<string, ModeIconKeyTypes> = {
   교통: 'ic_transportation',
   외출: 'ic_goingOut',
   수면: 'ic_sleep',
-  회의: 'ic_meeting',
+  가정: 'ic_home',
   학교: 'ic_school',
   공부: 'ic_study',
 };
@@ -92,7 +92,9 @@ export const normalizeModeIconKey = (
 };
 
 // 매핑에 없는 키(미지정/레거시 한글값 등)가 들어와도 항상 컴포넌트를 반환해 화면이 깨지지 않게 한다.
-export const getModeIconComponent = (iconKey: string): ModeIconComponentTypes => {
+export const getModeIconComponent = (
+  iconKey: string,
+): ModeIconComponentTypes => {
   const normalizedIconKey = normalizeModeIconKey(iconKey);
 
   return normalizedIconKey ? MODE_ICON_MAP[normalizedIconKey] : UnknownModeIcon;
