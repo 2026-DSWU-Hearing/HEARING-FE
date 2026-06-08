@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { isAxiosError } from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import type { ModeFormSubmitDataTypes } from '@/pages/home/components/modeForm/ModeFormContext';
 import { MAX_MODE_NAME_LENGTH } from '@/pages/home/components/modeForm/ModeFormContext';
 import {
@@ -36,6 +37,7 @@ const getModeEditErrorMessage = (error: unknown) => {
 export const useModeEditPage = () => {
   const { modeId } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const parsedModeId = Number(modeId);
   const isValidModeId = Number.isInteger(parsedModeId);
   const [errorMessage, setErrorMessage] = useState('');
@@ -104,8 +106,17 @@ export const useModeEditPage = () => {
   // 확인 모달에서 "확인"을 눌렀을 때 실제 삭제를 수행한다.
   const handleModeDeleteConfirm = async () => {
     try {
+      const deletedModeId = parsedModeId;
+
       await deleteMode(parsedModeId);
-      navigate('/');
+      navigate('/', { replace: true });
+      window.setTimeout(() => {
+        queryClient.removeQueries({
+          queryKey: ['modes', deletedModeId],
+          exact: true,
+          type: 'inactive',
+        });
+      }, 0);
     } catch (error) {
       setErrorMessage(getModeEditErrorMessage(error));
     }
