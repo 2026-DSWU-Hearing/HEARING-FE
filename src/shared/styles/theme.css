@@ -123,6 +123,7 @@
   --glass-tag-background: rgb(255 255 255 / 8%);
   --glass-tag-border: rgb(255 255 255 / 16%);
   --glass-tag-blur: 29px;
+  --glass-tag-shadow: inset 0 1px 0 rgb(255 255 255 / 20%);
 
   /* Gradient */
   --gradient-card-false: linear-gradient(
@@ -319,6 +320,7 @@
   border: 1px solid var(--glass-tag-border);
   backdrop-filter: blur(var(--glass-tag-blur));
   -webkit-backdrop-filter: blur(var(--glass-tag-blur));
+  box-shadow: var(--glass-tag-shadow);
 }
 
 /* gradient */
@@ -340,11 +342,11 @@
 
 /* icon size - --icon-* 토큰을 width, height 유틸리티로 노출한다 */
 @utility w-icon-* {
-  width: --value(--icon- *);
+  width: --value(--icon-*);
 }
 
 @utility h-icon-* {
-  height: --value(--icon- *);
+  height: --value(--icon-*);
 }
 
 /* shadow */

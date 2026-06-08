@@ -7,6 +7,7 @@ import {
   useState,
 } from 'react';
 import type { ReactNode } from 'react';
+import { DEFAULT_MODE_ICON_KEY } from '@/shared/components/icons/modes/modeIconMap';
 import { toggleSoundId } from '@/pages/home/utils/toggleSoundId';
 
 export type ModeFormPageTypes = 'create' | 'edit';
@@ -49,7 +50,6 @@ interface ModeFormContextTypes {
   handleDeleteClick: () => void;
 }
 
-const DEFAULT_MODE_ICON = '집';
 export const MAX_MODE_NAME_LENGTH = 10;
 
 const ModeFormContext = createContext<ModeFormContextTypes | null>(null);
@@ -60,7 +60,7 @@ export const ModeFormProvider = ({
   children,
   pageType,
   initialName = '',
-  initialIcon = DEFAULT_MODE_ICON,
+  initialIcon = DEFAULT_MODE_ICON_KEY,
   isSubmitting = false,
   isDeleting = false,
   onSubmit,

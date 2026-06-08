@@ -1,24 +1,40 @@
+import ModeIconView from '@/shared/components/icons/modes/ModeIconView';
+
 interface ModeIconPropTypes {
-  icon: string;
+  iconKey: string;
+  nameKo: string;
   isSelected: boolean;
-  onClick: (icon: string) => void;
+  onClick: (iconKey: string) => void;
 }
 
-const ModeIcon = ({ icon, isSelected, onClick }: ModeIconPropTypes) => {
+const ModeIcon = ({
+  iconKey,
+  nameKo,
+  isSelected,
+  onClick,
+}: ModeIconPropTypes) => {
   const handleModeIconClick = () => {
-    onClick(icon);
+    onClick(iconKey);
   };
+
+  const modeIconColorClassName = isSelected
+    ? 'text-primary-400'
+    : 'text-tertiary';
 
   return (
     <button
       type="button"
       onClick={handleModeIconClick}
       className={`flex aspect-square items-center justify-center rounded-pill body-base-medium ${
-        isSelected ? 'bg-[#FFE26E]/60' : 'bg-neutral-700'
+        isSelected ? 'bg-[#FFE26E]/20' : 'bg-neutral-700'
       }`}
       aria-pressed={isSelected}
+      aria-label={nameKo}
     >
-      {icon}
+      <ModeIconView
+        iconKey={iconKey}
+        className={`w-6 h-6 ${modeIconColorClassName}`}
+      />
     </button>
   );
 };
