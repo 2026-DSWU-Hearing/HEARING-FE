@@ -11,11 +11,7 @@ interface ModeCardPropTypes {
   isDoNotDisturb: boolean;
 }
 
-const ModeCard = ({
-  mode,
-  isSelected,
-  isDoNotDisturb,
-}: ModeCardPropTypes) => {
+const ModeCard = ({ mode, isSelected, isDoNotDisturb }: ModeCardPropTypes) => {
   const {
     handleActivateModeClick,
     handleActivateModeKeyDown,
@@ -32,10 +28,16 @@ const ModeCard = ({
       : 'cursor-pointer text-tertiary';
 
   const modeIconStyle = isDoNotDisturb
-    ? 'bg-neutral-700 text-disabled'
+    ? 'bg-neutral-700'
     : isSelected
-      ? 'text-white bg-primary-500/20 text-primary-500'
-      : 'bg-neutral-700 text-tertiary';
+      ? 'bg-primary-500/20'
+      : 'bg-neutral-700';
+
+  const modeIconColorClassName = isDoNotDisturb
+    ? 'text-disabled'
+    : isSelected
+      ? 'text-primary-400'
+      : 'text-tertiary';
 
   return (
     // 화살표 제외 영역은 누르면 활성 비활성
@@ -49,14 +51,17 @@ const ModeCard = ({
     >
       <span
         aria-hidden
-        className={`pointer-events-none absolute inset-0 card-true transition-opacity duration-300 ease-in-out ${
+        className={`pointer-events-none absolute inset-0 card-true transition-opacity duration-300 ease-in-out  ${
           isSelected && !isDoNotDisturb ? 'opacity-100' : 'opacity-0'
         }`}
       />
       <span
         className={`relative z-10 flex items-center justify-center w-[3rem] h-[3rem]  rounded-full p-2 transition-colors duration-300 ease-in-out ${modeIconStyle}`}
       >
-        <ModeIconView iconKey={mode.icon} className="w-[1.5rem] h-[1.5rem]" />
+        <ModeIconView
+          iconKey={mode.icon}
+          className={`w-[1.5rem] h-[1.5rem] ${modeIconColorClassName}`}
+        />
       </span>
       <div className="relative z-10 flex flex-row justify-between items-center mt-base">
         <div className="flex justify-end body-lg-medium font-bold">

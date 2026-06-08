@@ -63,6 +63,37 @@ export const MODE_ICON_MAP: Record<ModeIconKeyTypes, ModeIconComponentTypes> = {
   ic_study: StudyIcon,
 };
 
+const KOREAN_MODE_ICON_KEY_MAP: Record<string, ModeIconKeyTypes> = {
+  직장: 'ic_workplace',
+  운동: 'ic_exercise',
+  요리: 'ic_cooking',
+  자연: 'ic_nature',
+  여행: 'ic_travel',
+  긴급: 'ic_emergency',
+  동물: 'ic_animal',
+  카페: 'ic_cafe',
+  병원: 'ic_hospital',
+  교통: 'ic_transportation',
+  외출: 'ic_goingOut',
+  수면: 'ic_sleep',
+  회의: 'ic_meeting',
+  학교: 'ic_school',
+  공부: 'ic_study',
+};
+
+export const normalizeModeIconKey = (
+  iconKey: string,
+): ModeIconKeyTypes | null => {
+  if (Object.prototype.hasOwnProperty.call(MODE_ICON_MAP, iconKey)) {
+    return iconKey as ModeIconKeyTypes;
+  }
+
+  return KOREAN_MODE_ICON_KEY_MAP[iconKey] ?? null;
+};
+
 // 매핑에 없는 키(미지정/레거시 한글값 등)가 들어와도 항상 컴포넌트를 반환해 화면이 깨지지 않게 한다.
-export const getModeIconComponent = (iconKey: string): ModeIconComponentTypes =>
-  MODE_ICON_MAP[iconKey as ModeIconKeyTypes] ?? UnknownModeIcon;
+export const getModeIconComponent = (iconKey: string): ModeIconComponentTypes => {
+  const normalizedIconKey = normalizeModeIconKey(iconKey);
+
+  return normalizedIconKey ? MODE_ICON_MAP[normalizedIconKey] : UnknownModeIcon;
+};
