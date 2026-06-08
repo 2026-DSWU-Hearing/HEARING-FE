@@ -10,7 +10,15 @@ const MeetingIcon = ({ className }: MeetingIconPropTypes) => (
     xmlns="http://www.w3.org/2000/svg"
     className={className}
   >
-    <circle cx="12" cy="14" r="4" fill="currentColor" opacity="0.4" /><circle cx="24" cy="14" r="4" fill="currentColor" opacity="0.4" /><path d="M6 28 Q12 20 18 28 Q24 20 30 28" stroke="currentColor" stroke-width="2" fill="none" opacity="0.4" />
+    <circle cx="12" cy="14" r="4" fill="currentColor" opacity="0.4" />
+    <circle cx="24" cy="14" r="4" fill="currentColor" opacity="0.4" />
+    <path
+      d="M6 28 Q12 20 18 28 Q24 20 30 28"
+      stroke="currentColor"
+      strokeWidth="2"
+      fill="none"
+      opacity="0.4"
+    />
   </svg>
 );
 

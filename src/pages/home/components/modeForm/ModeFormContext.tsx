@@ -7,7 +7,7 @@ import {
   useState,
 } from 'react';
 import type { ReactNode } from 'react';
-import { DEFAULT_MODE_ICON_KEY } from '@/pages/home/constants/modeIcons';
+import { DEFAULT_MODE_ICON_KEY } from '@/shared/components/icons/modes/modeIconMap';
 import { toggleSoundId } from '@/pages/home/utils/toggleSoundId';
 
 export type ModeFormPageTypes = 'create' | 'edit';

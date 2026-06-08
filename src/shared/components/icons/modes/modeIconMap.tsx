@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react';
+import type { FunctionComponent } from 'react';
 import AnimalIcon from '@/shared/components/icons/modes/AnimalIcon';
 import CafeIcon from '@/shared/components/icons/modes/CafeIcon';
 import CookingIcon from '@/shared/components/icons/modes/CookingIcon';
@@ -38,7 +38,7 @@ export interface ModeIconPropTypes {
   className?: string;
 }
 
-type ModeIconComponentTypes = ComponentType<ModeIconPropTypes>;
+type ModeIconComponentTypes = FunctionComponent<ModeIconPropTypes>;
 
 // 새 모드 생성 폼의 기본 선택값.
 export const DEFAULT_MODE_ICON_KEY: ModeIconKeyTypes = 'ic_workplace';

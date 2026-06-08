@@ -1,4 +1,4 @@
-import { getModeIconComponent } from '@/pages/home/constants/modeIcons';
+import { getModeIconComponent } from '@/shared/components/icons/modes/modeIconMap';
 
 interface ModeIconViewPropTypes {
   iconKey: string;
