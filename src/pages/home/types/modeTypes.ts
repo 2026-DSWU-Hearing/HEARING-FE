@@ -67,3 +67,14 @@ export interface UpdateModeSoundActiveResponseTypes {
   sound_id: number;
   is_active: boolean;
 }
+
+export interface ModeIconCatalogItemTypes {
+  mode_id: number;
+  name_ko: string;
+  name_key: string;
+  icon_key: string;
+}
+
+export interface GetModeIconsResponseTypes {
+  icons: ModeIconCatalogItemTypes[];
+}

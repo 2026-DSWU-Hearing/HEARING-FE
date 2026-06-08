@@ -11,19 +11,19 @@ export const modeMock: GetModesResponseTypes = {
     {
       mode_id: 1,
       name: '실외',
-      icon: '바깥',
+      icon: 'ic_goingOut',
       is_active: false,
     },
     {
       mode_id: 2,
       name: '가정',
-      icon: '집',
+      icon: 'ic_workplace',
       is_active: true,
     },
     {
       mode_id: 3,
       name: '안전',
-      icon: '주의',
+      icon: 'ic_emergency',
       is_active: false,
     },
   ],
@@ -32,7 +32,7 @@ export const modeMock: GetModesResponseTypes = {
 export const modeDetailMock: GetModeDetailResponseTypes = {
   mode_id: 1,
   name: '실외',
-  icon: '바깥',
+  icon: 'ic_goingOut',
   is_active: false,
   sounds: [
     {
@@ -53,7 +53,7 @@ export const modeDetailMock: GetModeDetailResponseTypes = {
 export const createModeMock: CreateModeResponseTypes = {
   mode_id: 4,
   name: '새 모드',
-  icon: '별',
+  icon: 'ic_study',
   sounds: [
     {
       sound_id: 1,
@@ -65,7 +65,7 @@ export const createModeMock: CreateModeResponseTypes = {
 export const updateModeMock: UpdateModeResponseTypes = {
   mode_id: 1,
   name: '수정된 모드',
-  icon: '수정',
+  icon: 'ic_meeting',
   sounds: [
     {
       sound_id: 2,

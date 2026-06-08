@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useModeCard } from '@/pages/home/hooks/useModeCard';
 import type { ModeTypes } from '@/pages/home/types/modeTypes';
+import ModeIconView from '@/shared/components/icons/modes/ModeIconView';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleRight } from '@fortawesome/free-solid-svg-icons';
 
@@ -55,7 +56,7 @@ const ModeCard = ({
       <span
         className={`relative z-10 flex items-center justify-center w-[3rem] h-[3rem]  rounded-full p-2 transition-colors duration-300 ease-in-out ${modeIconStyle}`}
       >
-        {mode.icon}
+        <ModeIconView iconKey={mode.icon} className="w-[1.5rem] h-[1.5rem]" />
       </span>
       <div className="relative z-10 flex flex-row justify-between items-center mt-base">
         <div className="flex justify-end body-lg-medium font-bold">

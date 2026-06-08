@@ -1,42 +1,46 @@
 import ModeIcon from '@/pages/home/components/modeForm/ModeIcon';
-
-const MODE_ICON_OPTIONS = [
-  '집',
-  '바깥',
-  '업무',
-  '여행',
-  '주의',
-  '별',
-  '가방',
-  '문',
-  '달',
-  '차',
-  '병원',
-  '학교',
-  '카페',
-  '버스',
-  '알림',
-  '불',
-  '물',
-  '음악',
-];
+import { useGetModeIcons } from '@/pages/home/hooks/useGetModeIcons';
 
 interface ModeIconPickerPropTypes {
   selectedIcon: string;
-  onIconSelect: (icon: string) => void;
+  onIconSelect: (iconKey: string) => void;
 }
 
 const IconPicker = ({
   selectedIcon,
   onIconSelect,
 }: ModeIconPickerPropTypes) => {
+  const { data, isLoading, isError } = useGetModeIcons();
+
+  if (isLoading) {
+    return (
+      <div className="mx-auto grid max-w-[320px] grid-cols-5 gap-sm">
+        {Array.from({ length: 15 }).map((_, index) => (
+          <div
+            key={index}
+            className="aspect-square animate-pulse rounded-pill bg-neutral-700"
+          />
+        ))}
+      </div>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <p className="text-center text-sm font-bold text-neutral-400">
+        아이콘 목록을 불러오지 못했습니다
+      </p>
+    );
+  }
+
   return (
-    <div className="mx-auto grid max-w-[320px] grid-cols-6 gap-sm">
-      {MODE_ICON_OPTIONS.map((icon) => (
+    <div className="mx-auto grid max-w-[320px] grid-cols-5 gap-sm">
+      {data.icons.map((icon) => (
         <ModeIcon
-          key={icon}
-          icon={icon}
-          isSelected={selectedIcon === icon}
+          key={icon.icon_key}
+          iconKey={icon.icon_key}
+          nameKo={icon.name_ko}
+          isSelected={selectedIcon === icon.icon_key}
           onClick={onIconSelect}
         />
       ))}
