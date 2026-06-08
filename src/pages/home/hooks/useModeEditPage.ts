@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { isAxiosError } from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
@@ -38,6 +38,7 @@ export const useModeEditPage = () => {
   const { modeId } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const deletedModeIdRef = useRef<number | null>(null);
   const parsedModeId = Number(modeId);
   const isValidModeId = Number.isInteger(parsedModeId);
   const [errorMessage, setErrorMessage] = useState('');
@@ -52,6 +53,19 @@ export const useModeEditPage = () => {
   const { mutateAsync: updateMode, isPending: isUpdatingMode } = usePutMode();
   const { mutateAsync: deleteMode, isPending: isDeletingMode } =
     useDeleteMode();
+
+  useEffect(() => {
+    return () => {
+      const deletedModeId = deletedModeIdRef.current;
+
+      if (deletedModeId === null) return;
+
+      queryClient.removeQueries({
+        queryKey: ['modes', deletedModeId],
+        exact: true,
+      });
+    };
+  }, [queryClient]);
 
   const handleModeUpdateSubmit = async ({
     name,
@@ -106,17 +120,9 @@ export const useModeEditPage = () => {
   // 확인 모달에서 "확인"을 눌렀을 때 실제 삭제를 수행한다.
   const handleModeDeleteConfirm = async () => {
     try {
-      const deletedModeId = parsedModeId;
-
       await deleteMode(parsedModeId);
+      deletedModeIdRef.current = parsedModeId;
       navigate('/', { replace: true });
-      window.setTimeout(() => {
-        queryClient.removeQueries({
-          queryKey: ['modes', deletedModeId],
-          exact: true,
-          type: 'inactive',
-        });
-      }, 0);
     } catch (error) {
       setErrorMessage(getModeEditErrorMessage(error));
     }
