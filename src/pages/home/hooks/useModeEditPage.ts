@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { isAxiosError } from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import type { ModeFormSubmitDataTypes } from '@/pages/home/components/modeForm/ModeFormContext';
 import { MAX_MODE_NAME_LENGTH } from '@/pages/home/components/modeForm/ModeFormContext';
 import {
@@ -36,6 +37,8 @@ const getModeEditErrorMessage = (error: unknown) => {
 export const useModeEditPage = () => {
   const { modeId } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const deletedModeIdRef = useRef<number | null>(null);
   const parsedModeId = Number(modeId);
   const isValidModeId = Number.isInteger(parsedModeId);
   const [errorMessage, setErrorMessage] = useState('');
@@ -50,6 +53,19 @@ export const useModeEditPage = () => {
   const { mutateAsync: updateMode, isPending: isUpdatingMode } = usePutMode();
   const { mutateAsync: deleteMode, isPending: isDeletingMode } =
     useDeleteMode();
+
+  useEffect(() => {
+    return () => {
+      const deletedModeId = deletedModeIdRef.current;
+
+      if (deletedModeId === null) return;
+
+      queryClient.removeQueries({
+        queryKey: ['modes', deletedModeId],
+        exact: true,
+      });
+    };
+  }, [queryClient]);
 
   const handleModeUpdateSubmit = async ({
     name,
@@ -105,7 +121,8 @@ export const useModeEditPage = () => {
   const handleModeDeleteConfirm = async () => {
     try {
       await deleteMode(parsedModeId);
-      navigate('/');
+      deletedModeIdRef.current = parsedModeId;
+      navigate('/', { replace: true });
     } catch (error) {
       setErrorMessage(getModeEditErrorMessage(error));
     }
