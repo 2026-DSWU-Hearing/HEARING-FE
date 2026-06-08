@@ -30,9 +30,19 @@ export const useFcmToken = () => {
   useEffect(() => {
     const unsubscribe = onForegroundMessage((payload) => {
       const { title, body } = payload.notification ?? {};
-      if (Notification.permission === 'granted' && title) {
-        new Notification(title, { body, icon: '/icons/android-chrome-192x192.png' });
-      }
+      if (Notification.permission !== 'granted' || !title) return;
+
+      const notification = new Notification(title, {
+        body,
+        icon: '/icons/android-chrome-192x192.png',
+      });
+
+      // 포그라운드에서 만든 Notification은 onclick이 없으면 클릭해도 아무 동작이 없다.
+      // 클릭 시 백그라운드로 가려진 탭을 다시 앞으로 가져온다.
+      notification.onclick = () => {
+        window.focus();
+        notification.close();
+      };
     });
 
     return () => unsubscribe();

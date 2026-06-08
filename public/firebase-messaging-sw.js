@@ -26,3 +26,19 @@ messaging.onBackgroundMessage((payload) => {
     icon: '/icons/android-chrome-192x192.png',
   });
 });
+
+// 사용자가 알림을 클릭하면 앱을 연다.
+// 이미 열린 앱 탭이 있으면 그 탭에 focus하고, 없으면 새 창을 연다.
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  // waitUntil로 SW가 작업을 끝낼 때까지 살아있게 한다(안 하면 중간에 종료될 수 있다).
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      // 이 origin으로 이미 열린 탭이 있으면 새로 열지 않고 그 탭을 포커스한다.
+      const existingClient = clientList.find((client) => client.url.includes(self.location.origin));
+      if (existingClient) return existingClient.focus();
+      return self.clients.openWindow('/');
+    }),
+  );
+});
