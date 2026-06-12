@@ -39,6 +39,7 @@ const ModeEditPage = () => {
         pageType="edit"
         initialName={modeDetailData.name}
         initialIcon={modeDetailData.icon}
+        currentModeId={modeDetailData.mode_id}
         isSubmitting={isUpdatingMode}
         isDeleting={isDeletingMode}
         onSubmit={handleModeUpdateSubmit}
