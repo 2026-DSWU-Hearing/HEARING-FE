@@ -1,7 +1,10 @@
 import AddBtn from '@/pages/home/components/AddButton';
 import SoundAddBottomModal from '@/pages/home/components/sound/SoundAddBottomModal';
 import SoundCard from '@/pages/home/components/sound/SoundCard';
+import { MODE_MESSAGE } from '@/pages/home/constants/modeMessages';
 import { useSoundSection } from '@/pages/home/hooks/useSoundSection';
+import AlertModal from '@/shared/components/AlertModal';
+import ConfirmModal from '@/shared/components/ConfirmModal';
 
 const SoundSection = () => {
   const {
@@ -13,12 +16,17 @@ const SoundSection = () => {
     isEditMode,
     isAddSoundModalOpen,
     selectedRemoveSoundIds,
+    isDeleteConfirmOpen,
+    alertMessage,
     toggleEditMode,
     closeEditMode,
     openAddSoundModal,
     closeAddSoundModal,
+    closeDeleteConfirm,
+    clearAlertMessage,
     handleSoundCardClick,
     handleRemoveSelectedSoundsClick,
+    handleRemoveSelectedSoundsConfirm,
     handleAddSoundsComplete,
   } = useSoundSection();
 
@@ -96,6 +104,20 @@ const SoundSection = () => {
           onComplete={handleAddSoundsComplete}
         />
       )}
+
+      <ConfirmModal
+        isOpen={isDeleteConfirmOpen}
+        message={MODE_MESSAGE.DELETE_CONFIRM}
+        onConfirm={handleRemoveSelectedSoundsConfirm}
+        onCancel={() => {}}
+        onClose={closeDeleteConfirm}
+      />
+
+      <AlertModal
+        isOpen={Boolean(alertMessage)}
+        message={alertMessage}
+        onClose={clearAlertMessage}
+      />
     </section>
   );
 };
