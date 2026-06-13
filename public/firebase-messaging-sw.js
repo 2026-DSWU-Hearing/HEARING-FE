@@ -19,8 +19,11 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 // 앱이 백그라운드(탭 비활성/닫힘) 상태일 때 도착하는 푸시 메시지를 처리한다.
+// 백엔드는 data-only 페이로드를 보낸다(notification 키 없음). data-only는 브라우저가
+// 알림을 자동 표시하지 않으므로 여기서 직접 showNotification으로 띄운다.
+// 이렇게 해야 중복 표시(자동 1개 + 수동 1개)가 생기지 않고, notificationclick 핸들러도 항상 동작한다.
 messaging.onBackgroundMessage((payload) => {
-  const { title, body } = payload.notification ?? {};
+  const { title, body } = payload.data ?? {};
   self.registration.showNotification(title ?? '알림', {
     body,
     icon: '/icons/android-chrome-192x192.png',
