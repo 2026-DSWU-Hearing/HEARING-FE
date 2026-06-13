@@ -24,6 +24,10 @@ export const messaging = getMessaging(app);
 // Firebase 콘솔 > Cloud Messaging > 웹 푸시 인증서에서 발급한 공개키
 const VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY;
 
+// FCM 백그라운드 SW의 scope. PWA용 sw.js(scope '/')와 충돌하지 않도록 분리한다.
+// 등록(register)과 조회(getRegistration)가 반드시 같은 값을 써야 하므로 상수로 공유한다.
+export const FCM_SW_SCOPE = '/firebase-cloud-messaging-push-scope';
+
 // 특정 Service Worker가 activated 상태가 될 때까지 기다린다.
 // navigator.serviceWorker.ready는 scope '/'의 PWA SW만 보장하므로,
 // 별도 scope로 등록한 FCM SW의 활성화는 이 registration의 SW를 직접 추적해야 한다.
@@ -44,7 +48,7 @@ const registerFcmServiceWorker = async () => {
   if (!('serviceWorker' in navigator)) return undefined;
 
   const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
-    scope: '/firebase-cloud-messaging-push-scope',
+    scope: FCM_SW_SCOPE,
   });
 
   // register()는 등록만 보장하고 활성화는 보장하지 않는다.
@@ -55,11 +59,12 @@ const registerFcmServiceWorker = async () => {
 
 // 알림 권한을 요청하고, 허용 시 FCM 토큰을 발급받는다.
 // 토큰은 이 기기를 식별하는 주소로, 서버(또는 Firebase 콘솔)가 이 토큰으로 푸시를 보낸다.
-export const requestFcmToken = async (): Promise<string | null> => {
-  const permission = await Notification.requestPermission();
-  if (permission !== 'granted') return null;
-
+export const getCurrentFcmToken = async (): Promise<string | null> => {
   try {
+    if (!VAPID_KEY) {
+      throw new Error('VITE_FIREBASE_VAPID_KEY가 설정되지 않았습니다.');
+    }
+
     const serviceWorkerRegistration = await registerFcmServiceWorker();
     const token = await getToken(messaging, {
       vapidKey: VAPID_KEY,
@@ -72,6 +77,13 @@ export const requestFcmToken = async (): Promise<string | null> => {
     console.error('[FCM] 토큰 발급 실패:', error);
     return null;
   }
+};
+
+export const requestFcmToken = async (): Promise<string | null> => {
+  const permission = await Notification.requestPermission();
+  if (permission !== 'granted') return null;
+
+  return getCurrentFcmToken();
 };
 
 // 앱이 foreground(탭 활성) 상태일 때 도착하는 메시지를 구독한다.
