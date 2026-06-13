@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app';
-import { getMessaging, getToken, onMessage } from 'firebase/messaging';
+import { deleteToken, getMessaging, getToken, onMessage } from 'firebase/messaging';
 import type { MessagePayload } from 'firebase/messaging';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -60,7 +60,13 @@ export const requestFcmToken = async (): Promise<string | null> => {
   if (permission !== 'granted') return null;
 
   try {
+    if (!VAPID_KEY) {
+      throw new Error('VITE_FIREBASE_VAPID_KEY가 설정되지 않았습니다.');
+    }
+
     const serviceWorkerRegistration = await registerFcmServiceWorker();
+    await deleteToken(messaging);
+
     const token = await getToken(messaging, {
       vapidKey: VAPID_KEY,
       serviceWorkerRegistration,
