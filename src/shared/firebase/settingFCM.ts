@@ -24,6 +24,10 @@ export const messaging = getMessaging(app);
 // Firebase 콘솔 > Cloud Messaging > 웹 푸시 인증서에서 발급한 공개키
 const VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY;
 
+// FCM 백그라운드 SW의 scope. PWA용 sw.js(scope '/')와 충돌하지 않도록 분리한다.
+// 등록(register)과 조회(getRegistration)가 반드시 같은 값을 써야 하므로 상수로 공유한다.
+export const FCM_SW_SCOPE = '/firebase-cloud-messaging-push-scope';
+
 // 특정 Service Worker가 activated 상태가 될 때까지 기다린다.
 // navigator.serviceWorker.ready는 scope '/'의 PWA SW만 보장하므로,
 // 별도 scope로 등록한 FCM SW의 활성화는 이 registration의 SW를 직접 추적해야 한다.
@@ -44,7 +48,7 @@ const registerFcmServiceWorker = async () => {
   if (!('serviceWorker' in navigator)) return undefined;
 
   const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
-    scope: '/firebase-cloud-messaging-push-scope',
+    scope: FCM_SW_SCOPE,
   });
 
   // register()는 등록만 보장하고 활성화는 보장하지 않는다.
