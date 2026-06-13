@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 
-import { postFcmToken } from '@/pages/setting/apis/postFcmToken';
+import { postFcmToken } from '@/shared/apis/postFcmToken';
 import { requestFcmToken } from '@/shared/firebase/settingFCM';
 
 const getInitialPermission = (): NotificationPermission =>

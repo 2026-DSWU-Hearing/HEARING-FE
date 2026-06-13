@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app';
-import { deleteToken, getMessaging, getToken, onMessage } from 'firebase/messaging';
+import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import type { MessagePayload } from 'firebase/messaging';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -55,18 +55,13 @@ const registerFcmServiceWorker = async () => {
 
 // 알림 권한을 요청하고, 허용 시 FCM 토큰을 발급받는다.
 // 토큰은 이 기기를 식별하는 주소로, 서버(또는 Firebase 콘솔)가 이 토큰으로 푸시를 보낸다.
-export const requestFcmToken = async (): Promise<string | null> => {
-  const permission = await Notification.requestPermission();
-  if (permission !== 'granted') return null;
-
+export const getCurrentFcmToken = async (): Promise<string | null> => {
   try {
     if (!VAPID_KEY) {
       throw new Error('VITE_FIREBASE_VAPID_KEY가 설정되지 않았습니다.');
     }
 
     const serviceWorkerRegistration = await registerFcmServiceWorker();
-    await deleteToken(messaging);
-
     const token = await getToken(messaging, {
       vapidKey: VAPID_KEY,
       serviceWorkerRegistration,
@@ -78,6 +73,13 @@ export const requestFcmToken = async (): Promise<string | null> => {
     console.error('[FCM] 토큰 발급 실패:', error);
     return null;
   }
+};
+
+export const requestFcmToken = async (): Promise<string | null> => {
+  const permission = await Notification.requestPermission();
+  if (permission !== 'granted') return null;
+
+  return getCurrentFcmToken();
 };
 
 // 앱이 foreground(탭 활성) 상태일 때 도착하는 메시지를 구독한다.

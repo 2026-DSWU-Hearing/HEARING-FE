@@ -2,11 +2,13 @@ import { useLocation } from 'react-router-dom';
 
 import BottomNavigation from '@/layout/BottomNavigation';
 import AppRouter from '@/routes/AppRouter';
+import { useFcmTokenSync } from '@/shared/hooks/useFcmTokenSync';
 import { useForegroundNotification } from '@/shared/hooks/useForegroundNotification';
 import '@/App.css';
 
 function App() {
   const { pathname } = useLocation();
+  useFcmTokenSync();
   useForegroundNotification();
 
   // 모드쪽 설정 페이지에서는 네비게이션 숨김
