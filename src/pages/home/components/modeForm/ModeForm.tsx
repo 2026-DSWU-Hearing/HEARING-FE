@@ -8,6 +8,7 @@ import {
 import ModeHeader from '@/pages/home/components/modeForm/ModeHeader';
 import ModeIconPicker from '@/pages/home/components/modeForm/ModeIconPicker';
 import ModeSoundSelectSection from '@/pages/home/components/modeForm/ModeSoundSelectSection';
+import { MODE_MESSAGE } from '@/pages/home/constants/modeMessages';
 import type {
   ModeFormPageTypes,
   ModeFormSubmitDataTypes,
@@ -17,6 +18,7 @@ export interface ModeFormPropTypes {
   pageType: ModeFormPageTypes;
   initialName?: string;
   initialIcon?: string;
+  currentModeId?: number;
   isSubmitting?: boolean;
   isDeleting?: boolean;
   onSubmit: (formData: ModeFormSubmitDataTypes) => void;
@@ -37,6 +39,7 @@ const ModeFormContent = () => {
     hasDeleteAction,
     canSubmit,
     isModeNameTooLong,
+    isModeNameDuplicated,
     handleModeNameChange,
     handleIconSelect,
     handleSubmitClick,
@@ -61,7 +64,9 @@ const ModeFormContent = () => {
           errorMessage={
             isModeNameTooLong
               ? `모드 이름은 최대 ${MAX_MODE_NAME_LENGTH}글자까지 가능합니다`
-              : undefined
+              : isModeNameDuplicated
+                ? MODE_MESSAGE.DUPLICATED_NAME
+                : undefined
           }
         />
 

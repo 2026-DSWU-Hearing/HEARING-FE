@@ -5,8 +5,10 @@ export const MODE_MESSAGE = {
   EMPTY_NAME: '모드 이름을 입력해주세요',
   TOO_LONG_NAME: `모드 이름은 ${MAX_MODE_NAME_LENGTH}글자 이하로 입력해주세요`,
   EMPTY_SOUND: '소리를 1개 이상 선택해주세요',
+  DUPLICATED_NAME: '이미 사용 중인 모드 이름입니다',
   MAX_MODE_COUNT: '모드는 최대 6개까지 만들 수 있습니다',
   MIN_MODE_COUNT: '모드는 최소 1개 이상 유지해야 합니다',
+  MIN_SOUND_COUNT: '소리는 최소 1개 이상 유지해야 합니다',
   DELETE_CONFIRM: '정말 삭제하시겠습니까?',
 } as const;
 

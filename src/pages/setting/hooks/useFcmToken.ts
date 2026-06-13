@@ -27,9 +27,10 @@ export const useFcmToken = () => {
   }, []);
 
   // foreground 메시지는 OS 알림을 자동으로 띄우지 않으므로 직접 알림을 생성한다.
+  // 백엔드는 data-only 페이로드를 보내므로 payload.data에서 제목/본문을 읽는다.
   useEffect(() => {
     const unsubscribe = onForegroundMessage((payload) => {
-      const { title, body } = payload.notification ?? {};
+      const { title, body } = payload.data ?? {};
       if (Notification.permission !== 'granted' || !title) return;
 
       const options: NotificationOptions = {
