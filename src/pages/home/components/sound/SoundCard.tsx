@@ -1,4 +1,5 @@
 import CategoryBlock from '@/pages/home/components/sound/CategoryBlock';
+import SoundIconView from '@/shared/components/icons/sounds/SoundIconView';
 
 interface SoundCardSoundTypes {
   sound_id: number;
@@ -15,18 +16,6 @@ interface SoundCardPropTypes {
   isSelected?: boolean;
   onClick?: (soundId: number) => void;
 }
-
-const getSoundIcon = (categoryName: string) => {
-  if (categoryName.includes('긴급') || categoryName.includes('위험')) {
-    return '!';
-  }
-
-  if (categoryName.includes('생활')) {
-    return '●';
-  }
-
-  return '♪';
-};
 
 const SoundCard = ({
   sound,
@@ -62,9 +51,11 @@ const SoundCard = ({
       } ${cardStyle} `}
     >
       <div className="flex h-full flex-col items-center justify-center gap-xs transition-colors duration-300 ease-out">
-        <span className="w-icon-2xl h-icon-2xl font-black leading-none transition-transform duration-300 ease-out">
-          {getSoundIcon(categoryName)}
-        </span>
+        <SoundIconView
+          soundName={sound.name}
+          categoryName={categoryName}
+          className="w-icon-2xl h-icon-2xl leading-none transition-transform duration-300 ease-out"
+        />
         <span className="heading-base-semibold transition-colors duration-300 ease-out">
           {sound.name}
         </span>
