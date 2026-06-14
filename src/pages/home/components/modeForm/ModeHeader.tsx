@@ -36,7 +36,7 @@ const ModeHeader = ({
         type="button"
         onClick={onActionClick}
         disabled={isActionDisabled}
-        className="text-right body-lg-regular disabled:text-neutral-300"
+        className="text-right body-lg-regular text-primary-500 disabled:text-neutral-300"
       >
         {actionLabel}
       </button>

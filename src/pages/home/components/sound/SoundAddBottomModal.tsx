@@ -44,7 +44,7 @@ const SoundAddBottomModal = ({
           <button
             type="button"
             onClick={handleCompleteClick}
-            className="heading-base-semibold"
+            className="heading-base-semibold "
           >
             완료
           </button>
