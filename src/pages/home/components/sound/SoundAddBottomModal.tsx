@@ -29,7 +29,7 @@ const SoundAddBottomModal = ({
   } = useSoundAddModal({ onComplete });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/45">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#000000]/50">
       <div className="flex h-[76dvh] w-full max-w-[430px] flex-col rounded-t-[32px] bg-neutral-800 p-xl">
         <div className="mb-8 flex flex-shrink-0 items-center justify-between">
           <button
