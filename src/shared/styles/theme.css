@@ -332,6 +332,15 @@
   background-image: var(--gradient-card-true);
 }
 
+/* card-true 그라데이션을 테두리에 적용 (rounded 모서리 호환).
+   안쪽 채움색은 버튼 배경(--color-black)과 일치시켜야 안쪽에 색 띠가 생기지 않는다. */
+@utility border-card-true {
+  border: 0.5px solid transparent;
+  background:
+    linear-gradient(var(--color-black), var(--color-black)) padding-box,
+    var(--gradient-card-true) border-box;
+}
+
 @utility card-true-bottomsheet {
   background-image: var(--gradient-card-true-bottomsheet);
 }

@@ -22,7 +22,7 @@ const ModeCard = ({ mode, isSelected, isDoNotDisturb }: ModeCardPropTypes) => {
   });
 
   const modeCardStyle = isDoNotDisturb
-    ? 'cursor-not-allowed text-disabled opacity-60'
+    ? 'cursor-not-allowed text-tertiary'
     : isSelected
       ? 'cursor-pointer text-primary'
       : 'cursor-pointer text-tertiary';

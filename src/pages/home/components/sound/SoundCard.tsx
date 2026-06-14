@@ -59,7 +59,7 @@ const SoundCard = ({
         <span className="heading-base-semibold transition-colors duration-300 ease-out">
           {sound.name}
         </span>
-        <CategoryBlock categoryName={categoryName} />
+        <CategoryBlock categoryName={categoryName} isDisabled={isDoNotDisturb} />
       </div>
     </button>
   );
