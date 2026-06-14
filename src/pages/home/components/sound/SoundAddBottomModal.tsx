@@ -65,7 +65,7 @@ const SoundAddBottomModal = ({
           {isError && <p>소리 목록을 불러오지 못했습니다</p>}
         </div>
 
-        <div className="mt-5 flex-1 overflow-y-auto">
+        <div className="hide-scrollbar mt-5 flex-1 overflow-y-auto">
           <div className="grid grid-cols-3 gap-3">
             {filteredSounds.map((sound) => (
               <SoundCard
