@@ -1,6 +1,7 @@
 @theme {
   /* 폰트 */
-  --font-base: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+  --font-base: 'Pretendard Variable', 'Pretendard', 'Apple SD Gothic Neo',
+    sans-serif;
   --font-size-base: 1rem;
 
   /* 색상 */
@@ -165,7 +166,7 @@
 @utility heading-5xl-semibold {
   font-size: 2rem;
   line-height: 135%;
-  font-weight: 700;
+  font-weight: 600;
 }
 @utility heading-4xl-semibold {
   font-size: 1.75rem;
