@@ -64,7 +64,7 @@ const ModeCard = ({ mode, isSelected, isDoNotDisturb }: ModeCardPropTypes) => {
         />
       </span>
       <div className="relative z-10 flex flex-row justify-between items-center mt-base">
-        <div className="flex justify-end body-lg-medium font-bold">
+        <div className="flex justify-end body-lg-medium">
           {mode.name}
         </div>
 

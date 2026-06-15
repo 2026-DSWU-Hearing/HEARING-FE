@@ -14,10 +14,14 @@ const ModeEditPage = () => {
     isUpdatingMode,
     isDeletingMode,
     isDeleteConfirmOpen,
+    isActivateDeleteOpen,
+    activeDeleteMessage,
     handleModeUpdateSubmit,
     handleModeDeleteClick,
     handleModeDeleteConfirm,
+    handleActiveModeDeleteConfirm,
     closeDeleteConfirm,
+    closeActivateDelete,
     clearErrorMessage,
   } = useModeEditPage();
 
@@ -51,6 +55,13 @@ const ModeEditPage = () => {
         onConfirm={handleModeDeleteConfirm}
         onCancel={() => {}}
         onClose={closeDeleteConfirm}
+      />
+      <ConfirmModal
+        isOpen={isActivateDeleteOpen}
+        message={activeDeleteMessage}
+        onConfirm={handleActiveModeDeleteConfirm}
+        onCancel={() => {}}
+        onClose={closeActivateDelete}
       />
       <AlertModal
         isOpen={Boolean(errorMessage)}

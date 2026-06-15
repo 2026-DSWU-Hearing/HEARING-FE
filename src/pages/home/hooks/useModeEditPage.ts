@@ -11,6 +11,7 @@ import {
 import { useDeleteMode } from '@/pages/home/hooks/useDeleteMode';
 import { useGetModeDetail } from '@/pages/home/hooks/useGetModeDetail';
 import { useGetModes } from '@/pages/home/hooks/useGetModes';
+import { usePatchActivateMode } from '@/pages/home/hooks/usePatchActivateMode';
 import { usePutMode } from '@/pages/home/hooks/usePutMode';
 import { useModal } from '@/shared/hooks/useModal';
 
@@ -44,6 +45,8 @@ export const useModeEditPage = () => {
   const [errorMessage, setErrorMessage] = useState('');
   // 삭제 확인 모달의 열림/닫힘 상태
   const deleteConfirmModal = useModal();
+  // 활성 모드 삭제 시 "다른 모드로 전환 후 삭제" 안내 모달의 열림/닫힘 상태
+  const activateDeleteModal = useModal();
   const {
     data: modeDetailData,
     isLoading: isModeDetailLoading,
@@ -53,6 +56,14 @@ export const useModeEditPage = () => {
   const { mutateAsync: updateMode, isPending: isUpdatingMode } = usePutMode();
   const { mutateAsync: deleteMode, isPending: isDeletingMode } =
     useDeleteMode();
+  const { mutateAsync: activateMode, isPending: isActivatingMode } =
+    usePatchActivateMode();
+
+  // 현재 보고 있는 모드가 활성 모드인지 (modes 목록의 is_active 기준)
+  const currentMode = modesData?.modes.find(
+    (mode) => mode.mode_id === parsedModeId,
+  );
+  const isCurrentModeActive = currentMode?.is_active ?? false;
 
   useEffect(() => {
     return () => {
@@ -105,12 +116,17 @@ export const useModeEditPage = () => {
     }
   };
 
-  // 삭제 버튼 클릭: 최소 개수 검증 후 확인 모달을 연다.
+  // 삭제 버튼 클릭: 최소 개수 검증 후, 활성 모드면 전환 안내 모달을, 아니면 삭제 확인 모달을 연다.
   const handleModeDeleteClick = () => {
     if (!modeDetailData) return;
 
     if ((modesData?.modes.length ?? 0) <= 1) {
       setErrorMessage(MODE_MESSAGE.MIN_MODE_COUNT);
+      return;
+    }
+
+    if (isCurrentModeActive) {
+      activateDeleteModal.open();
       return;
     }
 
@@ -128,6 +144,25 @@ export const useModeEditPage = () => {
     }
   };
 
+  // 활성 모드 전환 안내 모달에서 "확인": 다른 모드를 활성화한 뒤 현재 모드를 삭제한다.
+  const handleActiveModeDeleteConfirm = async () => {
+    // 삭제 대상을 제외한 첫 번째 모드를 다음 활성 모드로 선택
+    const nextMode = modesData?.modes.find(
+      (mode) => mode.mode_id !== parsedModeId,
+    );
+
+    if (!nextMode) return;
+
+    try {
+      await activateMode(nextMode.mode_id);
+      await deleteMode(parsedModeId);
+      deletedModeIdRef.current = parsedModeId;
+      navigate('/', { replace: true });
+    } catch (error) {
+      setErrorMessage(getModeEditErrorMessage(error));
+    }
+  };
+
   const clearErrorMessage = () => setErrorMessage('');
 
   return {
@@ -137,12 +172,19 @@ export const useModeEditPage = () => {
     isModeDetailLoading,
     isModeDetailError,
     isUpdatingMode,
-    isDeletingMode,
+    // 삭제 또는 다른 모드 활성화가 진행 중이면 버튼을 비활성화한다.
+    isDeletingMode: isDeletingMode || isActivatingMode,
     isDeleteConfirmOpen: deleteConfirmModal.isOpen,
+    isActivateDeleteOpen: activateDeleteModal.isOpen,
+    activeDeleteMessage: MODE_MESSAGE.ACTIVE_DELETE_CONFIRM(
+      modeDetailData?.name ?? '',
+    ),
     handleModeUpdateSubmit,
     handleModeDeleteClick,
     handleModeDeleteConfirm,
+    handleActiveModeDeleteConfirm,
     closeDeleteConfirm: deleteConfirmModal.close,
+    closeActivateDelete: activateDeleteModal.close,
     clearErrorMessage,
   };
 };

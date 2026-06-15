@@ -10,6 +10,9 @@ export const MODE_MESSAGE = {
   MIN_MODE_COUNT: '모드는 최소 1개 이상 유지해야 합니다',
   MIN_SOUND_COUNT: '소리는 최소 1개 이상 유지해야 합니다',
   DELETE_CONFIRM: '정말 삭제하시겠습니까?',
+  // 활성 모드 삭제 시: 다른 모드로 전환 후 삭제할지 안내 (모드 이름 동적 삽입)
+  ACTIVE_DELETE_CONFIRM: (modeName: string) =>
+    `현재 '${modeName}' 모드가 활성화되어 있습니다.\n다른 모드로 전환 후 삭제하시겠습니까?`,
 } as const;
 
 // 서버 응답 상태에 따른 에러 메시지
