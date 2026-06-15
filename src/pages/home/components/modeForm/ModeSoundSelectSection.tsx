@@ -27,7 +27,7 @@ const ModeSoundSelectSection = () => {
       aria-labelledby="sound-select-heading"
       className="space-y-base mb-[3rem]"
     >
-      <div className="flex items-center justify-between gap-base mb-lg">
+      <div className="flex items-center justify-between gap-base mb-lg mt-2xl">
         <h2 id="sound-select-heading" className="heading-base-semibold">
           소리 선택
         </h2>
