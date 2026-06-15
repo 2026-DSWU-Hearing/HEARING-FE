@@ -5,6 +5,7 @@ import { MODE_MESSAGE } from '@/pages/home/constants/modeMessages';
 import { useSoundSection } from '@/pages/home/hooks/useSoundSection';
 import AlertModal from '@/shared/components/AlertModal';
 import ConfirmModal from '@/shared/components/ConfirmModal';
+import { AnimatePresence } from 'motion/react';
 
 const SoundSection = () => {
   const {
@@ -98,12 +99,14 @@ const SoundSection = () => {
         />
       </div>
 
-      {isAddSoundModalOpen && (
-        <SoundAddBottomModal
-          onClose={closeAddSoundModal}
-          onComplete={handleAddSoundsComplete}
-        />
-      )}
+      <AnimatePresence>
+        {isAddSoundModalOpen && (
+          <SoundAddBottomModal
+            onClose={closeAddSoundModal}
+            onComplete={handleAddSoundsComplete}
+          />
+        )}
+      </AnimatePresence>
 
       <ConfirmModal
         isOpen={isDeleteConfirmOpen}

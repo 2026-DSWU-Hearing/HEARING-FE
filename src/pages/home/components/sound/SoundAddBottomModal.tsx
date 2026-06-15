@@ -5,6 +5,7 @@ import { useSoundAddModal } from '@/pages/home/hooks/useSoundAddModal';
 import type { SoundTypes } from '@/pages/home/types/soundTypes';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { motion } from 'motion/react';
 
 interface SoundAddBottomModalPropTypes {
   onClose: () => void;
@@ -29,8 +30,20 @@ const SoundAddBottomModal = ({
   } = useSoundAddModal({ onComplete });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#000000]/50">
-      <div className="flex h-[76dvh] w-full max-w-[430px] flex-col rounded-t-[32px] bg-neutral-800 p-xl">
+    <motion.div
+      className="fixed inset-0 z-50 flex items-end justify-center bg-[#000000]/50"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+    >
+      <motion.div
+        className="flex h-[76dvh] w-full max-w-[430px] flex-col rounded-t-[32px] bg-neutral-800 p-xl"
+        initial={{ y: '100%' }}
+        animate={{ y: 0 }}
+        exit={{ y: '100%' }}
+        transition={{ type: 'spring', damping: 30, stiffness: 320 }}
+      >
         <div className="mb-8 flex flex-shrink-0 items-center justify-between">
           <button
             type="button"
@@ -78,8 +91,8 @@ const SoundAddBottomModal = ({
             ))}
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 
