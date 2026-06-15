@@ -52,7 +52,11 @@ export const useModeEditPage = () => {
     isLoading: isModeDetailLoading,
     isError: isModeDetailError,
   } = useGetModeDetail(isValidModeId ? parsedModeId : null);
-  const { data: modesData } = useGetModes();
+  const {
+    data: modesData,
+    isLoading: isModesLoading,
+    isError: isModesError,
+  } = useGetModes();
   const { mutateAsync: updateMode, isPending: isUpdatingMode } = usePutMode();
   const { mutateAsync: deleteMode, isPending: isDeletingMode } =
     useDeleteMode();
@@ -64,6 +68,15 @@ export const useModeEditPage = () => {
     (mode) => mode.mode_id === parsedModeId,
   );
   const isCurrentModeActive = currentMode?.is_active ?? false;
+
+  // 활성 모드를 삭제할 때 대신 활성화할 모드(삭제 대상을 제외한 첫 번째).
+  // 안내 모달 메시지와 실제 삭제 로직이 동일한 대상을 쓰도록 한 곳에서 계산한다.
+  const nextActiveMode = modesData?.modes.find(
+    (mode) => mode.mode_id !== parsedModeId,
+  );
+
+  // 목록 조회가 끝나지 않았거나 실패하면 삭제 가능 여부(개수·활성 상태)를 판단할 수 없다.
+  const isModesReady = !isModesLoading && !isModesError && Boolean(modesData);
 
   useEffect(() => {
     return () => {
@@ -118,7 +131,8 @@ export const useModeEditPage = () => {
 
   // 삭제 버튼 클릭: 최소 개수 검증 후, 활성 모드면 전환 안내 모달을, 아니면 삭제 확인 모달을 연다.
   const handleModeDeleteClick = () => {
-    if (!modeDetailData) return;
+    // 목록이 준비되지 않으면 개수·활성 상태를 신뢰할 수 없으므로 삭제를 막는다.
+    if (!modeDetailData || !isModesReady) return;
 
     if ((modesData?.modes.length ?? 0) <= 1) {
       setErrorMessage(MODE_MESSAGE.MIN_MODE_COUNT);
@@ -145,21 +159,27 @@ export const useModeEditPage = () => {
   };
 
   // 활성 모드 전환 안내 모달에서 "확인": 다른 모드를 활성화한 뒤 현재 모드를 삭제한다.
+  // 활성화와 삭제를 분리해, 활성화는 됐는데 삭제만 실패한 "부분 성공" 상태를 구분한다.
   const handleActiveModeDeleteConfirm = async () => {
-    // 삭제 대상을 제외한 첫 번째 모드를 다음 활성 모드로 선택
-    const nextMode = modesData?.modes.find(
-      (mode) => mode.mode_id !== parsedModeId,
-    );
+    if (!nextActiveMode) return;
 
-    if (!nextMode) return;
-
+    // 1단계: 다른 모드 활성화. 실패하면 서버 상태가 그대로이므로 일반 에러로 처리한다.
     try {
-      await activateMode(nextMode.mode_id);
+      await activateMode(nextActiveMode.mode_id);
+    } catch (error) {
+      setErrorMessage(getModeEditErrorMessage(error));
+      return;
+    }
+
+    // 2단계: 현재 모드 삭제. 여기서 실패하면 다른 모드는 이미 활성화된 부분 성공 상태다.
+    // 목록 캐시를 무효화해 화면을 서버 실제 상태와 다시 맞추고, 전용 안내를 띄운다.
+    try {
       await deleteMode(parsedModeId);
       deletedModeIdRef.current = parsedModeId;
       navigate('/', { replace: true });
-    } catch (error) {
-      setErrorMessage(getModeEditErrorMessage(error));
+    } catch {
+      queryClient.invalidateQueries({ queryKey: ['modes'] });
+      setErrorMessage(MODE_MESSAGE.ACTIVE_DELETE_PARTIAL_FAIL);
     }
   };
 
@@ -178,7 +198,10 @@ export const useModeEditPage = () => {
     isActivateDeleteOpen: activateDeleteModal.isOpen,
     activeDeleteMessage: MODE_MESSAGE.ACTIVE_DELETE_CONFIRM(
       modeDetailData?.name ?? '',
+      nextActiveMode?.name ?? '',
     ),
+    // 목록 미준비 시 삭제 버튼을 비활성화하기 위해 노출한다.
+    isModesReady,
     handleModeUpdateSubmit,
     handleModeDeleteClick,
     handleModeDeleteConfirm,

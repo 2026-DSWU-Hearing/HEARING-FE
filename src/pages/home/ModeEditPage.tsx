@@ -13,6 +13,7 @@ const ModeEditPage = () => {
     isModeDetailError,
     isUpdatingMode,
     isDeletingMode,
+    isModesReady,
     isDeleteConfirmOpen,
     isActivateDeleteOpen,
     activeDeleteMessage,
@@ -45,7 +46,7 @@ const ModeEditPage = () => {
         initialIcon={modeDetailData.icon}
         currentModeId={modeDetailData.mode_id}
         isSubmitting={isUpdatingMode}
-        isDeleting={isDeletingMode}
+        isDeleting={isDeletingMode || !isModesReady}
         onSubmit={handleModeUpdateSubmit}
         onDelete={handleModeDeleteClick}
       />

@@ -18,6 +18,10 @@ export const usePatchActivateMode = () => {
           })),
         };
       });
+
+      // 목록 캐시의 is_active만 갱신하면 ['modes', id] 상세 캐시와 활성 상태가 어긋난다.
+      // 활성 상태가 바뀐 모드들의 상세 캐시를 무효화해 다음 조회 시 서버 값으로 동기화한다.
+      queryClient.invalidateQueries({ queryKey: ['modes', data.mode_id] });
     },
   });
 };

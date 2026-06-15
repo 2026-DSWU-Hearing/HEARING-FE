@@ -63,11 +63,13 @@ const ModeFormContent = () => {
           onChange={handleModeNameChange}
           maxLength={MAX_MODE_NAME_LENGTH}
           errorMessage={
-            isModeNameTooLong
-              ? `모드 이름은 최대 ${MAX_MODE_NAME_LENGTH}글자까지 가능합니다`
-              : isModeNameDuplicated
-                ? MODE_MESSAGE.DUPLICATED_NAME
-                : undefined
+            isSubmitting
+              ? undefined
+              : isModeNameTooLong
+                ? `모드 이름은 최대 ${MAX_MODE_NAME_LENGTH}글자까지 가능합니다`
+                : isModeNameDuplicated
+                  ? MODE_MESSAGE.DUPLICATED_NAME
+                  : undefined
           }
         />
 

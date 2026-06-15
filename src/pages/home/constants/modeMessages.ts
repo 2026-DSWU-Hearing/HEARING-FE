@@ -10,9 +10,12 @@ export const MODE_MESSAGE = {
   MIN_MODE_COUNT: '모드는 최소 1개 이상 유지해야 합니다',
   MIN_SOUND_COUNT: '소리는 최소 1개 이상 유지해야 합니다',
   DELETE_CONFIRM: '정말 삭제하시겠습니까?',
-  // 활성 모드 삭제 시: 다른 모드로 전환 후 삭제할지 안내 (모드 이름 동적 삽입)
-  ACTIVE_DELETE_CONFIRM: (modeName: string) =>
-    `현재 '${modeName}' 모드가 활성화되어 있습니다.\n다른 모드로 전환 후 삭제하시겠습니까?`,
+  // 활성 모드 삭제 시: 어떤 모드로 전환되는지 명시하고 삭제할지 안내 (현재/다음 모드 이름 동적 삽입)
+  ACTIVE_DELETE_CONFIRM: (currentModeName: string, nextModeName: string) =>
+    `현재 '${currentModeName}' 모드가 활성화되어 있습니다.\n'${nextModeName}' 모드로 전환 후 삭제하시겠습니까?`,
+  // 다른 모드 활성화는 성공했지만 현재 모드 삭제가 실패했을 때의 부분 성공 안내
+  ACTIVE_DELETE_PARTIAL_FAIL:
+    '다른 모드로 전환은 되었지만 삭제에 실패했습니다.\n잠시 후 다시 시도해주세요',
 } as const;
 
 // 서버 응답 상태에 따른 에러 메시지
