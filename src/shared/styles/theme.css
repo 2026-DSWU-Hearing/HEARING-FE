@@ -1,7 +1,7 @@
 @theme {
   /* 폰트 */
-  --font-base: 'Pretendard Variable', 'Pretendard', 'Apple SD Gothic Neo',
-    sans-serif;
+  --font-base:
+    'Pretendard Variable', 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
   --font-size-base: 1rem;
 
   /* 색상 */
@@ -139,8 +139,8 @@
   );
   --gradient-card-true-bottomsheet: linear-gradient(
     to top,
-    color-mix(in srgb, var(--color-primary-300) 50%, transparent) 0%,
-    color-mix(in srgb, var(--color-neutral-50) 50%, transparent) 100%
+    color-mix(in srgb, var(--color-primary-400) 40%, transparent) 0%,
+    color-mix(in srgb, var(--color-primary-100) 40%, transparent) 100%
   );
   --gradient-default: linear-gradient(to bottom, #fdd043 0%, #82a6e6 100%);
 }

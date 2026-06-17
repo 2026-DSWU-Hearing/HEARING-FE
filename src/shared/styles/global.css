@@ -11,7 +11,7 @@ body {
   font-family: var(--font-base);
   font-size: var(--font-size-base);
   font-synthesis: none;
-  background-color: var(--color-black);
+  background-color: var(--color-neutral-700);
   color: var(--color-primary);
 }
 
@@ -24,6 +24,9 @@ body {
   min-height: 100dvh;
   margin: 0 auto;
   box-shadow: 0 0 40px rgba(0, 0, 0, 0.15);
+  background-color: var(--color-neutral-950);
+  /* 자식 요소의 margin이 박스 밖으로 새어 body 배경이 비치는 것을 방지 (margin collapsing 차단) */
+  overflow: hidden;
 }
 
 /* 버튼 */

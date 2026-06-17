@@ -22,7 +22,7 @@ const ModeHeader = ({
   };
 
   return (
-    <header className="mt-[2.75rem] mb-[2.5rem] grid grid-cols-[48px_1fr_64px] items-center">
+    <header className="mb-[2.5rem] grid grid-cols-[48px_1fr_64px] items-center">
       <button
         type="button"
         onClick={handleBackClick}

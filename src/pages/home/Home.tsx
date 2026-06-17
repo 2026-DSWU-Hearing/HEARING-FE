@@ -6,7 +6,7 @@ import { HomeModeProvider } from '@/pages/home/hooks/useHomeModeContext';
 const Home = () => {
   return (
     <HomeModeProvider>
-      <div className="min-h-dvh mb-[5rem] px-[1.03rem]">
+      <div className="min-h-dvh pt-[2.75rem] pb-[9.5rem] px-[1.03rem]">
         <HomeHeader />
         <ModeList />
         <SoundSection />
