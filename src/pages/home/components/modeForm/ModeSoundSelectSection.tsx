@@ -5,6 +5,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import SearchBar from '@/pages/home/components/SearchBar';
 import ModeSoundSelectBlock from '@/pages/home/components/modeForm/ModeSoundSelectBlock';
+import ModeSoundSelectSkeleton from '@/pages/home/components/modeForm/ModeSoundSelectSkeleton';
 import { useModeFormContext } from '@/pages/home/components/modeForm/ModeFormContext';
 import { useModeSoundSelectSection } from '@/pages/home/hooks/useModeSoundSelectSection';
 
@@ -42,11 +43,7 @@ const ModeSoundSelectSection = () => {
         onChange={handleSearchKeywordChange}
       />
 
-      {isLoading && (
-        <p className="body-sm-regular text-tertiary">
-          소리 목록을 불러오는 중...
-        </p>
-      )}
+      {isLoading && <ModeSoundSelectSkeleton />}
       {isError && (
         <p className="body-sm-regular text-state-alert">
           소리 목록을 불러오지 못했습니다

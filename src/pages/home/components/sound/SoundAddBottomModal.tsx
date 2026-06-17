@@ -1,11 +1,15 @@
 import SearchBar from '@/pages/home/components/SearchBar';
 import CategoryBar from '@/pages/home/components/sound/CategoryBar';
 import SoundCard from '@/pages/home/components/sound/SoundCard';
+import SoundCardSkeleton from '@/pages/home/components/sound/SoundCardSkeleton';
 import { useSoundAddModal } from '@/pages/home/hooks/useSoundAddModal';
 import type { SoundTypes } from '@/pages/home/types/soundTypes';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'motion/react';
+import { SkeletonTheme } from 'react-loading-skeleton';
+
+const SKELETON_SOUND_COUNT = 9;
 
 interface SoundAddBottomModalPropTypes {
   onClose: () => void;
@@ -75,12 +79,19 @@ const SoundAddBottomModal = ({
             onCategoryChange={handleCategoryChange}
           />
 
-          {isLoading && <p>소리 목록을 불러오는 중...</p>}
           {isError && <p>소리 목록을 불러오지 못했습니다</p>}
         </div>
 
         <div className="hide-scrollbar mt-5 flex-1 overflow-y-auto">
-          {hasNoSearchResult ? (
+          {isLoading ? (
+            <SkeletonTheme baseColor="#4a4b47" highlightColor="#5e5f5a">
+              <div className="grid grid-cols-3 gap-3">
+                {Array.from({ length: SKELETON_SOUND_COUNT }).map((_, index) => (
+                  <SoundCardSkeleton key={index} bgClassName="bg-neutral-700" />
+                ))}
+              </div>
+            </SkeletonTheme>
+          ) : hasNoSearchResult ? (
             <p className="body-sm-regular text-secondary text-center">
               검색 결과가 없습니다.
             </p>

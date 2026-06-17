@@ -1,11 +1,14 @@
 import AddBtn from '@/pages/home/components/AddButton';
 import SoundAddBottomModal from '@/pages/home/components/sound/SoundAddBottomModal';
 import SoundCard from '@/pages/home/components/sound/SoundCard';
+import SoundCardSkeleton from '@/pages/home/components/sound/SoundCardSkeleton';
 import { MODE_MESSAGE } from '@/pages/home/constants/modeMessages';
 import { useSoundSection } from '@/pages/home/hooks/useSoundSection';
 import AlertModal from '@/shared/components/AlertModal';
 import ConfirmModal from '@/shared/components/ConfirmModal';
 import { AnimatePresence } from 'motion/react';
+
+const SKELETON_SOUND_COUNT = 6;
 
 const SoundSection = () => {
   const {
@@ -69,23 +72,27 @@ const SoundSection = () => {
         )}
       </div>
 
-      {isLoading && <p>소리를 불러오는 중입니다...</p>}
       {isError && <p>모드에 담긴 소리를 불러오지 못했습니다</p>}
 
       <div className="grid grid-cols-3 gap-3">
-        {sounds.map((sound) => (
-          <SoundCard
-            key={sound.sound_id}
-            sound={sound}
-            isActive={sound.is_active}
-            isDoNotDisturb={isDoNotDisturb}
-            isEditMode={isEditMode}
-            isSelected={
-              !isDoNotDisturb && selectedRemoveSoundIds.includes(sound.sound_id)
-            }
-            onClick={handleSoundCardClick}
-          />
-        ))}
+        {isLoading
+          ? Array.from({ length: SKELETON_SOUND_COUNT }).map((_, index) => (
+              <SoundCardSkeleton key={index} />
+            ))
+          : sounds.map((sound) => (
+              <SoundCard
+                key={sound.sound_id}
+                sound={sound}
+                isActive={sound.is_active}
+                isDoNotDisturb={isDoNotDisturb}
+                isEditMode={isEditMode}
+                isSelected={
+                  !isDoNotDisturb &&
+                  selectedRemoveSoundIds.includes(sound.sound_id)
+                }
+                onClick={handleSoundCardClick}
+              />
+            ))}
       </div>
 
       <div className="mt-5 flex justify-center">

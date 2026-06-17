@@ -3,6 +3,7 @@ import { MODE_MESSAGE } from '@/pages/home/constants/modeMessages';
 import { useModeEditPage } from '@/pages/home/hooks/useModeEditPage';
 import AlertModal from '@/shared/components/AlertModal';
 import ConfirmModal from '@/shared/components/ConfirmModal';
+import LoadingSpinner from '@/shared/components/LoadingSpinner';
 
 const ModeEditPage = () => {
   const {
@@ -31,7 +32,7 @@ const ModeEditPage = () => {
   }
 
   if (isModeDetailLoading) {
-    return <div className="p-6">모드 정보를 불러오는 중...</div>;
+    return <LoadingSpinner />;
   }
 
   if (isModeDetailError || !modeDetailData) {
