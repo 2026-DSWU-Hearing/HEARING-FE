@@ -40,6 +40,7 @@ const ModeFormContent = () => {
     canSubmit,
     isModeNameTooLong,
     isModeNameDuplicated,
+    hasSubmitted,
     handleModeNameChange,
     handleIconSelect,
     handleSubmitClick,
@@ -63,7 +64,7 @@ const ModeFormContent = () => {
           onChange={handleModeNameChange}
           maxLength={MAX_MODE_NAME_LENGTH}
           errorMessage={
-            isSubmitting
+            hasSubmitted
               ? undefined
               : isModeNameTooLong
                 ? `모드 이름은 최대 ${MAX_MODE_NAME_LENGTH}글자까지 가능합니다`
