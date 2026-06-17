@@ -21,6 +21,7 @@ const SoundAddBottomModal = ({
     selectedCategory,
     selectedSoundIds,
     filteredSounds,
+    hasNoSearchResult,
     isLoading,
     isError,
     handleSearchKeywordChange,
@@ -79,17 +80,23 @@ const SoundAddBottomModal = ({
         </div>
 
         <div className="hide-scrollbar mt-5 flex-1 overflow-y-auto">
-          <div className="grid grid-cols-3 gap-3">
-            {filteredSounds.map((sound) => (
-              <SoundCard
-                key={sound.sound_id}
-                sound={sound}
-                isEditMode
-                isSelected={selectedSoundIds.includes(sound.sound_id)}
-                onClick={handleSoundSelect}
-              />
-            ))}
-          </div>
+          {hasNoSearchResult ? (
+            <p className="body-sm-regular text-secondary text-center">
+              검색 결과가 없습니다.
+            </p>
+          ) : (
+            <div className="grid grid-cols-3 gap-3">
+              {filteredSounds.map((sound) => (
+                <SoundCard
+                  key={sound.sound_id}
+                  sound={sound}
+                  isEditMode
+                  isSelected={selectedSoundIds.includes(sound.sound_id)}
+                  onClick={handleSoundSelect}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </motion.div>
     </motion.div>

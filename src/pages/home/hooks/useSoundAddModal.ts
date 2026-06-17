@@ -27,6 +27,8 @@ export const useSoundAddModal = ({
       return isMatchedKeyword && isMatchedCategory;
     });
   }, [data?.sounds, searchKeyword, selectedCategory]);
+  const hasNoSearchResult =
+    searchKeyword.trim().length > 0 && filteredSounds.length === 0;
 
   const handleSearchKeywordChange = useCallback((keyword: string) => {
     setSearchKeyword(keyword);
@@ -56,6 +58,7 @@ export const useSoundAddModal = ({
     selectedCategory,
     selectedSoundIds,
     filteredSounds,
+    hasNoSearchResult,
     isLoading,
     isError,
     handleSearchKeywordChange,

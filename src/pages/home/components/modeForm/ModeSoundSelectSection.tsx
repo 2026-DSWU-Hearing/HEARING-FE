@@ -53,7 +53,9 @@ const ModeSoundSelectSection = () => {
         </p>
       )}
       {hasNoSearchResult && (
-        <p className="body-sm-regular text-tertiary">검색 결과가 없습니다</p>
+        <p className="body-sm-regular text-secondary text-center">
+          검색 결과가 없습니다.
+        </p>
       )}
 
       {!isLoading && !isError && !hasNoSearchResult && (
