@@ -1,6 +1,7 @@
 @theme {
   /* 폰트 */
-  --font-base: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+  --font-base:
+    'Pretendard Variable', 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
   --font-size-base: 1rem;
 
   /* 색상 */
@@ -43,11 +44,11 @@
   --color-neutral-900: #21221e;
   --color-neutral-950: #11120f;
   /* text */
-  --color-text-primary: #f8f8f7;
-  --color-text-secondary: #e2e3e0;
-  --color-text-tertiary: #a9aaa6;
-  --color-text-disabled: #6f706c;
-  --color-text-inverse: #11120f;
+  --color-primary: #f8f8f7;
+  --color-secondary: #e2e3e0;
+  --color-tertiary: #a9aaa6;
+  --color-disabled: #6f706c;
+  --color-inverse: #11120f;
   /* state */
   --color-state-disabled: #c7c8c5;
   --color-state-active: #df9a00;
@@ -90,10 +91,13 @@
   --spacing-xxxs: 0.125rem; /* 2px */
 
   /* Icon Size */
-  --spacing-icon-hero: 1.75rem; /* 28px */
-  --spacing-icon-lg: 1.5rem; /* 24px */
-  --spacing-icon-md: 1.25rem; /* 20px */
-  --spacing-icon-sm: 1rem; /* 16px */
+  --icon-sm: 1rem; /* 16px */
+  --icon-md: 1.5rem; /* 24px */
+  --icon-lg: 1.75rem; /* 28px */
+  --icon-xl: 2rem; /* 32px */
+  --icon-2xl: 2.25rem; /* 36px */
+  --icon-3xl: 3rem; /* 48px */
+  --icon-4xl: 3.5rem; /* 56px */
 
   /* Opacity */
   --opacity-opaque: 1;
@@ -112,12 +116,33 @@
   --blur-xs: 4px;
 
   /* Effect */
-  --shadow-light: 0 0 20px 0 rgb(255 249 212 / 50%);
+  --shadow-light-20: 0 0 20px 0 rgb(255 249 212 / 50%);
+  --shadow-light-10: 0 0 10px 0 rgb(255 249 212 / 50%);
+  --shadow-chip: 0 0 4px 0 rgb(0 0 0 / 25%);
 
   /* Glass */
   --glass-tag-background: rgb(255 255 255 / 8%);
   --glass-tag-border: rgb(255 255 255 / 16%);
   --glass-tag-blur: 29px;
+  --glass-tag-shadow: inset 0 1px 0 rgb(255 255 255 / 20%);
+
+  /* Gradient */
+  --gradient-card-false: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--color-neutral-900) 30%, transparent) 0%,
+    color-mix(in srgb, var(--color-neutral-400) 30%, transparent) 100%
+  );
+  --gradient-card-true: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--color-primary-500) 30%, transparent) 0%,
+    color-mix(in srgb, var(--color-primary-400) 30%, transparent) 100%
+  );
+  --gradient-card-true-bottomsheet: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--color-primary-400) 40%, transparent) 0%,
+    color-mix(in srgb, var(--color-primary-100) 40%, transparent) 100%
+  );
+  --gradient-default: linear-gradient(to bottom, #fdd043 0%, #82a6e6 100%);
 }
 
 /* layout */
@@ -141,7 +166,7 @@
 @utility heading-5xl-semibold {
   font-size: 2rem;
   line-height: 135%;
-  font-weight: 700;
+  font-weight: 600;
 }
 @utility heading-4xl-semibold {
   font-size: 1.75rem;
@@ -255,7 +280,7 @@
   font-weight: 500;
 }
 
-@utility caption-xxs-regular {
+@utility caption-xs-regular {
   font-size: 0.6875rem;
   line-height: 145%;
   font-weight: 400;
@@ -296,4 +321,53 @@
   border: 1px solid var(--glass-tag-border);
   backdrop-filter: blur(var(--glass-tag-blur));
   -webkit-backdrop-filter: blur(var(--glass-tag-blur));
+  box-shadow: var(--glass-tag-shadow);
+}
+
+/* gradient */
+@utility card-false {
+  background-image: var(--gradient-card-false);
+}
+
+@utility card-true {
+  background-image: var(--gradient-card-true);
+}
+
+/* card-true 그라데이션을 테두리에 적용 (rounded 모서리 호환).
+   안쪽 채움색은 버튼 배경(--color-black)과 일치시켜야 안쪽에 색 띠가 생기지 않는다. */
+@utility border-card-true {
+  border: 0.5px solid transparent;
+  background:
+    linear-gradient(var(--color-black), var(--color-black)) padding-box,
+    var(--gradient-card-true) border-box;
+}
+
+@utility card-true-bottomsheet {
+  background-image: var(--gradient-card-true-bottomsheet);
+}
+
+@utility gradient-default {
+  background-image: var(--gradient-default);
+}
+
+/* icon size - --icon-* 토큰을 width, height 유틸리티로 노출한다 */
+@utility w-icon-* {
+  width: --value(--icon-*);
+}
+
+@utility h-icon-* {
+  height: --value(--icon-*);
+}
+
+/* shadow */
+@utility shadow-chip {
+  box-shadow: var(--shadow-chip);
+}
+
+@utility shadow-light-20 {
+  box-shadow: var(--shadow-light-20);
+}
+
+@utility shadow-light-10 {
+  box-shadow: var(--shadow-light-10);
 }

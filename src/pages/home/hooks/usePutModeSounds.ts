@@ -1,28 +1,3 @@
-// 실제 서버 연결 이후 바꿀 로직
-// import { useMutation, useQueryClient } from '@tanstack/react-query';
-// import type { UpdateModeSoundsRequestTypes } from '@/pages/home/types/soundTypes';
-// import { putModeSounds } from '../apis/putModeSounds';
-
-// export const usePutModeSounds = () => {
-//   const queryClient = useQueryClient();
-
-//   return useMutation({
-//     mutationFn: ({
-//       modeId,
-//       soundsData,
-//     }: {
-//       modeId: number;
-//       soundsData: UpdateModeSoundsRequestTypes;
-//     }) => putModeSounds(modeId, soundsData),
-//     onSuccess: (_, variables) => {
-//       queryClient.invalidateQueries({ queryKey: ['modes'] });
-//       queryClient.invalidateQueries({ queryKey: ['modes', variables.modeId] });
-//     },
-//   });
-// };
-
-// src/pages/home/hooks/usePutModeSounds.ts
-
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { putModeSounds } from '../apis/putModeSounds';
 import type { GetModeDetailResponseTypes } from '@/pages/home/types/modeTypes';
@@ -70,14 +45,12 @@ export const usePutModeSounds = () => {
                 ...sound,
                 category:
                   oldSound?.category ?? currentSound?.category_name ?? '',
+                is_active: oldSound?.is_active ?? true,
               };
             }),
           };
         },
       );
-
-      // 실제 서버 연결 후에는 아래 방식으로 변경 가능
-      // queryClient.invalidateQueries({ queryKey: ['modes', data.mode_id] });
     },
   });
 };

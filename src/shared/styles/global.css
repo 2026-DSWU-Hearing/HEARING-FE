@@ -1,3 +1,4 @@
+@import 'pretendard/dist/web/variable/pretendardvariable.css';
 @import 'tailwindcss';
 @import './theme.css';
 
@@ -9,8 +10,9 @@ body {
   margin: 0;
   font-family: var(--font-base);
   font-size: var(--font-size-base);
-  background-color: var(--color-background-neutral-base);
-  color: var(--color-text-primary);
+  font-synthesis: none;
+  background-color: var(--color-neutral-700);
+  color: var(--color-primary);
 }
 
 /* 앱 컨테이너 */
@@ -22,6 +24,9 @@ body {
   min-height: 100dvh;
   margin: 0 auto;
   box-shadow: 0 0 40px rgba(0, 0, 0, 0.15);
+  background-color: var(--color-neutral-950);
+  /* 자식 요소의 margin이 박스 밖으로 새어 body 배경이 비치는 것을 방지 (margin collapsing 차단) */
+  overflow: hidden;
 }
 
 /* 버튼 */
@@ -33,4 +38,16 @@ button {
 a {
   text-decoration: none;
   color: inherit;
+}
+
+/* OS 기본 스크롤바 완전히 숨김 (커스텀 오버레이 인디케이터로 대체) */
+.hide-scrollbar {
+  /* Firefox */
+  scrollbar-width: none;
+  /* IE, 구형 Edge */
+  -ms-overflow-style: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }

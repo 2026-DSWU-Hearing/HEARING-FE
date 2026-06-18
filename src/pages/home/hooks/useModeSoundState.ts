@@ -4,7 +4,6 @@ interface ModeSoundStateTypes {
   isEditMode: boolean;
   isAddSoundModalOpen: boolean;
   selectedRemoveSoundIds: number[];
-  disabledSoundIdsByMode: Record<number, number[]>;
 }
 
 type ModeSoundActionTypes =
@@ -13,14 +12,12 @@ type ModeSoundActionTypes =
   | { type: 'OPEN_ADD_SOUND_MODAL' }
   | { type: 'CLOSE_ADD_SOUND_MODAL' }
   | { type: 'TOGGLE_REMOVE_SOUND'; soundId: number }
-  | { type: 'RESET_REMOVE_SOUNDS' }
-  | { type: 'TOGGLE_DISABLED_SOUND'; modeId: number; soundId: number };
+  | { type: 'RESET_REMOVE_SOUNDS' };
 
 const INITIAL_MODE_SOUND_STATE: ModeSoundStateTypes = {
   isEditMode: false,
   isAddSoundModalOpen: false,
   selectedRemoveSoundIds: [],
-  disabledSoundIdsByMode: {},
 };
 
 const toggleNumberInList = (numbers: number[], targetNumber: number) => {
@@ -72,24 +69,12 @@ const modeSoundReducer = (
         ...state,
         selectedRemoveSoundIds: [],
       };
-    case 'TOGGLE_DISABLED_SOUND': {
-      const disabledSoundIds =
-        state.disabledSoundIdsByMode[action.modeId] ?? [];
-
-      return {
-        ...state,
-        disabledSoundIdsByMode: {
-          ...state.disabledSoundIdsByMode,
-          [action.modeId]: toggleNumberInList(disabledSoundIds, action.soundId),
-        },
-      };
-    }
     default:
       return state;
   }
 };
 
-// 편집 모드, 모달 열림 상태, 삭제 선택 목록, 비활성 소리 목록 같은 UI 상태를 관리하는 훅
+// 편집 모드, 모달 열림 상태, 삭제 선택 목록 같은 UI 상태를 관리하는 훅
 export const useModeSoundState = () => {
   const [state, dispatch] = useReducer(
     modeSoundReducer,
@@ -120,10 +105,6 @@ export const useModeSoundState = () => {
     dispatch({ type: 'RESET_REMOVE_SOUNDS' });
   }, []);
 
-  const toggleDisabledSound = useCallback((modeId: number, soundId: number) => {
-    dispatch({ type: 'TOGGLE_DISABLED_SOUND', modeId, soundId });
-  }, []);
-
   return {
     state,
     toggleEditMode,
@@ -132,6 +113,5 @@ export const useModeSoundState = () => {
     closeAddSoundModal,
     toggleRemoveSound,
     resetRemoveSounds,
-    toggleDisabledSound,
   };
 };

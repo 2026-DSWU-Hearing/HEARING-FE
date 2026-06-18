@@ -5,6 +5,7 @@ export interface ModeSoundTypes {
 
 export interface ModeDetailSoundTypes extends ModeSoundTypes {
   category: string;
+  is_active: boolean;
 }
 
 export interface ModeTypes {
@@ -55,4 +56,25 @@ export interface UpdateModeResponseTypes {
 export interface ActivateModeResponseTypes {
   mode_id: number;
   is_active: boolean;
+}
+
+export interface UpdateModeSoundActiveRequestTypes {
+  is_active: boolean;
+}
+
+export interface UpdateModeSoundActiveResponseTypes {
+  mode_id: number;
+  sound_id: number;
+  is_active: boolean;
+}
+
+export interface ModeIconCatalogItemTypes {
+  mode_id: number;
+  name_ko: string;
+  name_key: string;
+  icon_key: string;
+}
+
+export interface GetModeIconsResponseTypes {
+  icons: ModeIconCatalogItemTypes[];
 }

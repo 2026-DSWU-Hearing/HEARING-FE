@@ -1,24 +1,36 @@
-import AddBtn from '@/pages/home/components/AddBtn';
+import AddBtn from '@/pages/home/components/AddButton';
 import SoundAddBottomModal from '@/pages/home/components/sound/SoundAddBottomModal';
 import SoundCard from '@/pages/home/components/sound/SoundCard';
+import SoundCardSkeleton from '@/pages/home/components/sound/SoundCardSkeleton';
+import { MODE_MESSAGE } from '@/pages/home/constants/modeMessages';
 import { useSoundSection } from '@/pages/home/hooks/useSoundSection';
+import AlertModal from '@/shared/components/AlertModal';
+import ConfirmModal from '@/shared/components/ConfirmModal';
+import { AnimatePresence } from 'motion/react';
+
+const SKELETON_SOUND_COUNT = 6;
 
 const SoundSection = () => {
   const {
     selectedModeId,
+    isDoNotDisturb,
     sounds,
     isLoading,
     isError,
     isEditMode,
     isAddSoundModalOpen,
     selectedRemoveSoundIds,
-    disabledSoundIds,
+    isDeleteConfirmOpen,
+    alertMessage,
     toggleEditMode,
     closeEditMode,
     openAddSoundModal,
     closeAddSoundModal,
+    closeDeleteConfirm,
+    clearAlertMessage,
     handleSoundCardClick,
     handleRemoveSelectedSoundsClick,
+    handleRemoveSelectedSoundsConfirm,
     handleAddSoundsComplete,
   } = useSoundSection();
 
@@ -31,19 +43,19 @@ const SoundSection = () => {
       <div className="mb-5 flex items-center justify-between">
         <h2 className="text-xl font-bold">담은 소리</h2>
         {isEditMode ? (
-          <div className="flex gap-3">
+          <div className="flex gap-base">
             <button
               type="button"
               onClick={closeEditMode}
-              className="text-sm font-bold text-neutral-500"
+              className="body-base-regular text-secondary"
             >
               취소
             </button>
             <button
               type="button"
               onClick={handleRemoveSelectedSoundsClick}
-              className="text-sm font-bold text-neutral-900 disabled:text-neutral-300"
-              disabled={selectedRemoveSoundIds.length === 0}
+              className="body-base-regular text-state-alert"
+              disabled={isDoNotDisturb || selectedRemoveSoundIds.length === 0}
             >
               삭제
             </button>
@@ -52,39 +64,70 @@ const SoundSection = () => {
           <button
             type="button"
             onClick={toggleEditMode}
-            className="text-sm font-bold text-neutral-400"
+            className="body-base-regular text-tertiary"
+            disabled={isDoNotDisturb}
           >
             편집
           </button>
         )}
       </div>
 
-      {isLoading && <p>소리 목록을 불러오는 중...</p>}
       {isError && <p>모드에 담긴 소리를 불러오지 못했습니다</p>}
 
       <div className="grid grid-cols-3 gap-3">
-        {sounds.map((sound) => (
-          <SoundCard
-            key={sound.sound_id}
-            sound={sound}
-            isEditMode={isEditMode}
-            isDisabled={disabledSoundIds.includes(sound.sound_id)}
-            isSelected={selectedRemoveSoundIds.includes(sound.sound_id)}
-            onClick={handleSoundCardClick}
-          />
-        ))}
+        {isLoading
+          ? Array.from({ length: SKELETON_SOUND_COUNT }).map((_, index) => (
+              <SoundCardSkeleton key={index} />
+            ))
+          : sounds.map((sound) => (
+              <SoundCard
+                key={sound.sound_id}
+                sound={sound}
+                isActive={sound.is_active}
+                isDoNotDisturb={isDoNotDisturb}
+                isEditMode={isEditMode}
+                isSelected={
+                  !isDoNotDisturb &&
+                  selectedRemoveSoundIds.includes(sound.sound_id)
+                }
+                onClick={handleSoundCardClick}
+              />
+            ))}
       </div>
 
       <div className="mt-5 flex justify-center">
-        <AddBtn label="소리 추가하기" onClick={openAddSoundModal} />
+        <AddBtn
+          label="소리 추가하기"
+          onClick={openAddSoundModal}
+          disabled={isDoNotDisturb}
+          className={
+            isDoNotDisturb ? 'cursor-not-allowed opacity-60' : undefined
+          }
+        />
       </div>
 
-      {isAddSoundModalOpen && (
-        <SoundAddBottomModal
-          onClose={closeAddSoundModal}
-          onComplete={handleAddSoundsComplete}
-        />
-      )}
+      <AnimatePresence>
+        {isAddSoundModalOpen && (
+          <SoundAddBottomModal
+            onClose={closeAddSoundModal}
+            onComplete={handleAddSoundsComplete}
+          />
+        )}
+      </AnimatePresence>
+
+      <ConfirmModal
+        isOpen={isDeleteConfirmOpen}
+        message={MODE_MESSAGE.DELETE_CONFIRM}
+        onConfirm={handleRemoveSelectedSoundsConfirm}
+        onCancel={() => {}}
+        onClose={closeDeleteConfirm}
+      />
+
+      <AlertModal
+        isOpen={Boolean(alertMessage)}
+        message={alertMessage}
+        onClose={clearAlertMessage}
+      />
     </section>
   );
 };

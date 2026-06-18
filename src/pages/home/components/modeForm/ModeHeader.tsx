@@ -1,4 +1,6 @@
 import { useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faAngleLeft } from '@fortawesome/free-solid-svg-icons';
 
 interface ModeHeaderPropTypes {
   title: string;
@@ -20,21 +22,21 @@ const ModeHeader = ({
   };
 
   return (
-    <header className="mb-14 grid grid-cols-[48px_1fr_64px] items-center">
+    <header className="mb-[2.5rem] grid grid-cols-[48px_1fr_64px] items-center">
       <button
         type="button"
         onClick={handleBackClick}
-        className="text-4xl leading-none"
+        className="text-primary h-[1.5rem] w-[1.5rem]"
         aria-label="이전 페이지로 이동"
       >
-        ‹
+        <FontAwesomeIcon icon={faAngleLeft} />
       </button>
-      <h1 className="text-center text-xl font-bold">{title}</h1>
+      <h1 className="text-center heading-lg-semibold text-primary">{title}</h1>
       <button
         type="button"
         onClick={onActionClick}
         disabled={isActionDisabled}
-        className="text-right text-lg font-bold disabled:text-neutral-300"
+        className="text-right body-lg-regular text-primary-500 disabled:text-neutral-300"
       >
         {actionLabel}
       </button>
