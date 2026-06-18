@@ -70,7 +70,16 @@ const CategoryBlock = ({
     isDisabled,
   });
 
-  const className = `caption-xs-medium whitespace-nowrap rounded-full px-xs py-xxxs min-w-[4.25rem]  transition-colors duration-300 ease-in-out ${colorClassName}`;
+  // tag(카드 안): 카드(셀) 안쪽 너비를 꽉 채운다. 카테고리명이 길면 말줄임.
+  //   span/button 둘 다로 렌더되는데 span 은 기본 inline 이라 w-full/truncate 가 안 먹는다.
+  //   inline-flex + justify-center 로 display 를 명시해야 너비·말줄임·가운데정렬이 모두 동작한다.
+  // filter(모달 필터 바): 일정한 너비감이 필요하므로 기존 최소폭을 유지한다.
+  const widthClassName =
+    variant === 'filter'
+      ? 'min-w-[4.25rem]'
+      : 'inline-flex w-full justify-center truncate';
+
+  const className = `caption-xs-medium whitespace-nowrap rounded-full px-xs py-xxxs ${widthClassName} transition-colors duration-300 ease-in-out ${colorClassName}`;
 
   if (onClick) {
     const handleCategoryBlockClick = () => {
