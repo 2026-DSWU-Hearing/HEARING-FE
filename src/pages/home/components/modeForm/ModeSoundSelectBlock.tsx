@@ -1,10 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faMinus,
-  faPlus,
-  faVolumeHigh,
-} from '@fortawesome/free-solid-svg-icons';
+import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import CategoryBlock from '@/pages/home/components/sound/CategoryBlock';
+import SoundIconView from '@/shared/components/icons/sounds/SoundIconView';
 import type { SoundTypes } from '@/pages/home/types/soundTypes';
 
 interface ModeSoundSelectBlockPropTypes {
@@ -27,18 +24,22 @@ const ModeSoundSelectBlock = ({
       type="button"
       onClick={handleSoundToggleClick}
       aria-pressed={isSelected}
-      className={`flex h-[4rem] w-full items-center gap-sm rounded-lg border px-base text-left transition-colors active:scale-[0.99] ${
+      className={`flex h-[2.5rem] w-full items-center gap-sm rounded-pill border py-xs px-sm text-left transition-colors active:scale-[0.99] ${
         isSelected
-          ? 'border-primary-300/70 bg-primary-300/10'
-          : 'border-neutral-700 bg-neutral-950/20'
+          ? 'border-primary-500/70 bg-primary-300/10'
+          : 'border-1 border-neutral-700 bg-[#252623]'
       }`}
     >
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-neutral-800 text-secondary">
-        <FontAwesomeIcon icon={faVolumeHigh} />
+      <span className="flex h-[1.5rem] w-[1.5rem] shrink-0 items-center justify-center text-primary">
+        <SoundIconView
+          soundName={sound.name}
+          categoryName={sound.category_name}
+          className="w-icon-base h-icon-base leading-none"
+        />
       </span>
 
       <span className="min-w-0 flex-1">
-        <span className="block truncate heading-lg-semibold text-primary">
+        <span className="block truncate body-sm-regular text-secondary">
           {sound.name}
         </span>
       </span>
@@ -48,9 +49,9 @@ const ModeSoundSelectBlock = ({
       </span>
 
       <span
-        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-pill text-base ${
+        className={`flex w-[1.5rem] h-[1.5rem] shrink-0 items-center justify-center rounded-pill text-base ${
           isSelected
-            ? 'bg-primary-300 text-inverse'
+            ? 'bg-primary-500 text-inverse'
             : 'bg-neutral-600 text-primary'
         }`}
       >

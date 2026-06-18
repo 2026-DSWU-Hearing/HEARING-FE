@@ -22,7 +22,7 @@ const ModeHeader = ({
   };
 
   return (
-    <header className="mt-[2.75rem] mb-[2.5rem] grid grid-cols-[48px_1fr_64px] items-center">
+    <header className="mb-[2.5rem] grid grid-cols-[48px_1fr_64px] items-center">
       <button
         type="button"
         onClick={handleBackClick}
@@ -36,7 +36,7 @@ const ModeHeader = ({
         type="button"
         onClick={onActionClick}
         disabled={isActionDisabled}
-        className="text-right body-lg-regular disabled:text-neutral-300"
+        className="text-right body-lg-regular text-primary-500 disabled:text-neutral-300"
       >
         {actionLabel}
       </button>

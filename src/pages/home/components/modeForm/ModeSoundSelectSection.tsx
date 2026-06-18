@@ -5,6 +5,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import SearchBar from '@/pages/home/components/SearchBar';
 import ModeSoundSelectBlock from '@/pages/home/components/modeForm/ModeSoundSelectBlock';
+import ModeSoundSelectSkeleton from '@/pages/home/components/modeForm/ModeSoundSelectSkeleton';
 import { useModeFormContext } from '@/pages/home/components/modeForm/ModeFormContext';
 import { useModeSoundSelectSection } from '@/pages/home/hooks/useModeSoundSelectSection';
 
@@ -25,9 +26,9 @@ const ModeSoundSelectSection = () => {
   return (
     <section
       aria-labelledby="sound-select-heading"
-      className="space-y-base mb-[3rem]"
+      className="space-y-base pb-[3rem]"
     >
-      <div className="flex items-center justify-between gap-base mb-lg">
+      <div className="flex items-center justify-between gap-base mb-lg mt-2xl">
         <h2 id="sound-select-heading" className="heading-base-semibold">
           소리 선택
         </h2>
@@ -42,18 +43,16 @@ const ModeSoundSelectSection = () => {
         onChange={handleSearchKeywordChange}
       />
 
-      {isLoading && (
-        <p className="body-sm-regular text-tertiary">
-          소리 목록을 불러오는 중...
-        </p>
-      )}
+      {isLoading && <ModeSoundSelectSkeleton />}
       {isError && (
         <p className="body-sm-regular text-state-alert">
           소리 목록을 불러오지 못했습니다
         </p>
       )}
       {hasNoSearchResult && (
-        <p className="body-sm-regular text-tertiary">검색 결과가 없습니다</p>
+        <p className="body-sm-regular text-secondary text-center">
+          검색 결과가 없습니다.
+        </p>
       )}
 
       {!isLoading && !isError && !hasNoSearchResult && (

@@ -3,6 +3,7 @@ import { MODE_MESSAGE } from '@/pages/home/constants/modeMessages';
 import { useModeEditPage } from '@/pages/home/hooks/useModeEditPage';
 import AlertModal from '@/shared/components/AlertModal';
 import ConfirmModal from '@/shared/components/ConfirmModal';
+import LoadingSpinner from '@/shared/components/LoadingSpinner';
 
 const ModeEditPage = () => {
   const {
@@ -13,11 +14,16 @@ const ModeEditPage = () => {
     isModeDetailError,
     isUpdatingMode,
     isDeletingMode,
+    isModesReady,
     isDeleteConfirmOpen,
+    isActivateDeleteOpen,
+    activeDeleteMessage,
     handleModeUpdateSubmit,
     handleModeDeleteClick,
     handleModeDeleteConfirm,
+    handleActiveModeDeleteConfirm,
     closeDeleteConfirm,
+    closeActivateDelete,
     clearErrorMessage,
   } = useModeEditPage();
 
@@ -26,7 +32,7 @@ const ModeEditPage = () => {
   }
 
   if (isModeDetailLoading) {
-    return <div className="p-6">모드 정보를 불러오는 중...</div>;
+    return <LoadingSpinner />;
   }
 
   if (isModeDetailError || !modeDetailData) {
@@ -41,7 +47,7 @@ const ModeEditPage = () => {
         initialIcon={modeDetailData.icon}
         currentModeId={modeDetailData.mode_id}
         isSubmitting={isUpdatingMode}
-        isDeleting={isDeletingMode}
+        isDeleting={isDeletingMode || !isModesReady}
         onSubmit={handleModeUpdateSubmit}
         onDelete={handleModeDeleteClick}
       />
@@ -51,6 +57,13 @@ const ModeEditPage = () => {
         onConfirm={handleModeDeleteConfirm}
         onCancel={() => {}}
         onClose={closeDeleteConfirm}
+      />
+      <ConfirmModal
+        isOpen={isActivateDeleteOpen}
+        message={activeDeleteMessage}
+        onConfirm={handleActiveModeDeleteConfirm}
+        onCancel={() => {}}
+        onClose={closeActivateDelete}
       />
       <AlertModal
         isOpen={Boolean(errorMessage)}

@@ -5,14 +5,14 @@
 export const DEFAULT_CATEGORY_COLOR = 'border-neutral-400 text-neutral-300';
 
 export const CATEGORY_COLOR: Record<string, string> = {
-  생활음: 'bg-secondary-100/50 text-secondary-100',
-  긴급: 'bg-state-alert/50 text-primary',
-  교통: 'bg-primary-100/50 text-primary-100',
-  사람: 'bg-primary-500/50 text-primary-500',
-  주방: 'bg-primary-600/50 text-primary-600',
-  동물: 'bg-secondary-400/50 text-secondary-400',
-  음악: 'bg-neutral-50 text-neutral-50',
-  자연: 'bg-state-success/50 text-state-success',
+  생활음: 'bg-secondary-400 text-secondary-100',
+  긴급: 'bg-state-alert text-primary',
+  교통: 'bg-primary-100 text-primary-800',
+  사람: 'bg-primary-400 text-primary-800',
+  주방: 'bg-primary-800 text-primary-400',
+  동물: 'bg-secondary-600 text-secondary-100',
+  음악: 'bg-neutral-500 text-neutral-50',
+  자연: 'bg-state-success text-primary',
 };
 
 // 카테고리 이름으로 색 클래스를 안전하게 꺼낸다.

@@ -8,7 +8,7 @@ const HomeHeader = () => {
     useHomeModeContext();
 
   return (
-    <header className="mt-[2.75rem] mb-[2.5rem] flex flex-col gap-[1.5rem]">
+    <header className="mb-[2.5rem] flex flex-col gap-[1.5rem]">
       {/* 상단 행: 제목 + 알림 아이콘 */}
       <div className="flex items-start justify-between">
         <h1 className="heading-5xl-semibold text-primary">소리 필터링</h1>

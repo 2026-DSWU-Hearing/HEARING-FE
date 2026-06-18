@@ -3,9 +3,8 @@ import type { GetSoundCategoriesResponseTypes } from '@/pages/home/types/soundTy
 
 export const getSoundCategories =
   async (): Promise<GetSoundCategoriesResponseTypes> => {
-    const response = await http.get<GetSoundCategoriesResponseTypes>(
-      '/api/v1/sounds/categories',
-    );
+    const response =
+      await http.get<GetSoundCategoriesResponseTypes>('/sounds/categories');
 
     return response.data;
   };

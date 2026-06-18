@@ -47,6 +47,7 @@ interface ModeFormContextTypes {
   canSubmit: boolean;
   isModeNameTooLong: boolean;
   isModeNameDuplicated: boolean;
+  hasSubmitted: boolean;
   handleModeNameChange: (name: string) => void;
   handleIconSelect: (icon: string) => void;
   handleSoundToggle: (soundId: number) => void;
@@ -74,6 +75,7 @@ export const ModeFormProvider = ({
   const [modeName, setModeName] = useState(initialName);
   const [selectedIcon, setSelectedIcon] = useState(initialIcon);
   const [selectedSoundIds, setSelectedSoundIds] = useState<number[]>([]);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
   // 이름 중복 검사를 위해 기존 모드 목록을 가져온다. 두 페이지 훅과 같은 쿼리키라 캐시를 공유한다.
   const { data: modesData } = useGetModes();
@@ -130,6 +132,7 @@ export const ModeFormProvider = ({
   }, []);
 
   const handleSubmitClick = useCallback(() => {
+    setHasSubmitted(true);
     onSubmit({
       name: modeName,
       icon: selectedIcon,
@@ -157,6 +160,7 @@ export const ModeFormProvider = ({
       canSubmit,
       isModeNameTooLong,
       isModeNameDuplicated,
+      hasSubmitted,
       handleModeNameChange,
       handleIconSelect,
       handleSoundToggle,
@@ -178,6 +182,7 @@ export const ModeFormProvider = ({
       canSubmit,
       isModeNameTooLong,
       isModeNameDuplicated,
+      hasSubmitted,
       handleModeNameChange,
       handleIconSelect,
       handleSoundToggle,

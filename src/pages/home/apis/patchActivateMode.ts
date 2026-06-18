@@ -6,7 +6,7 @@ export const patchActivateMode = async (
   modeId: number,
 ): Promise<ActivateModeResponseTypes> => {
   const response = await http.patch<ActivateModeResponseTypes>(
-    `/api/v1/modes/${modeId}/activate`,
+    `/modes/${modeId}/activate`,
   );
 
   return response.data;

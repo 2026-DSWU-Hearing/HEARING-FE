@@ -7,7 +7,7 @@ export const getModeDetail = async (
   modeId: number,
 ): Promise<GetModeDetailResponseTypes> => {
   const response = await http.get<GetModeDetailResponseTypes>(
-    `/api/v1/modes/${modeId}`,
+    `/modes/${modeId}`,
   );
 
   return {

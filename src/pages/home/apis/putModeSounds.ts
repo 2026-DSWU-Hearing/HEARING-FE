@@ -9,7 +9,7 @@ export const putModeSounds = async (
   soundsData: UpdateModeSoundsRequestTypes,
 ): Promise<UpdateModeSoundsResponseTypes> => {
   const response = await http.put<UpdateModeSoundsResponseTypes>(
-    `/api/v1/modes/${modeId}/sounds`,
+    `/modes/${modeId}/sounds`,
     soundsData,
   );
 
