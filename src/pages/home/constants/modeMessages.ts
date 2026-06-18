@@ -10,6 +10,8 @@ export const MODE_MESSAGE = {
   MIN_MODE_COUNT: '모드는 최소 1개 이상 유지해야 합니다',
   MIN_SOUND_COUNT: '소리는 최소 1개 이상 유지해야 합니다',
   DELETE_CONFIRM: '정말 삭제하시겠습니까?',
+  // 소리 추가 모달에서 선택한 채로 닫으려 할 때: 변경사항이 저장되지 않음을 안내
+  CANCEL_CONFIRM: '정말 취소하시겠습니까?\n변경사항은 저장되지 않습니다',
   // 활성 모드 삭제 시: 어떤 모드로 전환되는지 명시하고 삭제할지 안내 (현재/다음 모드 이름 동적 삽입)
   ACTIVE_DELETE_CONFIRM: (currentModeName: string, nextModeName: string) =>
     `현재 '${currentModeName}' 모드가 활성화되어 있습니다.\n'${nextModeName}' 모드로 전환 후 삭제하시겠습니까?`,

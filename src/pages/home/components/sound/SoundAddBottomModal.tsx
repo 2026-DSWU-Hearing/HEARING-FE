@@ -2,8 +2,10 @@ import SearchBar from '@/pages/home/components/SearchBar';
 import CategoryBar from '@/pages/home/components/sound/CategoryBar';
 import SoundCard from '@/pages/home/components/sound/SoundCard';
 import SoundCardSkeleton from '@/pages/home/components/sound/SoundCardSkeleton';
+import { MODE_MESSAGE } from '@/pages/home/constants/modeMessages';
 import { useSoundAddModal } from '@/pages/home/hooks/useSoundAddModal';
 import type { SoundTypes } from '@/pages/home/types/soundTypes';
+import ConfirmModal from '@/shared/components/ConfirmModal';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'motion/react';
@@ -28,11 +30,15 @@ const SoundAddBottomModal = ({
     hasNoSearchResult,
     isLoading,
     isError,
+    isCancelConfirmOpen,
+    closeCancelConfirm,
     handleSearchKeywordChange,
     handleCategoryChange,
     handleSoundSelect,
     handleCompleteClick,
-  } = useSoundAddModal({ onComplete });
+    handleCloseClick,
+    handleCancelConfirm,
+  } = useSoundAddModal({ onComplete, onClose });
 
   return (
     <motion.div
@@ -52,7 +58,7 @@ const SoundAddBottomModal = ({
         <div className="mb-8 flex flex-shrink-0 items-center justify-between">
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleCloseClick}
             className="w-[1.5rem] leading-none"
             aria-label="소리 추가 닫기"
           >
@@ -110,6 +116,14 @@ const SoundAddBottomModal = ({
           )}
         </div>
       </motion.div>
+
+      <ConfirmModal
+        isOpen={isCancelConfirmOpen}
+        message={MODE_MESSAGE.CANCEL_CONFIRM}
+        onConfirm={handleCancelConfirm}
+        onCancel={() => {}}
+        onClose={closeCancelConfirm}
+      />
     </motion.div>
   );
 };
