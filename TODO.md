@@ -2,10 +2,6 @@
 
 ## ui 관련
 
-- [ ] 소리 카드 반응형으로
-- [ ] 스켈레톤 ui
-- [ ] 애니메이션 넣기 (바탐 모달 같은 것들)
-
 # Home 부분
 
 - [ ] (보류) context API 사용한 부분을 zustand로 바꾸는 게 좋을지 검토하기 → 검토 결과 현 시점 비권장. 페이지 간 상태 공유나 영속화(persist) 필요 시 재검토. (보고서: ~/.claude/plans/zustand-migration-review.md)
