@@ -32,8 +32,12 @@ export const useSoundAddModal = ({
       return isMatchedKeyword && isMatchedCategory;
     });
   }, [data?.sounds, searchKeyword, selectedCategory]);
+  // 로딩/에러 중에는 빈 결과가 일시적일 수 있으므로, 에러 메시지와 "검색 결과 없음"이 겹쳐 노출되지 않도록 게이트한다.
   const hasNoSearchResult =
-    searchKeyword.trim().length > 0 && filteredSounds.length === 0;
+    !isLoading &&
+    !isError &&
+    searchKeyword.trim().length > 0 &&
+    filteredSounds.length === 0;
 
   const handleSearchKeywordChange = useCallback((keyword: string) => {
     setSearchKeyword(keyword);

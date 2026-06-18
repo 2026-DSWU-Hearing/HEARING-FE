@@ -162,6 +162,9 @@ export const useModeEditPage = () => {
   // 활성화와 삭제를 분리해, 활성화는 됐는데 삭제만 실패한 "부분 성공" 상태를 구분한다.
   const handleActiveModeDeleteConfirm = async () => {
     if (!nextActiveMode) return;
+    // 확인을 누른 시점에 안내 모달을 먼저 닫는다.
+    // 부분 성공(활성화 O, 삭제 X) 시 "전환 후 삭제할까요?" 메시지가 잘못 남는 것을 방지한다.
+    activateDeleteModal.close();
 
     // 1단계: 다른 모드 활성화. 실패하면 서버 상태가 그대로이므로 일반 에러로 처리한다.
     try {
