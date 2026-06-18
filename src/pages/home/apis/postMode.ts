@@ -9,10 +9,7 @@ import { normalizeModeIconKey } from '@/shared/components/icons/modes/modeIconMa
 export const postMode = async (
   modeData: CreateModeRequestTypes,
 ): Promise<CreateModeResponseTypes> => {
-  const response = await http.post<CreateModeResponseTypes>(
-    '/api/v1/modes',
-    modeData,
-  );
+  const response = await http.post<CreateModeResponseTypes>('/modes', modeData);
 
   return {
     ...response.data,

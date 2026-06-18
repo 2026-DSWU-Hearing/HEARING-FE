@@ -4,5 +4,5 @@ export const deleteModeSound = async (
   modeId: number,
   soundId: number,
 ): Promise<void> => {
-  await http.delete(`/api/v1/modes/${modeId}/sounds/${soundId}`);
+  await http.delete(`/modes/${modeId}/sounds/${soundId}`);
 };

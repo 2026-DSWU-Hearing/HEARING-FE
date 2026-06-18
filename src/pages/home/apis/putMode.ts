@@ -11,7 +11,7 @@ export const putMode = async (
   modeData: UpdateModeRequestTypes,
 ): Promise<UpdateModeResponseTypes> => {
   const response = await http.put<UpdateModeResponseTypes>(
-    `/api/v1/modes/${modeId}`,
+    `/modes/${modeId}`,
     modeData,
   );
 

@@ -4,7 +4,7 @@ import { normalizeModeIconKey } from '@/shared/components/icons/modes/modeIconMa
 
 // 모드 목록 조회
 export const getModes = async (): Promise<GetModesResponseTypes> => {
-  const response = await http.get<GetModesResponseTypes>('/api/v1/modes');
+  const response = await http.get<GetModesResponseTypes>('/modes');
   return {
     modes: response.data.modes.map((mode) => ({
       ...mode,

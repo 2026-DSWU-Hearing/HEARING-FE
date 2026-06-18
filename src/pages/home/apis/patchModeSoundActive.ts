@@ -10,7 +10,7 @@ export const patchModeSoundActive = async (
   soundActiveData: UpdateModeSoundActiveRequestTypes,
 ): Promise<UpdateModeSoundActiveResponseTypes> => {
   const response = await http.patch<UpdateModeSoundActiveResponseTypes>(
-    `/api/v1/modes/${modeId}/sounds/${soundId}`,
+    `/modes/${modeId}/sounds/${soundId}`,
     soundActiveData,
   );
 
