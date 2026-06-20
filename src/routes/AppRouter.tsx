@@ -6,11 +6,13 @@ import ModeEditPage from '@/pages/home/ModeEditPage';
 import Communication from '@/pages/communication/Communication';
 import LiveSound from '@/pages/liveSound/LiveSound';
 import Setting from '@/pages/setting/Setting';
+import Login from '@/pages/login/Login';
 
 const AppRouter = () => {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
       <Route path="/modes/new" element={<ModeCreatePage />} />
       <Route path="/modes/:modeId/settings" element={<ModeEditPage />} />
       <Route path="/communication" element={<Communication />} />
