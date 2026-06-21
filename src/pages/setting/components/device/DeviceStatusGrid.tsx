@@ -35,7 +35,7 @@ const DeviceStatusGrid = ({
         icon={faWifi}
         label="연결 상태"
         value={CONNECTION_STATUS_LABEL[connectionStatus]}
-        valueClassName={isConnected ? 'text-state-success' : 'text-disabled'}
+        valueClassName={isConnected ? 'text-secondary' : 'text-disabled'}
       />
     </div>
   );

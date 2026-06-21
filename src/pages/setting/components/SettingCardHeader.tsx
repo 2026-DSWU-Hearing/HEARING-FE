@@ -24,12 +24,14 @@ const SettingCardHeader = ({
   onEdit,
 }: SettingCardHeaderPropTypes) => {
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex min-w-0 items-center gap-base">
-        <FontAwesomeIcon
-          icon={icon}
-          className="h-icon-md w-icon-md shrink-0 text-tertiary"
-        />
+    <div className="flex justify-between">
+      <div className="flex min-w-0 gap-base">
+        <div className="self-start">
+          <FontAwesomeIcon
+            icon={icon}
+            className="text-[1.5rem] shrink-0 text-tertiary"
+          />
+        </div>
         <div className="flex min-w-0 flex-col gap-xxxs">
           <span className="body-small-regular text-secondary">{label}</span>
           <span className="heading-lg-semibold truncate text-primary">
@@ -43,11 +45,11 @@ const SettingCardHeader = ({
           type="button"
           onClick={onEdit}
           aria-label={`${label} 편집`}
-          className="shrink-0"
+          className="shrink-0 self-start"
         >
           <FontAwesomeIcon
             icon={faPen}
-            className="h-icon-sm w-icon-sm text-tertiary"
+            className="text-[1.4rem] text-tertiary"
           />
         </button>
       )}

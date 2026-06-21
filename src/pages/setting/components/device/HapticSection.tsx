@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { faMobileScreen } from '@fortawesome/free-solid-svg-icons';
+import { faMobileVibrate } from '@fortawesome/free-solid-svg-icons';
 
 import SettingSectionTitle from '@/pages/setting/components/SettingSectionTitle';
 import SettingCard from '@/pages/setting/components/SettingCard';
@@ -22,7 +22,7 @@ const HapticSection = () => {
     <section className="flex flex-col gap-sm">
       <SettingSectionTitle title="진동 강도 설정" />
       <SettingCard
-        icon={faMobileScreen}
+        icon={faMobileVibrate}
         label="햅틱 강도 조절"
         title="햅틱 피드백 강도"
       >

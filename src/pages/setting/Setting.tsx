@@ -20,7 +20,7 @@ const Setting = () => {
         <DeviceSection />
         <HapticSection />
       </div>
-
+      {/* 나중에 회원가입 쪽으로 이동할 예정 */}
       <button
         type="button"
         onClick={handleRequestPermission}

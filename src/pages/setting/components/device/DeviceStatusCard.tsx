@@ -26,8 +26,9 @@ const DeviceStatusCard = ({
     <div className="flex flex-row gap-sm rounded-lg bg-neutral-800 px-base py-sm">
       <FontAwesomeIcon
         icon={icon}
-        className="h-icon-sm w-icon-sm shrink-0 text-neutral-50"
+        className="text-[1.2rem] shrink-0 text-neutral-50"
       />
+
       <div className="flex flex-col gap-[0.44rem]">
         <span className="heading-lg-semibold text-primary">{label}</span>
 
