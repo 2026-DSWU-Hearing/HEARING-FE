@@ -3,4 +3,5 @@ export const NICKNAME_MAX_LENGTH = 10;
 
 export const PROFILE_MESSAGE = {
   TOO_LONG_NICKNAME: `닉네임은 최대 ${NICKNAME_MAX_LENGTH}글자까지만 가능합니다`,
+  EMPTY_NICKNAME: '닉네임을 입력해주세요',
 } as const;

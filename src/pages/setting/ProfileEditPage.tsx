@@ -22,13 +22,16 @@ const ProfileEditPage = () => {
     DISABILITY_TYPE.HARD_OF_HEARING,
   );
 
+  const isNicknameEmpty = nickname.trim().length === 0;
   const isNicknameTooLong = nickname.length > NICKNAME_MAX_LENGTH;
   const nicknameErrorMessage = isNicknameTooLong
     ? PROFILE_MESSAGE.TOO_LONG_NICKNAME
-    : undefined;
+    : isNicknameEmpty
+      ? PROFILE_MESSAGE.EMPTY_NICKNAME
+      : undefined;
 
-  // 닉네임 길이가 기준을 넘으면 완료(저장)를 막는다.
-  const isDoneDisabled = isNicknameTooLong;
+  // 닉네임이 비어있거나 길이가 기준을 넘으면 완료(저장)를 막는다.
+  const isDoneDisabled = isNicknameEmpty || isNicknameTooLong;
 
   const handleNicknameChange = (value: string) => {
     setNickname(value);
@@ -43,7 +46,7 @@ const ProfileEditPage = () => {
       return;
     }
 
-    // TODO(api): PATCH /users/me 로 닉네임·장애유형 저장 후 이동한다.
+    // TODO(api): PATCH /users/me 로 닉네임(nickname.trim())·장애유형 저장 후 이동한다.
     navigate(-1);
   };
 
