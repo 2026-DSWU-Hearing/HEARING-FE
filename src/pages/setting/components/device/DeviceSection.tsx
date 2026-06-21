@@ -9,10 +9,14 @@ import DeviceStatusGrid from '@/pages/setting/components/device/DeviceStatusGrid
 import ConnectDeviceBtn from '@/pages/setting/components/device/ConnectDeviceBtn';
 import DeviceNameEditModal from '@/pages/setting/components/device/DeviceNameEditModal';
 import { CONNECTION_STATUS } from '@/pages/setting/constants/connectionStatus';
-import type { ConnectionStatusTypes } from '@/pages/setting/constants/connectionStatus';
+import type { DeviceInfoTypes } from '@/pages/setting/types/deviceTypes';
 
-// TODO(api): GET /devices(가칭)로 조회 후 더미 상수를 대체한다.
-const DUMMY_BATTERY_LEVEL = 80;
+// TODO(api): GET /devices(가칭)로 조회 후 더미 값을 대체한다.
+const DUMMY_DEVICE_INFO: DeviceInfoTypes = {
+  name: 'ESP32',
+  batteryLevel: 80,
+  connectionStatus: CONNECTION_STATUS.CONNECTED,
+};
 
 /**
  * 나의 디바이스 섹션.
@@ -21,10 +25,9 @@ const DUMMY_BATTERY_LEVEL = 80;
  * 연결 상태·기기 이름은 API 부재로 현재 client state로 관리한다.
  */
 const DeviceSection = () => {
-  const [connectionStatus, setConnectionStatus] =
-    useState<ConnectionStatusTypes>(CONNECTION_STATUS.CONNECTED);
-  const [deviceName, setDeviceName] = useState('ESP32');
+  const [deviceInfo, setDeviceInfo] = useState<DeviceInfoTypes>(DUMMY_DEVICE_INFO);
 
+  const { name, batteryLevel, connectionStatus } = deviceInfo;
   const isConnected = connectionStatus === CONNECTION_STATUS.CONNECTED;
 
   const nameModal = useModal();
@@ -32,20 +35,26 @@ const DeviceSection = () => {
 
   const handleEditClick = () => nameModal.open();
 
-  const handleNameSubmit = (name: string) => {
-    setDeviceName(name);
+  const handleNameSubmit = (newName: string) => {
+    setDeviceInfo((prev) => ({ ...prev, name: newName }));
     // TODO(api): PATCH /devices(가칭)로 기기 이름 변경 요청.
   };
 
   const handleDisconnectClick = () => disconnectModal.open();
 
   const handleConfirmDisconnect = () => {
-    setConnectionStatus(CONNECTION_STATUS.DISCONNECTED);
+    setDeviceInfo((prev) => ({
+      ...prev,
+      connectionStatus: CONNECTION_STATUS.DISCONNECTED,
+    }));
     // TODO(api): 디바이스 연결 해제 요청.
   };
 
   const handleConnectClick = () => {
-    setConnectionStatus(CONNECTION_STATUS.CONNECTED);
+    setDeviceInfo((prev) => ({
+      ...prev,
+      connectionStatus: CONNECTION_STATUS.CONNECTED,
+    }));
     // TODO(api): 디바이스 연결 요청.
   };
 
@@ -61,11 +70,11 @@ const DeviceSection = () => {
         <SettingCard
           icon={faMicrochip}
           label="기기 이름"
-          title={deviceName}
+          title={name}
           onEdit={handleEditClick}
         >
           <DeviceStatusGrid
-            batteryLevel={DUMMY_BATTERY_LEVEL}
+            batteryLevel={batteryLevel}
             connectionStatus={connectionStatus}
           />
         </SettingCard>
@@ -75,7 +84,7 @@ const DeviceSection = () => {
 
       {nameModal.isOpen && (
         <DeviceNameEditModal
-          currentName={deviceName}
+          currentName={name}
           onClose={nameModal.close}
           onSubmit={handleNameSubmit}
         />
