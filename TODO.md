@@ -1,6 +1,25 @@
 # 오늘 할 일
 
-## ui 관련
+## 설정 페이지 컴포넌트 만들기
+
+- [ ] 나의 디바이스 부분 컴포넌트
+- [ ] 진동 강도 설정 부분 컴포넌트
+
+# 리팩토링
+
+- [ ] **ModeHeader를 TopNavigation으로 통합 후 삭제**: 두 헤더가 거의 동일 → `TopNavigation`(`src/layout/TopNavigation.tsx`)으로 일원화. props 1:1 매핑 가능: `actionLabel`→`rightText`, `onActionClick`→`onRightClick`, `isActionDisabled`→`isRightDisabled`, 주황 활성색은 `rightVariant="active"`. `TopNavigation`은 이미 grid(`grid-cols-[48px_1fr_64px]`, 제목 중앙)로 통일해둠.
+  - **⚠️ 핵심 함정: 패딩 이중 적용.** `ModeForm.tsx:51`의 래퍼 `div`가 `pt-[2.75rem] px-[1.03rem]`을 갖고 있는데, `TopNavigation`은 같은 패딩을 자체 내장함. 단순 치환 시 헤더가 56px 더 내려가고 좌우 패딩이 2배가 됨 → 교체할 때 **래퍼에서 `pt`/`px`를 빼거나 본문(`<main>`)에만 좌우 패딩을 다시 줘야 함.**
+  - 호출 예시(교체 후):
+    ```tsx
+    <TopNavigation
+      title={headerTitle}
+      rightText={headerActionLabel}
+      onRightClick={handleSubmitClick}
+      rightVariant="active"
+      isRightDisabled={isSubmitting || !canSubmit}
+    />
+    ```
+  - 정렬: `ModeHeader`도 동일 grid였으므로 제목 위치 동일. 비활성 색(`disabled:text-neutral-300`)·활성 색(`text-primary-500`)·하단 간격(2.5rem)도 이미 일치. → 패딩만 정리하면 `ModeHeader` 삭제 가능(사용처는 `ModeForm.tsx` 한 곳).
 
 # Home 부분
 

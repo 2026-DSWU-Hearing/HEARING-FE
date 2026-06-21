@@ -7,6 +7,7 @@ interface TopNavigationPropTypes {
   rightText?: string;
   onRightClick?: () => void;
   rightVariant?: 'default' | 'active';
+  isRightDisabled?: boolean;
 }
 
 const TopNavigation = ({
@@ -14,6 +15,7 @@ const TopNavigation = ({
   rightText,
   onRightClick,
   rightVariant = 'default',
+  isRightDisabled = false,
 }: TopNavigationPropTypes) => {
   const navigate = useNavigate();
 
@@ -27,7 +29,7 @@ const TopNavigation = ({
   }[rightVariant];
 
   return (
-    <header className=" flex h-[1.5rem] w-full items-center justify-between px-3 mb-2xl">
+    <header className="grid w-full grid-cols-[48px_1fr_64px] items-center pt-[2.75rem] px-[1.03rem] mb-2xl">
       <button
         type="button"
         onClick={handleBackClick}
@@ -37,16 +39,20 @@ const TopNavigation = ({
         <FontAwesomeIcon icon={faAngleLeft} />
       </button>
 
-      <h1 className="heading-lg-semibold text-primary">{title}</h1>
+      <h1 className="text-center heading-lg-semibold text-primary">{title}</h1>
 
-      {rightText && onRightClick && (
+      {/* 우측 버튼이 없어도 3번째 컬럼(64px)을 차지해 제목 중앙 정렬을 유지한다. */}
+      {rightText && onRightClick ? (
         <button
           type="button"
           onClick={onRightClick}
-          className={`body-lg-regular ${rightTextColorClassName}`}
+          disabled={isRightDisabled}
+          className={`text-right body-lg-regular disabled:text-neutral-300 ${rightTextColorClassName}`}
         >
           {rightText}
         </button>
+      ) : (
+        <span aria-hidden="true" />
       )}
     </header>
   );
