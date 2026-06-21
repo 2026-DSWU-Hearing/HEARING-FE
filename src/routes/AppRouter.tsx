@@ -6,6 +6,7 @@ import ModeEditPage from '@/pages/home/ModeEditPage';
 import Communication from '@/pages/communication/Communication';
 import LiveSound from '@/pages/liveSound/LiveSound';
 import Setting from '@/pages/setting/Setting';
+import NotificationSettingPage from '@/pages/setting/components/NotificationSettingPage';
 import Login from '@/pages/login/Login';
 
 const AppRouter = () => {
@@ -18,6 +19,10 @@ const AppRouter = () => {
       <Route path="/communication" element={<Communication />} />
       <Route path="/live-sound" element={<LiveSound />} />
       <Route path="/setting" element={<Setting />} />
+      <Route
+        path="/setting/notification"
+        element={<NotificationSettingPage />}
+      />
     </Routes>
   );
 };
