@@ -1,5 +1,6 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import type { ComponentType } from 'react';
+
 import HomeIcon from '@/shared/components/icons/HomeIcon';
 import CommunicationIcon from '@/shared/components/icons/CommunicationIcon';
 import LiveSoundIcon from '@/shared/components/icons/LiveSoundIcon';
@@ -19,9 +20,21 @@ const NAVIGATION_ITEMS: NavigationItemTypes[] = [
   { to: '/setting', label: '설정', Icon: SettingIcon },
 ];
 
+const HIDDEN_NAVIGATION_PATHS = ['/login'];
+
 const BottomNavigation = () => {
+  const location = useLocation();
+
+  const isNavigationHidden = HIDDEN_NAVIGATION_PATHS.includes(
+    location.pathname,
+  );
+
+  if (isNavigationHidden) {
+    return null;
+  }
+
   return (
-    <nav className="fixed bottom-0  z-10 flex h-[5.1875rem] w-full max-w-[430px] justify-around bg-background-neutral-base px-3 items-center">
+    <nav className="fixed bottom-0 z-10 flex h-[5.1875rem] w-full max-w-[430px] items-center justify-around bg-background-neutral-base px-3">
       {NAVIGATION_ITEMS.map(({ to, end, label, Icon }) => (
         <NavLink key={to} to={to} end={end} aria-label={label}>
           {({ isActive }) => (
