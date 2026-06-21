@@ -6,7 +6,7 @@ const NotificationSettingBar = () => {
   return (
     <Link
       to="/setting/notification"
-      className="flex items-center justify-between rounded-xl bg-neutral-800 px-[1.25rem] py-[1.03rem]"
+      className="flex items-center justify-between rounded-xl bg-neutral-900 px-[1.25rem] py-[1.03rem]"
     >
       <span className="body-lg-regular text-primary">알림 설정</span>
       <FontAwesomeIcon

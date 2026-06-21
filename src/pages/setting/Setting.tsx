@@ -1,11 +1,13 @@
 import { useFcmToken } from '@/pages/setting/hooks/useFcmToken';
 import NotificationSettingBar from '@/pages/setting/components/NotificationSettingBar';
+import Profile from '@/pages/setting/components/Profile';
 
 const Setting = () => {
   const { handleRequestPermission } = useFcmToken();
 
   return (
     <div className="flex flex-col gap-3 p-4">
+      <Profile />
       <NotificationSettingBar />
 
       <button
