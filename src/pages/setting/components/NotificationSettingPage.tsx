@@ -29,14 +29,12 @@ const NotificationSettingPage = () => {
 
   return (
     <div className="flex flex-col">
-      <div className="pt-[2.81rem]">
-        <TopNavigation
-          title="알림 설정"
-          rightText="완료"
-          onRightClick={handleDoneClick}
-          rightVariant="default"
-        />
-      </div>
+      <TopNavigation
+        title="알림 설정"
+        rightText="완료"
+        onRightClick={handleDoneClick}
+        rightVariant="default"
+      />
 
       <section className="flex flex-col gap-xs px-[1.34rem]">
         <h2 className="heading-base-semibold text-secondary">알림 종류</h2>

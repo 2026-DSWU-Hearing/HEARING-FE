@@ -27,7 +27,7 @@ const TopNavigation = ({
   }[rightVariant];
 
   return (
-    <header className=" flex h-[1.5rem] w-full items-center justify-between px-3 mb-2xl">
+    <header className=" flex h-[1.5rem] w-full items-center justify-between pt-[2.75rem] px-[1.03rem] mb-2xl">
       <button
         type="button"
         onClick={handleBackClick}
