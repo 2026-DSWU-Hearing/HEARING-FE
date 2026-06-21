@@ -25,8 +25,9 @@ body {
   margin: 0 auto;
   box-shadow: 0 0 40px rgba(0, 0, 0, 0.15);
   background-color: var(--color-neutral-950);
-  /* 자식 요소의 margin이 박스 밖으로 새어 body 배경이 비치는 것을 방지 (margin collapsing 차단) */
-  overflow: hidden;
+  /* 가로 넘침/자식 margin이 박스 밖으로 새는 것만 차단하고,
+     세로는 콘텐츠가 길어지면 스크롤되도록 허용한다. */
+  overflow-x: hidden;
 }
 
 /* 버튼 */

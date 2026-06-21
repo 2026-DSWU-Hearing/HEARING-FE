@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import TopNavigation from '@/layout/TopNavigation';
 import TextInput from '@/shared/components/TextInput';
-import DisabilityTypeSelector from '@/pages/setting/components/DisabilityTypeSelector';
+import DisabilityTypeSelector from '@/pages/setting/components/profile/DisabilityTypeSelector';
 import {
   DISABILITY_TYPE,
   type DisabilityTypeTypes,

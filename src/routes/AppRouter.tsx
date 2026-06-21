@@ -7,7 +7,7 @@ import Communication from '@/pages/communication/Communication';
 import LiveSound from '@/pages/liveSound/LiveSound';
 import Setting from '@/pages/setting/Setting';
 import NotificationSettingPage from '@/pages/setting/components/NotificationSettingPage';
-import ProfileEditPage from '@/pages/setting/components/ProfileEditPage';
+import ProfileEditPage from '@/pages/setting/components/profile/ProfileEditPage';
 import Login from '@/pages/login/Login';
 
 const AppRouter = () => {
