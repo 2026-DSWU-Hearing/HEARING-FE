@@ -2,7 +2,7 @@ import brandLogo from '@/shared/assets/brand/brand-logo.png';
 
 const LoginLogo = () => {
   return (
-    <div className="mb-[86px] flex flex-col items-center">
+    <div className="mb-[px] flex flex-col items-center">
       <img
         className="w-[140px] h-auto object-contain"
         src={brandLogo}
