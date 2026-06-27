@@ -371,3 +371,19 @@
 @utility shadow-light-10 {
   box-shadow: var(--shadow-light-10);
 }
+
+/* 실시간 소리 감지 파동 - 고정된 동심원 링들이 안→밖으로 순차적으로 밝아졌다 어두워진다.
+   각 링에 animation-delay만 다르게 줘 빛이 바깥으로 흐르는 듯한 웨이브를 만든다. */
+@keyframes sound-wave {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@utility animate-sound-wave {
+  animation: sound-wave 2.8s ease-in-out infinite;
+}
