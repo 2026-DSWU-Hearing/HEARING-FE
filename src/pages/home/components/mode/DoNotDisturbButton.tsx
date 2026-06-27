@@ -10,12 +10,12 @@ const STYLES = {
     off: 'border-[0.5px] border-neutral-500',
   },
   text: {
-    on: 'left-[0.875rem] pr-[2.5rem] text-primary',
-    off: 'right-[0.875rem] pl-[2.5rem] text-tertiary',
+    on: 'pl-[1rem] pr-[2.7rem] text-primary',
+    off: 'pl-[2.7rem] pr-[1rem] text-tertiary',
   },
   thumb: {
-    on: 'translate-x-[5.5rem] shadow-light-20',
-    off: 'translate-x-0 bg-tertiary',
+    on: 'left-[calc(100%_-_2.125rem)] shadow-light-20',
+    off: 'left-[0.375rem] bg-tertiary',
   },
   icon: {
     on: 'text-primary',
@@ -39,26 +39,26 @@ const DoNotDisturbButton = ({
       type="button"
       role="switch"
       aria-checked={isDoNotDisturb}
-      aria-label="방해금지 모드"
+      aria-label="알림 받지 않기 모드"
       disabled={isDisabled}
       onClick={onToggle}
-      className={`p-xxs relative h-[2.75rem] w-[8rem] rounded-pill bg-black disabled:cursor-not-allowed disabled:opacity-60 ${
+      className={`relative inline-flex h-[2.75rem] w-fit min-w-[8rem] items-center rounded-pill bg-black disabled:cursor-not-allowed disabled:opacity-60 ${
         isDoNotDisturb ? STYLES.button.on : STYLES.button.off
       }`}
     >
       {/* 텍스트: thumb 반대편에 고정 */}
       <span
-        className={`caption-xs-regular absolute top-1/2 -translate-y-1/2 whitespace-nowrap transition-all ${
+        className={`caption-xs-regular block whitespace-nowrap transition-colors ${
           isDoNotDisturb ? STYLES.text.on : STYLES.text.off
         }`}
       >
-        방해금지 모드 {isDoNotDisturb ? 'on' : 'off'}
+        알림 받지 않기 {isDoNotDisturb ? 'on' : 'off'}
       </span>
 
       {/* thumb 역할의 달 아이콘 원: off=왼쪽, on=오른쪽으로 미끄러짐 */}
       <span
         style={isDoNotDisturb ? { background: ON_THUMB_BACKGROUND } : undefined}
-        className={`absolute top-[0.375rem] left-[0.375rem] flex h-[1.75rem] w-[1.75rem] items-center justify-center rounded-pill transition-all duration-300 ease-in-out ${
+        className={`absolute top-[0.375rem] flex h-[1.75rem] w-[1.75rem] items-center justify-center rounded-pill transition-all duration-300 ease-in-out ${
           isDoNotDisturb ? STYLES.thumb.on : STYLES.thumb.off
         }`}
       >
