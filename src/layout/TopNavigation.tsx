@@ -29,7 +29,7 @@ const TopNavigation = ({
   }[rightVariant];
 
   return (
-    <header className="grid w-full grid-cols-[48px_1fr_64px] items-center pt-[2.75rem] px-[1.03rem] mb-2xl">
+    <header className="grid w-full grid-cols-[64px_1fr_64px] items-center pt-[2.75rem] px-[1.03rem] mb-2xl">
       <button
         type="button"
         onClick={handleBackClick}

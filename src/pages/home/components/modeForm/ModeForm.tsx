@@ -1,10 +1,10 @@
+import TopNavigation from '@/layout/TopNavigation';
 import ModeDeleteBtn from '@/pages/home/components/modeForm/ModeDeleteBtn';
 import {
   MAX_MODE_NAME_LENGTH,
   ModeFormProvider,
   useModeFormContext,
 } from '@/pages/home/components/modeForm/ModeFormContext';
-import ModeHeader from '@/pages/home/components/modeForm/ModeHeader';
 import ModeIconPicker from '@/pages/home/components/modeForm/ModeIconPicker';
 import ModeSoundSelectSection from '@/pages/home/components/modeForm/ModeSoundSelectSection';
 import { MODE_MESSAGE } from '@/pages/home/constants/modeMessages';
@@ -48,15 +48,16 @@ const ModeFormContent = () => {
   } = useModeFormContext();
 
   return (
-    <div className="min-h-dvh pt-[2.75rem] px-[1.03rem] ">
-      <ModeHeader
+    <div className="min-h-dvh">
+      <TopNavigation
         title={headerTitle}
-        actionLabel={headerActionLabel}
-        onActionClick={handleSubmitClick}
-        isActionDisabled={isSubmitting || !canSubmit}
+        rightText={headerActionLabel}
+        onRightClick={handleSubmitClick}
+        rightVariant="active"
+        isRightDisabled={isSubmitting || !canSubmit}
       />
 
-      <main>
+      <main className="px-[1.03rem]">
         <TextInput
           label={modeNameLabel}
           value={modeName}
