@@ -79,7 +79,7 @@ const CategoryBlock = ({
       ? 'min-w-[4.25rem]'
       : 'inline-flex w-full justify-center truncate';
 
-  const className = `caption-xs-medium whitespace-nowrap rounded-full px-xs py-xxxs ${widthClassName} transition-colors duration-300 ease-in-out ${colorClassName}`;
+  const className = `caption-xs-medium whitespace-nowrap rounded-full px-xs py-xxxs shadow-chip ${widthClassName} transition-colors duration-300 ease-in-out ${colorClassName}`;
 
   if (onClick) {
     const handleCategoryBlockClick = () => {
