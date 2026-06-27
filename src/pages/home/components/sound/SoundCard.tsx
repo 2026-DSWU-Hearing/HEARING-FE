@@ -33,40 +33,47 @@ const SoundCard = ({
 
   const isOnStyle = isEditMode ? isSelected : isActive;
 
+  // 보더 두께는 1px 고정(시프트 방지), 색만 전환: 꺼짐=회색 / 켜짐=투명.
   const cardStyle = isDoNotDisturb
-    ? 'bg-neutral-900 text-neutral-700'
+    ? 'bg-neutral-900 text-neutral-700 border border-neutral-900'
     : isOnStyle
-      ? 'card-true-bottomsheet tag-glass-effect text-primary'
-      : 'bg-neutral-800 text-primary border-[1px] solid border-neutral-600';
+      ? 'bg-neutral-800 text-primary border border-transparent'
+      : 'bg-neutral-800 text-primary border border-neutral-600';
+
+  const activeLayerStyle =
+    !isDoNotDisturb && isOnStyle ? 'opacity-100' : 'opacity-0';
 
   return (
     <button
       type="button"
       aria-disabled={isDoNotDisturb}
       onClick={handleSoundCardClick}
-      className={`@container flex h-full min-h-[7rem] min-w-0 flex-col rounded-xl p-sm text-center transition-all duration-500 ease-out ${
+      className={`@container relative flex h-full min-h-[7rem] min-w-0 flex-col overflow-hidden rounded-xl p-sm text-center transition-[color,border-color,transform] duration-700 ease-out ${
         isDoNotDisturb
           ? 'cursor-not-allowed'
           : 'cursor-pointer active:scale-[0.97]'
       } ${cardStyle} `}
     >
-      {/* 아이콘 + 소리명: 남는 세로 공간(flex-1)을 채우며 가운데 정렬 →
-          카드가 길어져도 카테고리를 밀어내 바닥에 고정시킨다 */}
-      <div className="flex min-w-0 flex-1 flex-col items-center justify-center gap-xs transition-colors duration-300 ease-out">
-        {/* 직접 그린 SVG는 h-/w-(박스 크기)로, FA 폴백은 text-(font-size)로 크기가 정해지므로
-            두 경로가 같은 크기로 보이도록 동일한 clamp 를 h/w 와 text 에 모두 준다. */}
+      {/* 켜짐 외형(글래스+그라데이션) 레이어. opacity 만 크로스페이드해 전환을 부드럽게 한다. */}
+      <span
+        aria-hidden="true"
+        className={`pointer-events-none absolute inset-0 rounded-xl card-true-bottomsheet tag-glass-effect border-0 transition-opacity duration-700 ease-out ${activeLayerStyle}`}
+      />
+      {/* 아이콘 + 소리명: flex-1 로 남는 공간을 채워 카테고리를 바닥에 고정한다. */}
+      <div className="relative z-10 flex min-w-0 flex-1 flex-col items-center justify-center gap-xs transition-colors duration-700 ease-out">
+        {/* SVG(h/w)·FA 폴백(text) 두 경로가 같은 크기로 보이도록 동일 clamp 적용. */}
         <SoundIconView
           soundName={sound.name}
           categoryName={categoryName}
-          className="h-[clamp(1.75rem,32cqi,2.25rem)] w-[clamp(1.75rem,32cqi,2.25rem)] text-[clamp(1.75rem,32cqi,2.25rem)] leading-none transition-transform duration-300 ease-out"
+          className="h-[clamp(1.75rem,32cqi,2.25rem)] w-[clamp(1.75rem,32cqi,2.25rem)] text-[clamp(1.75rem,32cqi,2.25rem)] leading-none transition-transform duration-700 ease-out"
         />
-        <span className="heading-base-semibold w-full break-keep text-center transition-colors duration-300 ease-out">
+        <span className="heading-base-semibold w-full break-keep text-center transition-colors duration-700 ease-out">
           {sound.name}
         </span>
       </div>
 
-      {/* 카테고리: 카드 바닥에 고정 → 행마다 카드 높이가 달라도 라인이 가지런 */}
-      <div className="mt-xs flex w-full min-w-0 justify-center">
+      {/* 카테고리: 카드 바닥에 고정해 행마다 높이가 달라도 라인을 가지런히. */}
+      <div className="relative z-10 mt-xs flex w-full min-w-0 justify-center">
         <CategoryBlock
           categoryName={categoryName}
           isDisabled={isDoNotDisturb}
