@@ -1,6 +1,5 @@
 import { useCallback, useState } from 'react';
 import { MODE_MESSAGE } from '@/pages/home/constants/modeMessages';
-import { useDeleteModeSound } from '@/pages/home/hooks/useDeleteModeSound';
 import { useGetModeDetail } from '@/pages/home/hooks/useGetModeDetail';
 import { useHomeModeContext } from '@/pages/home/hooks/useHomeModeContext';
 import { useModeSoundState } from '@/pages/home/hooks/useModeSoundState';
@@ -13,7 +12,6 @@ import { useModal } from '@/shared/hooks/useModal';
 export const useSoundSection = () => {
   const { selectedModeId, isDoNotDisturb } = useHomeModeContext();
   const { data, isLoading, isError } = useGetModeDetail(selectedModeId);
-  const { mutateAsync: deleteModeSound } = useDeleteModeSound();
   const { mutate: patchModeSoundActive, isPending: isPatchModeSoundActivePending } =
     usePatchModeSoundActive();
   const { mutate: putModeSounds } = usePutModeSounds();
@@ -93,20 +91,30 @@ export const useSoundSection = () => {
   ]);
 
   // 확인 모달에서 "확인"을 눌렀을 때 실제 삭제를 수행한다.
-  const handleRemoveSelectedSoundsConfirm = useCallback(async () => {
-    if (selectedModeId === null) return;
+  // 삭제 = "빼기"가 아니라 삭제 대상을 제외한 "남길 소리"만 모아 한 번에 PUT하는 방식.
+  // 추가(handleAddSoundsComplete)와 동일한 mutation/캐시 경로를 공유한다.
+  const handleRemoveSelectedSoundsConfirm = useCallback(() => {
+    if (selectedModeId === null || !data) return;
 
-    await Promise.all(
-      state.selectedRemoveSoundIds.map((soundId) =>
-        deleteModeSound({ modeId: selectedModeId, soundId }),
-      ),
-    );
+    const nextSounds = data.sounds
+      .filter(
+        (sound) => !state.selectedRemoveSoundIds.includes(sound.sound_id),
+      )
+      .map((sound) => ({ sound_id: sound.sound_id, name: sound.name }));
+
+    putModeSounds({
+      modeId: selectedModeId,
+      soundsData: {
+        sounds: nextSounds,
+      },
+    });
 
     resetRemoveSounds();
     closeEditMode();
   }, [
     closeEditMode,
-    deleteModeSound,
+    data,
+    putModeSounds,
     resetRemoveSounds,
     selectedModeId,
     state.selectedRemoveSoundIds,
