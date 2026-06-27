@@ -1,5 +1,11 @@
+import LiveSoundHeader from './components/LiveSoundHeader';
+
 const LiveSound = () => {
-  return <div>실시간 소리 감지 페이지 </div>;
+  return (
+    <>
+      <LiveSoundHeader />
+    </>
+  );
 };
 
 export default LiveSound;
