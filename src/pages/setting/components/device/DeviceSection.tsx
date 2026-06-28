@@ -9,6 +9,7 @@ import ConnectDeviceBtn from '@/pages/setting/components/device/ConnectDeviceBtn
 import DeviceNameEditModal from '@/pages/setting/components/device/DeviceNameEditModal';
 import { useGetDevices } from '@/pages/setting/hooks/useGetDevices';
 import { usePatchDevice } from '@/pages/setting/hooks/usePatchDevice';
+import { SettingCardSkeleton } from '@/pages/setting/components/SettingSkeleton';
 import { CONNECTION_STATUS } from '@/pages/setting/constants/connectionStatus';
 
 /**
@@ -48,12 +49,11 @@ const DeviceSection = () => {
     updateDevice({ deviceId: device.id, deviceData: { is_connected: true } });
   };
 
-  // TODO(skeleton): 6번 작업에서 SettingCardSkeleton으로 교체한다.
   if (isLoading) {
     return (
       <section className="flex flex-col gap-sm">
         <SettingSectionTitle title="나의 디바이스" />
-        <div className="h-[7rem] animate-pulse rounded-xl bg-neutral-900" />
+        <SettingCardSkeleton />
       </section>
     );
   }

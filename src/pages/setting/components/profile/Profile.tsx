@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 
 import { useGetUsers } from '@/pages/setting/hooks/useGetUsers';
+import { ProfileSkeleton } from '@/pages/setting/components/SettingSkeleton';
 import {
   DISABILITY_TYPE_LABEL,
   type DisabilityTypeTypes,
@@ -15,11 +16,8 @@ const Profile = () => {
     navigate('/setting/profile/edit');
   };
 
-  // TODO(skeleton): 6번 작업에서 SettingCardSkeleton으로 교체한다.
   if (isLoading) {
-    return (
-      <div className="h-[5.75rem] animate-pulse rounded-xl bg-neutral-900" />
-    );
+    return <ProfileSkeleton />;
   }
 
   if (isError || !user) {
