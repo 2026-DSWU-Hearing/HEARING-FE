@@ -2,10 +2,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { useGetUsers } from '@/pages/setting/hooks/useGetUsers';
 import { ProfileSkeleton } from '@/pages/setting/components/SettingSkeleton';
-import {
-  DISABILITY_TYPE_LABEL,
-  type DisabilityTypeTypes,
-} from '@/pages/setting/constants/disabilityType';
+import { getDisabilityLabel } from '@/pages/setting/constants/disabilityType';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -28,13 +25,7 @@ const Profile = () => {
     );
   }
 
-  // disability_type은 서버 코드값(HARD_OF_HEARING/DEAF)과 일치한다고 가정한다.
-  // null이거나 매핑에 없는 값이면 '미설정'으로 표시한다.
-  const disabilityLabel =
-    user.disability_type !== null
-      ? (DISABILITY_TYPE_LABEL[user.disability_type as DisabilityTypeTypes] ??
-        '미설정')
-      : '미설정';
+  const disabilityLabel = getDisabilityLabel(user.disability_type);
 
   return (
     <div className="flex items-center gap-base rounded-xl bg-neutral-900 px-base py-base">
