@@ -8,8 +8,8 @@ import {
 import type { ConnectionStatusTypes } from '@/pages/setting/constants/connectionStatus';
 
 interface DeviceStatusGridPropTypes {
-  /** 배터리 잔량 (0~100) */
-  batteryLevel: number;
+  /** 배터리 잔량 (0~100). 정보 없음이면 null */
+  batteryLevel: number | null;
   /** 연결 상태 코드값 */
   connectionStatus: ConnectionStatusTypes;
 }
@@ -23,13 +23,15 @@ const DeviceStatusGrid = ({
   connectionStatus,
 }: DeviceStatusGridPropTypes) => {
   const isConnected = connectionStatus === CONNECTION_STATUS.CONNECTED;
+  // 배터리 정보가 없으면 0%로 오해하지 않도록 placeholder를 표시한다.
+  const batteryLabel = batteryLevel === null ? '-' : `${batteryLevel}%`;
 
   return (
     <div className="grid grid-cols-2 gap-sm">
       <DeviceStatusCard
         icon={faBatteryFull}
         label="배터리"
-        value={`${batteryLevel}%`}
+        value={batteryLabel}
       />
       <DeviceStatusCard
         icon={faWifi}

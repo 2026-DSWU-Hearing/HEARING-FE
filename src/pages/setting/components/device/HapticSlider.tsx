@@ -4,8 +4,10 @@ import type { KeyboardEvent, PointerEvent } from 'react';
 interface HapticSliderPropTypes {
   /** 현재 값 (0~100) */
   value: number;
-  /** 값 변경 핸들러 */
+  /** 값 변경 핸들러 (드래그 중 매 프레임 호출 — 화면 즉시 반영용) */
   onChange: (value: number) => void;
+  /** 값 확정 핸들러 (드래그 종료·키보드 입력 시 호출 — 저장용). 미지정 시 호출하지 않는다. */
+  onChangeEnd?: (value: number) => void;
   /** 왼쪽 끝 라벨 */
   minLabel?: string;
   /** 오른쪽 끝 라벨 */
@@ -25,6 +27,7 @@ const THUMB_SIZE = 25;
 const HapticSlider = ({
   value,
   onChange,
+  onChangeEnd,
   minLabel = '약함',
   maxLabel = '강함',
 }: HapticSliderPropTypes) => {
@@ -32,17 +35,21 @@ const HapticSlider = ({
 
   const clamp = (rawValue: number) => Math.max(0, Math.min(100, rawValue));
 
-  // 포인터의 화면 X좌표를 트랙 기준 0~100 값으로 변환한다.
+  // 포인터의 화면 X좌표를 트랙 기준 0~100 값으로 변환해 반환한다.
+  // commit=true면 확정 핸들러(onChangeEnd)까지 호출한다(드래그 종료 시).
   const computeValue = useCallback(
-    (clientX: number) => {
+    (clientX: number, commit = false) => {
       const track = trackRef.current;
       if (!track) return;
 
       const { left, width } = track.getBoundingClientRect();
       const ratio = ((clientX - left) / width) * 100;
-      onChange(clamp(Math.round(ratio)));
+      const nextValue = clamp(Math.round(ratio));
+
+      onChange(nextValue);
+      if (commit) onChangeEnd?.(nextValue);
     },
-    [onChange],
+    [onChange, onChangeEnd],
   );
 
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
@@ -56,9 +63,22 @@ const HapticSlider = ({
     computeValue(event.clientX);
   };
 
+  // 드래그를 놓는 순간 마지막 값을 확정(저장)한다.
+  const handlePointerUp = (event: PointerEvent<HTMLDivElement>) => {
+    computeValue(event.clientX, true);
+  };
+
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'ArrowRight') onChange(clamp(value + 1));
-    if (event.key === 'ArrowLeft') onChange(clamp(value - 1));
+    const delta =
+      event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
+    if (delta === 0) return;
+
+    const nextValue = clamp(value + delta);
+    // 경계값(0/100)에서 키를 길게 눌러도 동일 값으로 PATCH가 반복되지 않게 막는다.
+    if (nextValue === value) return;
+
+    onChange(nextValue);
+    onChangeEnd?.(nextValue);
   };
 
   // thumb 중심을 채움 지점에 맞추기 위해 thumb 반지름만큼 왼쪽으로 보정한다.
@@ -76,6 +96,7 @@ const HapticSlider = ({
         ref={trackRef}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
         onKeyDown={handleKeyDown}
         role="slider"
         aria-label="진동 강도"

@@ -1,62 +1,67 @@
-import { useState } from 'react';
 import { faMicrochip } from '@fortawesome/free-solid-svg-icons';
 
 import ConfirmModal from '@/shared/components/ConfirmModal';
-import { useModal } from '@/shared/hooks/useModal';
 import SettingSectionTitle from '@/pages/setting/components/SettingSectionTitle';
 import SettingCard from '@/pages/setting/components/SettingCard';
 import DeviceStatusGrid from '@/pages/setting/components/device/DeviceStatusGrid';
 import ConnectDeviceBtn from '@/pages/setting/components/device/ConnectDeviceBtn';
+import DeleteDeviceBtn from '@/pages/setting/components/device/DeleteDeviceBtn';
 import DeviceNameEditModal from '@/pages/setting/components/device/DeviceNameEditModal';
-import { CONNECTION_STATUS } from '@/pages/setting/constants/connectionStatus';
-import type { DeviceInfoTypes } from '@/pages/setting/types/deviceTypes';
-
-// TODO(api): GET /devices(가칭)로 조회 후 더미 값을 대체한다.
-const DUMMY_DEVICE_INFO: DeviceInfoTypes = {
-  name: 'ESP32',
-  batteryLevel: 80,
-  connectionStatus: CONNECTION_STATUS.CONNECTED,
-};
+import DeviceRegisterModal from '@/pages/setting/components/device/DeviceRegisterModal';
+import { SettingCardSkeleton } from '@/pages/setting/components/SettingSkeleton';
+import { useDeviceSection } from '@/pages/setting/hooks/useDeviceSection';
 
 /**
- * 나의 디바이스 섹션.
- * 연결됨: 섹션 제목(연결 해제하기) + 디바이스 카드(기기 이름·배터리·연결 상태).
- * 미연결: 골드 "디바이스 연결하기" 버튼만 표시한다.
- * 연결 상태·기기 이름은 API 부재로 현재 client state로 관리한다.
+ * 나의 디바이스 섹션. 등록 여부·연결 여부로 3상태를 분기한다.
+ * - 미등록: "디바이스 등록" 버튼
+ * - 등록 + 연결 해제: "디바이스 연결하기" 버튼 + 삭제 버튼
+ * - 등록 + 연결: 디바이스 카드(이름·배터리·연결 상태) + "연결 해제하기" + 삭제 버튼
+ * 조회·매핑·등록/연결/해제/삭제/이름변경 로직은 useDeviceSection 훅에 있다.
  */
 const DeviceSection = () => {
-  const [deviceInfo, setDeviceInfo] = useState<DeviceInfoTypes>(DUMMY_DEVICE_INFO);
+  const {
+    name,
+    batteryLevel,
+    connectionStatus,
+    isConnected,
+    isRegistered,
+    isLoading,
+    isError,
+    isMutating,
+    nameModal,
+    disconnectModal,
+    registerModal,
+    deleteModal,
+    handleEditClick,
+    handleNameSubmit,
+    handleConnectClick,
+    handleDisconnectClick,
+    handleConfirmDisconnect,
+    handleRegisterClick,
+    handleRegisterSubmit,
+    handleDeleteClick,
+    handleConfirmDelete,
+  } = useDeviceSection();
 
-  const { name, batteryLevel, connectionStatus } = deviceInfo;
-  const isConnected = connectionStatus === CONNECTION_STATUS.CONNECTED;
+  if (isLoading) {
+    return (
+      <section className="flex flex-col gap-sm">
+        <SettingSectionTitle title="나의 디바이스" />
+        <SettingCardSkeleton />
+      </section>
+    );
+  }
 
-  const nameModal = useModal();
-  const disconnectModal = useModal();
-
-  const handleEditClick = () => nameModal.open();
-
-  const handleNameSubmit = (newName: string) => {
-    setDeviceInfo((prev) => ({ ...prev, name: newName }));
-    // TODO(api): PATCH /devices(가칭)로 기기 이름 변경 요청.
-  };
-
-  const handleDisconnectClick = () => disconnectModal.open();
-
-  const handleConfirmDisconnect = () => {
-    setDeviceInfo((prev) => ({
-      ...prev,
-      connectionStatus: CONNECTION_STATUS.DISCONNECTED,
-    }));
-    // TODO(api): 디바이스 연결 해제 요청.
-  };
-
-  const handleConnectClick = () => {
-    setDeviceInfo((prev) => ({
-      ...prev,
-      connectionStatus: CONNECTION_STATUS.CONNECTED,
-    }));
-    // TODO(api): 디바이스 연결 요청.
-  };
+  if (isError) {
+    return (
+      <section className="flex flex-col gap-sm">
+        <SettingSectionTitle title="나의 디바이스" />
+        <div className="flex items-center rounded-xl bg-neutral-900 px-base py-base body-base-regular text-secondary">
+          기기 정보를 불러오지 못했습니다
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="flex flex-col gap-sm">
@@ -66,20 +71,40 @@ const DeviceSection = () => {
         onActionClick={isConnected ? handleDisconnectClick : undefined}
       />
 
-      {isConnected ? (
-        <SettingCard
-          icon={faMicrochip}
-          label="기기 이름"
-          title={name}
-          onEdit={handleEditClick}
-        >
-          <DeviceStatusGrid
-            batteryLevel={batteryLevel}
-            connectionStatus={connectionStatus}
+      {!isRegistered && (
+        <ConnectDeviceBtn
+          label="디바이스 등록"
+          onClick={handleRegisterClick}
+          disabled={isMutating}
+        />
+      )}
+
+      {isRegistered && !isConnected && (
+        <div className="flex flex-col gap-sm">
+          <ConnectDeviceBtn
+            label="디바이스 연결하기"
+            onClick={handleConnectClick}
+            disabled={isMutating}
           />
-        </SettingCard>
-      ) : (
-        <ConnectDeviceBtn onClick={handleConnectClick} />
+          <DeleteDeviceBtn onClick={handleDeleteClick} />
+        </div>
+      )}
+
+      {isRegistered && isConnected && (
+        <div className="flex flex-col gap-sm">
+          <SettingCard
+            icon={faMicrochip}
+            label="기기 이름"
+            title={name}
+            onEdit={handleEditClick}
+          >
+            <DeviceStatusGrid
+              batteryLevel={batteryLevel}
+              connectionStatus={connectionStatus}
+            />
+          </SettingCard>
+          <DeleteDeviceBtn onClick={handleDeleteClick} />
+        </div>
       )}
 
       {nameModal.isOpen && (
@@ -87,6 +112,13 @@ const DeviceSection = () => {
           currentName={name}
           onClose={nameModal.close}
           onSubmit={handleNameSubmit}
+        />
+      )}
+
+      {registerModal.isOpen && (
+        <DeviceRegisterModal
+          onClose={registerModal.close}
+          onSubmit={handleRegisterSubmit}
         />
       )}
 
@@ -98,6 +130,18 @@ const DeviceSection = () => {
         onClose={disconnectModal.close}
         confirmText="해제"
         cancelText="취소"
+        confirmDisabled={isMutating}
+      />
+
+      <ConfirmModal
+        isOpen={deleteModal.isOpen}
+        message={'기기를 삭제하시겠습니까?\n등록된 기기 정보가 모두 삭제됩니다.'}
+        onConfirm={handleConfirmDelete}
+        onCancel={deleteModal.close}
+        onClose={deleteModal.close}
+        confirmText="삭제"
+        cancelText="취소"
+        confirmDisabled={isMutating}
       />
     </section>
   );

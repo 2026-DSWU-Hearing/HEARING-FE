@@ -7,7 +7,8 @@ import {
 } from '@/pages/setting/constants/disabilityType';
 
 interface DisabilityTypeSelectorPropTypes {
-  value: DisabilityTypeTypes;
+  /** 선택된 장애 유형. 미설정이면 null (아무 항목도 선택되지 않음) */
+  value: DisabilityTypeTypes | null;
   onChange: (value: DisabilityTypeTypes) => void;
 }
 

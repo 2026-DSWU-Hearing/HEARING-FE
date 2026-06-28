@@ -1,21 +1,31 @@
 import { useNavigate } from 'react-router-dom';
 
-import {
-  DISABILITY_TYPE,
-  DISABILITY_TYPE_LABEL,
-  type DisabilityTypeTypes,
-} from '@/pages/setting/constants/disabilityType';
+import { useGetUsers } from '@/pages/setting/hooks/useGetUsers';
+import { ProfileSkeleton } from '@/pages/setting/components/SettingSkeleton';
+import { getDisabilityLabel } from '@/pages/setting/constants/disabilityType';
 
 const Profile = () => {
   const navigate = useNavigate();
 
-  // TODO(api): GET /users/me 로 프로필(닉네임·장애유형) 조회 후 대체한다.
-  const nickname = '뽀롱이';
-  const disabilityType: DisabilityTypeTypes = DISABILITY_TYPE.HARD_OF_HEARING;
+  const { data: user, isLoading, isError } = useGetUsers();
 
   const handleEditClick = () => {
     navigate('/setting/profile/edit');
   };
+
+  if (isLoading) {
+    return <ProfileSkeleton />;
+  }
+
+  if (isError || !user) {
+    return (
+      <div className="flex items-center rounded-xl bg-neutral-900 px-base py-base body-base-regular text-secondary">
+        프로필을 불러오지 못했습니다
+      </div>
+    );
+  }
+
+  const disabilityLabel = getDisabilityLabel(user.disability_type);
 
   return (
     <div className="flex items-center gap-base rounded-xl bg-neutral-900 px-base py-base">
@@ -27,10 +37,10 @@ const Profile = () => {
 
       <div className="flex min-w-0 gap-[0.44rem] flex-1 flex-col">
         <span className="heading-lg-semibold truncate text-primary">
-          {nickname}
+          {user.nickname}
         </span>
         <span className="heading-base-semibold text-secondary">
-          {DISABILITY_TYPE_LABEL[disabilityType]}
+          {disabilityLabel}
         </span>
       </div>
 
