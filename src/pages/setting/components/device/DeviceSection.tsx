@@ -27,6 +27,7 @@ const DeviceSection = () => {
     isRegistered,
     isLoading,
     isError,
+    isMutating,
     nameModal,
     disconnectModal,
     registerModal,
@@ -71,7 +72,11 @@ const DeviceSection = () => {
       />
 
       {!isRegistered && (
-        <ConnectDeviceBtn label="디바이스 등록" onClick={handleRegisterClick} />
+        <ConnectDeviceBtn
+          label="디바이스 등록"
+          onClick={handleRegisterClick}
+          disabled={isMutating}
+        />
       )}
 
       {isRegistered && !isConnected && (
@@ -79,6 +84,7 @@ const DeviceSection = () => {
           <ConnectDeviceBtn
             label="디바이스 연결하기"
             onClick={handleConnectClick}
+            disabled={isMutating}
           />
           <DeleteDeviceBtn onClick={handleDeleteClick} />
         </div>
@@ -124,6 +130,7 @@ const DeviceSection = () => {
         onClose={disconnectModal.close}
         confirmText="해제"
         cancelText="취소"
+        confirmDisabled={isMutating}
       />
 
       <ConfirmModal
@@ -134,6 +141,7 @@ const DeviceSection = () => {
         onClose={deleteModal.close}
         confirmText="삭제"
         cancelText="취소"
+        confirmDisabled={isMutating}
       />
     </section>
   );

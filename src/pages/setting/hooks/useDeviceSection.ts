@@ -13,9 +13,12 @@ import { CONNECTION_STATUS } from '@/pages/setting/constants/connectionStatus';
  */
 export const useDeviceSection = () => {
   const { data: devices, isLoading, isError } = useGetDevices();
-  const { mutate: updateDevice } = usePatchDevice();
-  const { mutate: createDevice } = usePostDevice();
-  const { mutate: removeDevice } = useDeleteDevice();
+  const { mutate: updateDevice, isPending: isUpdating } = usePatchDevice();
+  const { mutate: createDevice, isPending: isCreating } = usePostDevice();
+  const { mutate: removeDevice, isPending: isDeleting } = useDeleteDevice();
+
+  // 등록/연결/해제/삭제 중 하나라도 진행 중이면 버튼·모달 확인을 막아 연타·중복 요청을 방지한다.
+  const isMutating = isUpdating || isCreating || isDeleting;
 
   const device = devices?.[0];
   // 등록 여부 (미등록/등록 상태 분기용)
@@ -36,19 +39,20 @@ export const useDeviceSection = () => {
   const handleDisconnectClick = () => disconnectModal.open();
 
   const handleConfirmDisconnect = () => {
-    if (!device) return;
+    if (!device || isMutating) return;
     updateDevice({ deviceId: device.id, deviceData: { is_connected: false } });
   };
 
   const handleConnectClick = () => {
     // 등록된(연결 해제 상태) 기기를 다시 연결한다. 미등록 상태에선 이 핸들러가 호출되지 않는다.
-    if (!device) return;
+    if (!device || isMutating) return;
     updateDevice({ deviceId: device.id, deviceData: { is_connected: true } });
   };
 
   const handleRegisterClick = () => registerModal.open();
 
   const handleRegisterSubmit = (nickname: string) => {
+    if (isMutating) return;
     // TODO(api): 실제 BLE 페어링 시 generateMockMacAddress()를 페어링 MAC으로 교체.
     createDevice({ nickname, mac_address: generateMockMacAddress() });
   };
@@ -56,7 +60,7 @@ export const useDeviceSection = () => {
   const handleDeleteClick = () => deleteModal.open();
 
   const handleConfirmDelete = () => {
-    if (!device) return;
+    if (!device || isMutating) return;
     removeDevice(device.id);
   };
 
@@ -76,6 +80,7 @@ export const useDeviceSection = () => {
     isRegistered,
     isLoading,
     isError,
+    isMutating,
     nameModal,
     disconnectModal,
     registerModal,

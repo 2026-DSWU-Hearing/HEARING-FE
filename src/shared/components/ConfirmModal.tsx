@@ -11,6 +11,8 @@ interface ConfirmModalPropTypes {
   confirmText?: string;
   cancelText?: string;
   hideCancel?: boolean;
+  /** 확인 버튼 비활성화 여부 (저장 중 중복 클릭 방지 등) */
+  confirmDisabled?: boolean;
 }
 
 const ConfirmModal = ({
@@ -22,6 +24,7 @@ const ConfirmModal = ({
   confirmText,
   cancelText,
   hideCancel,
+  confirmDisabled,
 }: ConfirmModalPropTypes) => {
   const messageId = useId();
 
@@ -64,6 +67,7 @@ const ConfirmModal = ({
           confirmText={confirmText}
           cancelText={cancelText}
           hideCancel={hideCancel}
+          confirmDisabled={confirmDisabled}
         />
       </div>
     </div>
