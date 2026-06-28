@@ -1,7 +1,6 @@
 /**
  * 넥밴드(ESP32) 기기 API 타입.
  * 서버 응답 스펙(snake_case)을 그대로 따른다.
- * UI 표시용 타입은 `deviceTypes.ts`(camelCase)에 별도로 존재한다.
  */
 
 /** GET /devices, PATCH /devices/{device_id} 응답 (DeviceResponse) */
