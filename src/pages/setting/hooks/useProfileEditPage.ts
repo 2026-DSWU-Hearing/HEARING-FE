@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useGetUsers } from '@/pages/setting/hooks/useGetUsers';
@@ -17,7 +17,7 @@ import {
 export const useProfileEditPage = () => {
   const navigate = useNavigate();
 
-  const { data: user } = useGetUsers();
+  const { data: user, isLoading } = useGetUsers();
   const { mutateAsync: updateUsers, isPending: isUpdatingUsers } =
     usePatchUsers();
 
@@ -28,9 +28,10 @@ export const useProfileEditPage = () => {
 
   // 조회한 사용자 정보로 폼 초기값을 한 번만 채운다.
   // (입력 중 재조회로 값이 덮어써지지 않도록 isInitialized 가드를 둔다.)
-  const isInitialized = useRef(false);
+  // state로 두어 초기화 완료 시 리렌더되며 유효성 검증이 갱신되게 한다.
+  const [isInitialized, setIsInitialized] = useState(false);
   useEffect(() => {
-    if (isInitialized.current || !user) {
+    if (isInitialized || !user) {
       return;
     }
 
@@ -39,16 +40,19 @@ export const useProfileEditPage = () => {
     if (initialDisabilityType !== null) {
       setDisabilityType(initialDisabilityType);
     }
-    isInitialized.current = true;
-  }, [user]);
+    setIsInitialized(true);
+  }, [user, isInitialized]);
 
   const isNicknameEmpty = nickname.trim().length === 0;
   const isNicknameTooLong = nickname.length > NICKNAME_MAX_LENGTH;
-  const nicknameErrorMessage = isNicknameTooLong
-    ? PROFILE_MESSAGE.TOO_LONG_NICKNAME
-    : isNicknameEmpty
-      ? PROFILE_MESSAGE.EMPTY_NICKNAME
-      : undefined;
+  // 초기값 주입 전에는 '빈 닉네임 = 에러'로 오판해 깜빡이지 않도록 에러를 숨긴다.
+  const nicknameErrorMessage = !isInitialized
+    ? undefined
+    : isNicknameTooLong
+      ? PROFILE_MESSAGE.TOO_LONG_NICKNAME
+      : isNicknameEmpty
+        ? PROFILE_MESSAGE.EMPTY_NICKNAME
+        : undefined;
 
   // 닉네임이 비어있거나 길이가 기준을 넘거나 저장 중이면 완료(저장)를 막는다.
   const isDoneDisabled = isNicknameEmpty || isNicknameTooLong || isUpdatingUsers;
@@ -78,6 +82,7 @@ export const useProfileEditPage = () => {
     disabilityType,
     nicknameErrorMessage,
     isDoneDisabled,
+    isLoading,
     handleNicknameChange,
     handleDisabilityTypeSelect,
     handleDoneClick,
