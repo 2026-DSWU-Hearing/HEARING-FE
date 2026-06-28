@@ -1,6 +1,9 @@
 import { useGetDevices } from '@/pages/setting/hooks/useGetDevices';
 import { usePatchDevice } from '@/pages/setting/hooks/usePatchDevice';
+import { usePostDevice } from '@/pages/setting/hooks/usePostDevice';
+import { useDeleteDevice } from '@/pages/setting/hooks/useDeleteDevice';
 import { useModal } from '@/shared/hooks/useModal';
+import { generateMockMacAddress } from '@/pages/setting/utils/generateMockMacAddress';
 import { CONNECTION_STATUS } from '@/pages/setting/constants/connectionStatus';
 
 /**
@@ -11,11 +14,17 @@ import { CONNECTION_STATUS } from '@/pages/setting/constants/connectionStatus';
 export const useDeviceSection = () => {
   const { data: devices, isLoading, isError } = useGetDevices();
   const { mutate: updateDevice } = usePatchDevice();
+  const { mutate: createDevice } = usePostDevice();
+  const { mutate: removeDevice } = useDeleteDevice();
 
   const device = devices?.[0];
+  // 등록 여부 (미등록/등록 상태 분기용)
+  const isRegistered = device !== undefined;
 
   const nameModal = useModal();
   const disconnectModal = useModal();
+  const registerModal = useModal();
+  const deleteModal = useModal();
 
   const handleEditClick = () => nameModal.open();
 
@@ -32,10 +41,23 @@ export const useDeviceSection = () => {
   };
 
   const handleConnectClick = () => {
-    // 기기가 없으면(미등록) 재연결할 대상이 없어 동작하지 않는다.
-    // TODO(api): 기기 등록(POST /devices) 작업에서 등록 모달 연결 — 회원가입 때 '나중에 하기'한 사용자용.
+    // 등록된(연결 해제 상태) 기기를 다시 연결한다. 미등록 상태에선 이 핸들러가 호출되지 않는다.
     if (!device) return;
     updateDevice({ deviceId: device.id, deviceData: { is_connected: true } });
+  };
+
+  const handleRegisterClick = () => registerModal.open();
+
+  const handleRegisterSubmit = (nickname: string) => {
+    // TODO(api): 실제 BLE 페어링 시 generateMockMacAddress()를 페어링 MAC으로 교체.
+    createDevice({ nickname, mac_address: generateMockMacAddress() });
+  };
+
+  const handleDeleteClick = () => deleteModal.open();
+
+  const handleConfirmDelete = () => {
+    if (!device) return;
+    removeDevice(device.id);
   };
 
   // API 응답(snake_case)을 UI 표시값으로 매핑한다.
@@ -51,14 +73,21 @@ export const useDeviceSection = () => {
     batteryLevel,
     connectionStatus,
     isConnected,
+    isRegistered,
     isLoading,
     isError,
     nameModal,
     disconnectModal,
+    registerModal,
+    deleteModal,
     handleEditClick,
     handleNameSubmit,
     handleConnectClick,
     handleDisconnectClick,
     handleConfirmDisconnect,
+    handleRegisterClick,
+    handleRegisterSubmit,
+    handleDeleteClick,
+    handleConfirmDelete,
   };
 };
