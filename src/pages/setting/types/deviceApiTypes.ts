@@ -13,6 +13,12 @@ export interface DeviceResponseTypes {
   last_seen_at: string | null;
 }
 
+/** POST /devices 요청 바디 (DeviceCreate). 두 필드 모두 필수. */
+export interface CreateDeviceRequestTypes {
+  nickname: string;
+  mac_address: string;
+}
+
 /**
  * PATCH /devices/{device_id} 요청 바디 (DeviceUpdate).
  * 부분 수정이므로 모든 필드 선택적.
