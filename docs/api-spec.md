@@ -233,7 +233,8 @@
   | `name`                                                                      | string                      | ✅   |
   | `icon`                                                                      | string                      | ✅   |
   | `sounds`                                                                    | array&lt;ModeSoundInput&gt; | ✅   |
-  | - `ModeSoundInput`: `{ sound_id: integer (required), name?: string\|null }` |
+
+  - `ModeSoundInput`: `{ sound_id: integer (required), name?: string\|null }`
 
 - **Response** `200` → `ModeWriteResponse`
   - `{ mode_id, name, icon, sounds: ModeSoundItem[] }`, `ModeSoundItem`: `{ sound_id, name }`

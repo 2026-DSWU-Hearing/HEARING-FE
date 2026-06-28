@@ -23,6 +23,9 @@ const DeviceRegisterModal = ({
 }: DeviceRegisterModalPropTypes) => {
   const titleId = useId();
   const [nickname, setNickname] = useState('');
+  // 등록 요청이 시작된 직후 모달이 언마운트되기 전까지의 더블클릭으로
+  // POST /devices가 중복 호출되는 것을 막는 락.
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEscapeKey(true, onClose);
 
@@ -34,7 +37,8 @@ const DeviceRegisterModal = ({
 
   const handleSubmit = () => {
     const trimmedName = nickname.trim();
-    if (!trimmedName || isOverLength) return;
+    if (!trimmedName || isOverLength || isSubmitting) return;
+    setIsSubmitting(true);
     onSubmit(trimmedName);
     onClose();
   };
@@ -67,7 +71,7 @@ const DeviceRegisterModal = ({
           onCancel={onClose}
           confirmText="등록"
           cancelText="취소"
-          confirmDisabled={isOverLength || isEmpty}
+          confirmDisabled={isOverLength || isEmpty || isSubmitting}
         />
       </div>
     </div>

@@ -4,10 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { useGetUsers } from '@/pages/setting/hooks/useGetUsers';
 import { usePatchUsers } from '@/pages/setting/hooks/usePatchUsers';
 import {
-  DISABILITY_TYPE,
   toDisabilityType,
   type DisabilityTypeTypes,
 } from '@/pages/setting/constants/disabilityType';
+import type { UpdateUsersRequestTypes } from '@/pages/setting/types/usersTypes';
 import {
   NICKNAME_MAX_LENGTH,
   PROFILE_MESSAGE,
@@ -22,9 +22,10 @@ export const useProfileEditPage = () => {
     usePatchUsers();
 
   const [nickname, setNickname] = useState('');
-  const [disabilityType, setDisabilityType] = useState<DisabilityTypeTypes>(
-    DISABILITY_TYPE.HARD_OF_HEARING,
-  );
+  // 미설정(또는 미지원 코드값)은 기본값으로 메우지 않고 null로 둔다.
+  // (기본값을 넣으면 닉네임만 고쳐도 disability_type이 의도치 않게 저장됨)
+  const [disabilityType, setDisabilityType] =
+    useState<DisabilityTypeTypes | null>(null);
 
   // 조회한 사용자 정보로 폼 초기값을 한 번만 채운다.
   // (입력 중 재조회로 값이 덮어써지지 않도록 isInitialized 가드를 둔다.)
@@ -36,10 +37,8 @@ export const useProfileEditPage = () => {
     }
 
     setNickname(user.nickname);
-    const initialDisabilityType = toDisabilityType(user.disability_type);
-    if (initialDisabilityType !== null) {
-      setDisabilityType(initialDisabilityType);
-    }
+    // 서버 값이 미설정/미지원이면 null로 두어 selector에 아무것도 선택되지 않게 한다.
+    setDisabilityType(toDisabilityType(user.disability_type));
     setIsInitialized(true);
   }, [user, isInitialized]);
 
@@ -70,10 +69,13 @@ export const useProfileEditPage = () => {
       return;
     }
 
-    await updateUsers({
-      nickname: nickname.trim(),
-      disability_type: disabilityType,
-    });
+    const payload: UpdateUsersRequestTypes = { nickname: nickname.trim() };
+    // 미설정(null)일 땐 PATCH에서 제외해 기존 서버 값을 덮어쓰지 않는다.
+    if (disabilityType !== null) {
+      payload.disability_type = disabilityType;
+    }
+
+    await updateUsers(payload);
     navigate(-1);
   };
 

@@ -66,7 +66,8 @@ export const useDeviceSection = () => {
 
   // API 응답(snake_case)을 UI 표시값으로 매핑한다.
   const name = device?.nickname ?? '';
-  const batteryLevel = device?.battery_level ?? 0;
+  // battery_level은 nullable. "정보 없음"을 0%로 왜곡하지 않도록 null을 그대로 둔다.
+  const batteryLevel = device?.battery_level ?? null;
   const isConnected = device?.is_connected ?? false;
   const connectionStatus = isConnected
     ? CONNECTION_STATUS.CONNECTED

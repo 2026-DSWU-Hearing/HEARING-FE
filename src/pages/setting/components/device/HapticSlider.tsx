@@ -69,16 +69,16 @@ const HapticSlider = ({
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'ArrowRight') {
-      const nextValue = clamp(value + 1);
-      onChange(nextValue);
-      onChangeEnd?.(nextValue);
-    }
-    if (event.key === 'ArrowLeft') {
-      const nextValue = clamp(value - 1);
-      onChange(nextValue);
-      onChangeEnd?.(nextValue);
-    }
+    const delta =
+      event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
+    if (delta === 0) return;
+
+    const nextValue = clamp(value + delta);
+    // 경계값(0/100)에서 키를 길게 눌러도 동일 값으로 PATCH가 반복되지 않게 막는다.
+    if (nextValue === value) return;
+
+    onChange(nextValue);
+    onChangeEnd?.(nextValue);
   };
 
   // thumb 중심을 채움 지점에 맞추기 위해 thumb 반지름만큼 왼쪽으로 보정한다.
