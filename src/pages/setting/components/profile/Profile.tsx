@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 
+import { useGetUsers } from '@/pages/setting/hooks/useGetUsers';
 import {
-  DISABILITY_TYPE,
   DISABILITY_TYPE_LABEL,
   type DisabilityTypeTypes,
 } from '@/pages/setting/constants/disabilityType';
@@ -9,13 +9,34 @@ import {
 const Profile = () => {
   const navigate = useNavigate();
 
-  // TODO(api): GET /users/me 로 프로필(닉네임·장애유형) 조회 후 대체한다.
-  const nickname = '뽀롱이';
-  const disabilityType: DisabilityTypeTypes = DISABILITY_TYPE.HARD_OF_HEARING;
+  const { data: user, isLoading, isError } = useGetUsers();
 
   const handleEditClick = () => {
     navigate('/setting/profile/edit');
   };
+
+  // TODO(skeleton): 6번 작업에서 SettingCardSkeleton으로 교체한다.
+  if (isLoading) {
+    return (
+      <div className="h-[5.75rem] animate-pulse rounded-xl bg-neutral-900" />
+    );
+  }
+
+  if (isError || !user) {
+    return (
+      <div className="flex items-center rounded-xl bg-neutral-900 px-base py-base body-base-regular text-secondary">
+        프로필을 불러오지 못했습니다
+      </div>
+    );
+  }
+
+  // disability_type은 서버 코드값(HARD_OF_HEARING/DEAF)과 일치한다고 가정한다.
+  // null이거나 매핑에 없는 값이면 '미설정'으로 표시한다.
+  const disabilityLabel =
+    user.disability_type !== null
+      ? (DISABILITY_TYPE_LABEL[user.disability_type as DisabilityTypeTypes] ??
+        '미설정')
+      : '미설정';
 
   return (
     <div className="flex items-center gap-base rounded-xl bg-neutral-900 px-base py-base">
@@ -27,10 +48,10 @@ const Profile = () => {
 
       <div className="flex min-w-0 gap-[0.44rem] flex-1 flex-col">
         <span className="heading-lg-semibold truncate text-primary">
-          {nickname}
+          {user.nickname}
         </span>
         <span className="heading-base-semibold text-secondary">
-          {DISABILITY_TYPE_LABEL[disabilityType]}
+          {disabilityLabel}
         </span>
       </div>
 
