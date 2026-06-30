@@ -8,12 +8,16 @@ import type {
 } from '@/shared/types/detectionTypes';
 
 // 인증 실패 시 서버가 보내는 close code. 토큰 문제이므로 재연결하지 않는다.
+// 단, 핸드셰이크가 거부되면 브라우저는 4401 대신 1006을 주기도 하므로 단독 신호로는 부족하다.
 const AUTH_FAILED_CLOSE_CODE = 4401;
 // 정상 종료(cleanup에서 우리가 의도적으로 닫을 때) 사용하는 close code.
 const NORMAL_CLOSE_CODE = 1000;
 // 재연결 백오프: 첫 1초에서 시작해 2배씩 늘리고 상한 30초.
 const INITIAL_RECONNECT_DELAY = 1000;
 const MAX_RECONNECT_DELAY = 30000;
+// 한 번도 연결에 성공하지 못한 채(onopen 없이) 닫히는 상황의 연속 재시도 상한.
+// 가짜/만료 토큰처럼 매번 같은 이유로 거부될 때 서버를 무한히 두드리지 않게 한다.
+const MAX_INITIAL_CONNECT_ATTEMPTS = 5;
 
 interface UseDetectionSocketParamsTypes {
   onDetection: (detection: DetectionTypes) => void;
@@ -21,7 +25,8 @@ interface UseDetectionSocketParamsTypes {
 
 // 실시간 소리 감지 알림을 받는 WebSocket을 연결하는 훅.
 // 토큰이 있을 때만 연결하고, detection 메시지를 받으면 onDetection 콜백으로 넘긴다.
-// 비정상 종료 시 지수 백오프로 재연결하되, 인증 실패(4401)는 재연결하지 않는다.
+// 비정상 종료 시 지수 백오프로 재연결하되, 인증 실패(4401) 또는 연결조차 못 한
+// 반복 거부(상한 초과)는 재연결하지 않아 잘못된 토큰으로 서버를 무한히 두드리지 않는다.
 export const useDetectionSocket = ({ onDetection }: UseDetectionSocketParamsTypes) => {
   // 콜백이 매 렌더마다 바뀌어도 effect를 재실행하지 않도록 ref로 최신 콜백을 참조한다.
   const onDetectionRef = useRef(onDetection);
@@ -37,6 +42,10 @@ export const useDetectionSocket = ({ onDetection }: UseDetectionSocketParamsType
     let reconnectDelay = INITIAL_RECONNECT_DELAY;
     // cleanup으로 의도적으로 닫은 경우 onclose에서 재연결하지 않도록 표시한다.
     let isUnmounted = false;
+    // 한 번이라도 연결(onopen)에 성공했는지. 성공 이력이 있으면 끊겨도 재연결한다.
+    let hasConnected = false;
+    // onopen 없이 연속으로 닫힌 횟수. 상한을 넘으면 인증/거부로 보고 재연결을 멈춘다.
+    let initialConnectAttempts = 0;
 
     const connect = () => {
       // 토큰에 쿼리스트링 예약 문자(+, /, = 등)가 있어도 깨지지 않도록 인코딩한다.
@@ -45,8 +54,10 @@ export const useDetectionSocket = ({ onDetection }: UseDetectionSocketParamsType
       socket = new WebSocket(url);
 
       socket.onopen = () => {
-        // 연결에 성공하면 백오프 지연을 초기화한다.
+        // 연결에 성공하면 성공 이력을 남기고 백오프/시도 횟수를 초기화한다.
+        hasConnected = true;
         reconnectDelay = INITIAL_RECONNECT_DELAY;
+        initialConnectAttempts = 0;
       };
 
       socket.onmessage = (event) => {
@@ -76,6 +87,16 @@ export const useDetectionSocket = ({ onDetection }: UseDetectionSocketParamsType
         if (event.code === AUTH_FAILED_CLOSE_CODE) {
           console.error('[WS] 인증 실패로 연결이 종료되었습니다.');
           return;
+        }
+
+        // 한 번도 연결에 성공하지 못한 채(onopen 미발생) 닫혔다면 핸드셰이크 거부로 본다.
+        // 브라우저가 4401 대신 1006을 주는 경우라, 상한까지만 시도하고 멈춰 무한 재연결을 막는다.
+        if (!hasConnected) {
+          initialConnectAttempts += 1;
+          if (initialConnectAttempts >= MAX_INITIAL_CONNECT_ATTEMPTS) {
+            console.error('[WS] 연결에 반복 실패하여 재연결을 중단합니다. (토큰/인증 확인 필요)');
+            return;
+          }
         }
 
         // 비정상/정상 종료 모두 지수 백오프로 재연결한다.
