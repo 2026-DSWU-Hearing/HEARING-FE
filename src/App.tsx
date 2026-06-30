@@ -26,10 +26,14 @@ function App() {
       showToast({ soundName: sound_name, categoryName: sound_category }),
   });
 
-  // 모드쪽 설정 페이지와 설정 하위 서브페이지에서는 네비게이션 숨김
+  // 모드쪽 설정 페이지, 설정 하위 서브페이지, 알림 페이지에서는 네비게이션 숨김
   // ('/setting' 메인은 '/setting/'에 걸리지 않아 탭바가 유지된다)
+  // 알림 페이지는 TopNavigation으로 진입/뒤로가기 하는 서브 페이지라 탭바를 숨긴다
+  // (어떤 탭도 active가 되지 않는 어정쩡한 상태를 방지).
   const hideNavigation =
-    pathname.startsWith('/modes/') || pathname.startsWith('/setting/');
+    pathname.startsWith('/modes/') ||
+    pathname.startsWith('/setting/') ||
+    pathname === '/notifications';
 
   return (
     <div className="app">
