@@ -20,6 +20,7 @@
 # 실시간 소리 감지 알림 (WebSocket)
 
 - [ ] **알림 탭 페이지 만들 때 고려할 것 — TanStack Query 캐시 갱신**: WS 감지 알림(`useDetectionSocket`) 수신 시 현재는 인앱 토스트만 띄움. 알림 내역/목록 페이지가 생기면, `onDetection` 콜백에서 알림 목록 관련 쿼리를 `invalidateQueries`(또는 `setQueryData`로 새 항목 추가)해 다른 화면도 최신화해야 함. 관련 목록 조회 API가 생긴 뒤 적용. (감지 결과 타입은 `src/shared/types/detectionTypes.ts`)
+- [ ] **로그인 구현 완료 후 WS 자동 연결 동작 확인**: `useDetectionSocket`은 `App`이 `getAccessToken()`으로 읽은 토큰을 prop으로 받고 `[token]` 의존성으로 연결한다. 로그인 성공 시 `useGoogleAuth`의 `navigate('/')`가 `App` 리렌더를 유발해 토큰이 새로 주입되며 WS가 연결되는 구조(#72). 로그인 미완성이라 코드만 갖춰둔 상태 → 로그인 완성 후 "로그인 직후 WS가 실제로 붙는지" 한 번 검증할 것. (로그인이 `navigate` 대신 같은 페이지 유지 방식으로 바뀌면 트리거 재검토 필요)
 
 # 커스텀 모달
 

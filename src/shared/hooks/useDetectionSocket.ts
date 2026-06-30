@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
 
-import { getAccessToken } from '@/pages/login/utils/tokenStorage';
 import { getWebSocketBaseUrl } from '@/shared/utils/getWebSocketBaseUrl';
 import type {
   DetectionMessageTypes,
@@ -20,6 +19,11 @@ const MAX_RECONNECT_DELAY = 30000;
 const MAX_INITIAL_CONNECT_ATTEMPTS = 5;
 
 interface UseDetectionSocketParamsTypes {
+  // 인증에 쓸 access token. 호출부(App)가 매 렌더마다 최신 값을 읽어 넘긴다.
+  // localStorage는 반응형이 아니라(값이 바뀌어도 리렌더가 안 일어남) 훅이 직접 읽으면
+  // 로그인 직후 토큰 변경을 감지하지 못한다. 그래서 라우트 변경 등으로 리렌더되는
+  // 호출부가 토큰을 주입하고, 토큰이 바뀌면(=의존성 변경) 그때 연결을 트리거한다.
+  token: string | null;
   onDetection: (detection: DetectionTypes) => void;
 }
 
@@ -27,14 +31,13 @@ interface UseDetectionSocketParamsTypes {
 // 토큰이 있을 때만 연결하고, detection 메시지를 받으면 onDetection 콜백으로 넘긴다.
 // 비정상 종료 시 지수 백오프로 재연결하되, 인증 실패(4401) 또는 연결조차 못 한
 // 반복 거부(상한 초과)는 재연결하지 않아 잘못된 토큰으로 서버를 무한히 두드리지 않는다.
-export const useDetectionSocket = ({ onDetection }: UseDetectionSocketParamsTypes) => {
+export const useDetectionSocket = ({ token, onDetection }: UseDetectionSocketParamsTypes) => {
   // 콜백이 매 렌더마다 바뀌어도 effect를 재실행하지 않도록 ref로 최신 콜백을 참조한다.
   const onDetectionRef = useRef(onDetection);
   onDetectionRef.current = onDetection;
 
   useEffect(() => {
-    const token = getAccessToken();
-    // 로그인 전(토큰 없음)에는 연결하지 않는다. 로그인 후 재마운트 시 연결된다.
+    // 로그인 전(토큰 없음)에는 연결하지 않는다. 토큰이 생겨 재호출되면 그때 연결된다.
     if (!token) return;
 
     let socket: WebSocket | null = null;
@@ -112,5 +115,6 @@ export const useDetectionSocket = ({ onDetection }: UseDetectionSocketParamsType
       if (reconnectTimer) clearTimeout(reconnectTimer);
       socket?.close(NORMAL_CLOSE_CODE);
     };
-  }, []);
+    // token이 바뀌면(로그인/로그아웃) 기존 연결을 정리하고 새 토큰으로 다시 연결한다.
+  }, [token]);
 };
