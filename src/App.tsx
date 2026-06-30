@@ -16,7 +16,7 @@ function App() {
   // (FCM 포그라운드 알림과 중복되지 않도록 백엔드가 앱 활성 시 WS로만 보낸다.)
   useDetectionSocket({
     onDetection: ({ sound_name, sound_category }) =>
-      showToast(`${sound_name} (${sound_category}) 감지됨`),
+      showToast({ soundName: sound_name, categoryName: sound_category }),
   });
 
   // 모드쪽 설정 페이지와 설정 하위 서브페이지에서는 네비게이션 숨김

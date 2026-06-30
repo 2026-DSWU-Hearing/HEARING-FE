@@ -13,15 +13,19 @@ import ToastViewport from '@/shared/components/toast/ToastViewport';
 
 export interface ToastItemTypes {
   id: number;
-  message: string;
+  soundName: string;
+  categoryName: string;
 }
 
+// 토스트에 띄울 감지 정보. id를 제외한 토스트 표시 데이터.
+export type ToastContentTypes = Omit<ToastItemTypes, 'id'>;
+
 interface ToastContextTypes {
-  showToast: (message: string) => void;
+  showToast: (content: ToastContentTypes) => void;
 }
 
 // 토스트가 화면에 떠 있는 시간(ms). 이후 자동으로 사라진다.
-const TOAST_DURATION = 3000;
+const TOAST_DURATION = 5000;
 
 const ToastContext = createContext<ToastContextTypes | null>(null);
 
@@ -49,11 +53,11 @@ export const ToastProvider = ({ children }: ToastProviderPropTypes) => {
   }, []);
 
   const showToast = useCallback(
-    (message: string) => {
+    (content: ToastContentTypes) => {
       const id = nextIdRef.current;
       nextIdRef.current += 1;
 
-      setToasts((prevToasts) => [...prevToasts, { id, message }]);
+      setToasts((prevToasts) => [...prevToasts, { id, ...content }]);
 
       const timer = setTimeout(() => removeToast(id), TOAST_DURATION);
       timersRef.current.set(id, timer);
