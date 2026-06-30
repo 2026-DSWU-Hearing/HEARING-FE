@@ -8,6 +8,8 @@ export const setAuthTokens = (accessToken: string, refreshToken: string) => {
   localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
 };
 
+export const getAccessToken = () => localStorage.getItem(ACCESS_TOKEN_KEY);
+
 export const removeAuthTokens = () => {
   localStorage.removeItem(ACCESS_TOKEN_KEY);
   localStorage.removeItem(REFRESH_TOKEN_KEY);
