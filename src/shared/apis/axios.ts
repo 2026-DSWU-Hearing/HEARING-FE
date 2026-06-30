@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+import { getAccessToken } from '@/pages/login/utils/tokenStorage';
+
 const http = axios.create({
   baseURL: import.meta.env.VITE_APP_BASE_URL, //추후 env에 백 배포 url 추가
   timeout: 5000,
@@ -12,7 +14,7 @@ const http = axios.create({
 // Request Interceptor 설정
 http.interceptors.request.use((config) => {
   // 서버에 요청 전에 localStorage에서 토큰을 가져와 헤더에 추가
-  const token = localStorage.getItem('token');
+  const token = getAccessToken();
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });

@@ -1,7 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app';
-import { getMessaging, getToken, onMessage } from 'firebase/messaging';
-import type { MessagePayload } from 'firebase/messaging';
+import { getMessaging, getToken } from 'firebase/messaging';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -85,8 +84,3 @@ export const requestFcmToken = async (): Promise<string | null> => {
 
   return getCurrentFcmToken();
 };
-
-// 앱이 foreground(탭 활성) 상태일 때 도착하는 메시지를 구독한다.
-// 반환된 함수를 호출하면 구독이 해제된다.
-export const onForegroundMessage = (callback: (payload: MessagePayload) => void) =>
-  onMessage(messaging, callback);
