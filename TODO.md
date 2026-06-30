@@ -10,12 +10,16 @@
 
 > 배경: 현재는 백엔드 `DEV_AUTH_BYPASS=true` 덕분에 인증 헤더 없이 토큰 등록이 됨. 로그인이 붙고 bypass가 false가 되면 인증 헤더 없는 요청은 401 → axios 인터셉터가 `/login`으로 리다이렉트함. 아래 작업으로 정식 인증 흐름으로 전환해야 함.
 
-- [ ] **access token 저장 연결**: 로그인 성공 시 받은 access token을 `localStorage.setItem('token', ...)`에 저장. → `src/shared/apis/axios.ts`의 요청 인터셉터가 이미 `localStorage.token`을 읽어 `Authorization: Bearer`로 자동 부착하므로, 저장만 하면 FCM 토큰 등록 요청도 자동으로 인증됨.
+- [x] **access token 저장 연결**: 로그인 성공 시 `setAuthTokens`가 `ACCESS_TOKEN_KEY('accessToken')`로 저장하고, `src/shared/apis/axios.ts` 요청 인터셉터가 `getAccessToken()`으로 읽어 `Authorization: Bearer`로 자동 부착함. (#72에서 axios가 `'token'` 키를 읽던 불일치 버그 수정 완료. WebSocket 인증도 같은 `getAccessToken()` 재사용.)
 - [ ] **`/login` 라우트 추가**: `axios.ts` 응답 인터셉터가 401 시 `window.location.href = '/login'`으로 보내는데 현재 해당 라우트가 없어 "No routes matched" 경고 발생. 로그인 페이지 라우트 등록 필요. (`src/routes/AppRouter.tsx`)
 - [ ] **FCM 토큰 등록 시점 이동**: 설정 페이지 버튼 → 로그인/디바이스 연결 플로우 안으로 이동. "로그인 + 디바이스 연결 완료" 후 알림 허용 버튼을 띄우고, 허용 시 `requestFcmToken` → `postFcmToken` 호출. (현 `useFcmToken` 훅 그대로 재사용 가능)
 - [ ] **토큰 갱신/만료 대응**: FCM 토큰은 변경될 수 있음. 로그인할 때마다 또는 앱 진입 시 토큰 재발급 후 서버에 재전송하는 정책 검토. 로그아웃 시 서버에서 토큰 제거(엔드포인트 백엔드와 협의).
 
-- [ ] (보류) FCM foreground 알림 표시 - `title` 없는 메시지 대응. 현재 `useFcmToken.ts`의 `onForegroundMessage` 핸들러가 `if (... && title)` 조건이라 `notification.title`이 없으면 알림이 안 뜸. → 서버 연동 시 `data`-only 페이로드를 쓰면 `notification.title`이 비어 알림이 누락될 수 있음. `new Notification(title ?? '알림', ...)` 형태의 fallback 필요. 서버 페이로드 구조(`data` 키) 확정 후 background SW(`firebase-messaging-sw.js`)와 함께 반영.
+- [x] ~~(보류) FCM foreground 알림 표시~~ → **해소(#72)**: 앱이 켜져 있을 때(포그라운드)는 FCM 대신 WebSocket(`useDetectionSocket`) 인앱 토스트로 전환. FCM+WS 알림 중복 문제 해결. FCM 토큰 등록/백그라운드 SW(`firebase-messaging-sw.js`)는 그대로 유지(앱 꺼졌을 때 알림용).
+
+# 실시간 소리 감지 알림 (WebSocket)
+
+- [ ] **알림 탭 페이지 만들 때 고려할 것 — TanStack Query 캐시 갱신**: WS 감지 알림(`useDetectionSocket`) 수신 시 현재는 인앱 토스트만 띄움. 알림 내역/목록 페이지가 생기면, `onDetection` 콜백에서 알림 목록 관련 쿼리를 `invalidateQueries`(또는 `setQueryData`로 새 항목 추가)해 다른 화면도 최신화해야 함. 관련 목록 조회 API가 생긴 뒤 적용. (감지 결과 타입은 `src/shared/types/detectionTypes.ts`)
 
 # 커스텀 모달
 
