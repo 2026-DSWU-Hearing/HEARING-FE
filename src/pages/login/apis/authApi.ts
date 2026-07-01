@@ -12,7 +12,6 @@ const authApi = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true,
 });
 
 export const postGoogleAuth = async ({

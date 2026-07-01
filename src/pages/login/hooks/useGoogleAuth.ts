@@ -1,9 +1,9 @@
+import axios from 'axios';
+import type { CredentialResponse } from '@react-oauth/google';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { CredentialResponse } from '@react-oauth/google';
 
 import { postGoogleAuth } from '../apis/authApi';
-import { setAuthTokens } from '../utils/tokenStorage';
 
 export const useGoogleAuth = () => {
   const navigate = useNavigate();
@@ -13,24 +13,40 @@ export const useGoogleAuth = () => {
     credentialResponse: CredentialResponse,
   ) => {
     try {
+      console.log('구글 로그인 성공 응답:', credentialResponse);
+      setIsGoogleLoginLoading(true);
+
       const idToken = credentialResponse.credential;
+      console.log('idToken:', idToken);
 
       if (!idToken) {
-        alert('구글 로그인 토큰을 받지 못했습니다.');
+        alert('구글 로그인 토큰을 가져오지 못했습니다.');
         return;
       }
 
-      setIsGoogleLoginLoading(true);
-
-      const { access_token, refresh_token } = await postGoogleAuth({
+      const data = await postGoogleAuth({
         id_token: idToken,
       });
 
-      setAuthTokens(access_token, refresh_token);
+      console.log('백엔드 로그인 응답:', data);
+
+      localStorage.setItem('accessToken', data.access_token);
+      localStorage.setItem('refreshToken', data.refresh_token);
+      localStorage.setItem('tokenType', data.token_type);
+      localStorage.setItem('loginType', 'google');
 
       navigate('/');
     } catch (error) {
-      console.error(error);
+      if (axios.isAxiosError(error)) {
+        console.error(
+          '백엔드 구글 로그인 실패 status:',
+          error.response?.status,
+        );
+        console.error('백엔드 구글 로그인 실패 data:', error.response?.data);
+      } else {
+        console.error('구글 로그인 실패:', error);
+      }
+
       alert('구글 로그인에 실패했습니다.');
     } finally {
       setIsGoogleLoginLoading(false);
@@ -38,7 +54,8 @@ export const useGoogleAuth = () => {
   };
 
   const handleGoogleLoginError = () => {
-    alert('구글 로그인이 취소되었거나 실패했습니다.');
+    console.error('구글 인증 자체 실패');
+    alert('구글 로그인에 실패했습니다.');
   };
 
   return {
