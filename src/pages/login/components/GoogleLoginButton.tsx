@@ -16,10 +16,10 @@ const GoogleLoginButton = ({
 }: GoogleLoginButtonPropTypes) => {
   return (
     <div className="w-full">
-      <div className="relative h-[48px] w-full overflow-hidden rounded-full bg-[#1f211f]">
+      <div className="relative h-[48px] w-full overflow-hidden rounded-full bg-neutral-900">
         <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center gap-[10px]">
           <img src={googleIcon} alt="Google" className="h-[18px] w-[18px]" />
-          <span className="text-[14px] font-medium text-white">
+          <span className="text-[14px] font-medium text-[#e8e8e8]">
             Google로 로그인
           </span>
         </div>
