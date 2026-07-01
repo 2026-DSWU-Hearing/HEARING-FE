@@ -2,9 +2,11 @@ import { useNavigate } from 'react-router-dom';
 
 import GoogleLoginButton from './components/GoogleLoginButton';
 import LoginLogo from './components/LoginLogo';
-import PasswordInput from './components/PasswordInput';
+// import PasswordInput from './components/PasswordInput';
 import { useGoogleAuth } from './hooks/useGoogleAuth';
-import { useLoginForm } from './hooks/useLoginForm';
+//import { useLoginForm } from './hooks/useLoginForm';
+
+import { postGuestLogin } from './apis/authApi';
 
 import './login.css';
 
