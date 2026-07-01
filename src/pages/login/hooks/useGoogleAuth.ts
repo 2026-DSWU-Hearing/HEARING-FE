@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+//import { useNavigate } from 'react-router-dom';
 import type { CredentialResponse } from '@react-oauth/google';
 
 import { postGoogleAuth } from '../apis/authApi';
 import { setAuthTokens } from '../utils/tokenStorage';
 
 export const useGoogleAuth = () => {
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
   const [isGoogleLoginLoading, setIsGoogleLoginLoading] = useState(false);
 
   const handleGoogleLoginSuccess = async (
@@ -28,7 +28,9 @@ export const useGoogleAuth = () => {
 
       setAuthTokens(access_token, refresh_token);
 
-      navigate('/');
+      // 로그인 api 정상 작동 후 온보딩 페이지로 이동
+      //navigate('/onboarding/nickname');
+
     } catch (error) {
       console.error(error);
       alert('구글 로그인에 실패했습니다.');
