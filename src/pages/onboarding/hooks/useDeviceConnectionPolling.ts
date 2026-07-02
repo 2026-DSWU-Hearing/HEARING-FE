@@ -11,7 +11,7 @@ export const useDeviceConnectionPolling = () => {
   const navigate = useNavigate();
   const hasNavigatedRef = useRef(false);
 
-  const accessToken = localStorage.getItem('accessToken');
+  const accessToken = getAccessToken();
 
   const setHardwareConnected = useOnboardingStore(
     (state) => state.setHardwareConnected,
