@@ -27,13 +27,7 @@ const HwCompletePage = () => {
             메인 화면으로 이동
           </LongConfirmButton>
 
-          <button
-            type="button"
-            onClick={() => navigate('/')}
-            className="heading-base-semibold flex h-[42px] w-full items-center justify-center rounded-pill bg-disabled text-neutral-800"
-          >
-            홈으로 이동
-          </button>
+        
         </div>
       }
     >
