@@ -51,17 +51,20 @@ const TopNavigation = ({
   }[rightVariant];
 
   return (
-    <header className="grid w-full grid-cols-[64px_1fr_64px] items-center pt-[2.75rem] px-[1.03rem] mb-2xl">
+    <header className="mb-2xl grid w-full grid-cols-[64px_1fr_64px] items-center px-[1.03rem] pt-[2.75rem]">
       <button
         type="button"
         onClick={handleBackClick}
         aria-label="이전 페이지로 이동"
-        className="text-primary h-[1.5rem] w-[1.5rem]"
+        className="aspect-square h-[32px] w-[32px] text-primary"
       >
         {backIconSrc ? (
-          <img src={backIconSrc} alt="" className="h-full w-full" />
+          <img src={backIconSrc} alt="" className="h-full w-ful p-[5px]" />
         ) : (
-          <FontAwesomeIcon icon={faAngleLeft} />
+          <FontAwesomeIcon
+            icon={faAngleLeft}
+            className="h-full w-full p-[5px]"
+          />
         )}
       </button>
 

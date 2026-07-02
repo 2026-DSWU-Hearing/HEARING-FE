@@ -33,6 +33,7 @@ function App() {
   const hideNavigation =
     pathname.startsWith('/modes/') ||
     pathname.startsWith('/setting/') ||
+    pathname.startsWith('/onboarding') ||
     pathname === '/notifications';
 
   return (
