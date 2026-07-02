@@ -1,6 +1,11 @@
 import { createContext } from 'react';
 
-import type { OnboardingContextTypes } from '../types/onboardingTypes';
+import type { OnboardingFormTypes } from '@/pages/onboarding/types/onboardingTypes';
+
+interface OnboardingFormContextTypes {
+  onboardingForm: OnboardingFormTypes;
+  updateOnboardingForm: (form: Partial<OnboardingFormTypes>) => void;
+}
 
 export const OnboardingFormContext =
-  createContext<OnboardingContextTypes | null>(null);
+  createContext<OnboardingFormContextTypes | null>(null);

@@ -1,3 +1,4 @@
+// src/pages/onboarding/hooks/useDeviceConnectionPolling.ts
 import { useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -10,6 +11,8 @@ export const useDeviceConnectionPolling = () => {
   const navigate = useNavigate();
   const hasNavigatedRef = useRef(false);
 
+  const accessToken = localStorage.getItem('accessToken');
+
   const setHardwareConnected = useOnboardingStore(
     (state) => state.setHardwareConnected,
   );
@@ -20,14 +23,18 @@ export const useDeviceConnectionPolling = () => {
   const { data: devices, isError } = useQuery({
     queryKey: ['devices'],
     queryFn: getDevices,
-    refetchInterval: DEVICE_POLLING_INTERVAL_MS,
+    enabled: Boolean(accessToken),
+    refetchInterval: accessToken ? DEVICE_POLLING_INTERVAL_MS : false,
     refetchOnWindowFocus: false,
+    retry: false,
+    throwOnError: false,
   });
 
   useEffect(() => {
     if (hasNavigatedRef.current) return;
+    if (!Array.isArray(devices)) return;
 
-    const connectedDevice = devices?.find((device) => device.is_connected);
+    const connectedDevice = devices.find((device) => device.is_connected);
 
     if (!connectedDevice) return;
 

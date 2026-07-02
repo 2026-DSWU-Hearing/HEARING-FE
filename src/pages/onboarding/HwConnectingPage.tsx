@@ -1,10 +1,11 @@
+
 import { useConnectingAnimation } from '@/pages/onboarding/hooks/useConnectingAnimation';
 import { useDeviceConnectionPolling } from '@/pages/onboarding/hooks/useDeviceConnectionPolling';
 
 const HwConnectingPage = () => {
   const currentFrame = useConnectingAnimation();
 
-  useDeviceConnectionPolling();
+  // useDeviceConnectionPolling();
 
   return (
     <main className="flex min-h-dvh w-full justify-center bg-neutral-950 text-primary">
