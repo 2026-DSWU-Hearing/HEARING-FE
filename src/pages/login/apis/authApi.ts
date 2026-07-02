@@ -1,23 +1,15 @@
-import axios from 'axios';
+import http from '@/shared/apis/axios';
 
 import type {
   GoogleAuthRequestTypes,
   GoogleAuthResponseTypes,
   GuestLoginResponseTypes,
-} from '../types/loginTypes';
-
-const authApi = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
-  timeout: 5000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+} from '@/pages/login/types/loginTypes';
 
 export const postGoogleAuth = async ({
   id_token,
 }: GoogleAuthRequestTypes): Promise<GoogleAuthResponseTypes> => {
-  const response = await authApi.post<GoogleAuthResponseTypes>('/auth/google', {
+  const response = await http.post<GoogleAuthResponseTypes>('/auth/google', {
     id_token,
   });
 
@@ -25,7 +17,7 @@ export const postGoogleAuth = async ({
 };
 
 export const postGuestLogin = async (): Promise<GuestLoginResponseTypes> => {
-  const response = await authApi.post<GuestLoginResponseTypes>('/auth/guest');
+  const response = await http.post<GuestLoginResponseTypes>('/auth/guest');
 
   return response.data;
 };

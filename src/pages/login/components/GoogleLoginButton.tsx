@@ -1,7 +1,7 @@
 import { GoogleLogin } from '@react-oauth/google';
 import type { CredentialResponse } from '@react-oauth/google';
 
-import googleIcon from '@/shared/assets/icons/login/ic_google_gray.svg';
+import googleIcon from '@/shared/assets/icons/login/google.svg';
 
 interface GoogleLoginButtonPropTypes {
   isGoogleLoginLoading: boolean;
@@ -16,10 +16,10 @@ const GoogleLoginButton = ({
 }: GoogleLoginButtonPropTypes) => {
   return (
     <div className="w-full">
-      <div className="relative h-[48px] w-full overflow-hidden rounded-full bg-neutral-900">
+      <div className="relative h-[48px] w-full overflow-hidden rounded-full bg-neutral-900 focus-within:ring-2 focus-within:ring-primary-400">
         <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center gap-[10px]">
-          <img src={googleIcon} alt="Google" className="h-[18px] w-[18px]" />
-          <span className="text-[14px] font-medium text-[#e8e8e8]">
+          <img src={googleIcon} alt="" className="h-[18px] w-[18px]" />
+          <span className="body-base-medium text-secondary">
             Google로 로그인
           </span>
         </div>
