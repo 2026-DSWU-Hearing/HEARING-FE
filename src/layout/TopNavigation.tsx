@@ -13,26 +13,35 @@ interface RightIconButtonTypes {
 }
 
 interface TopNavigationPropTypes {
-  title: string;
+  title?: string;
   rightText?: string;
   onRightClick?: () => void;
   rightVariant?: 'default' | 'active';
   isRightDisabled?: boolean;
   // rightIconButton 이 있으면 rightText 보다 우선해서 렌더한다.
   rightIconButton?: RightIconButtonTypes;
+  onBackClick?: () => void;
+  backIconSrc?: string;
 }
 
 const TopNavigation = ({
-  title,
+  title = '',
   rightText,
   onRightClick,
   rightVariant = 'default',
   isRightDisabled = false,
   rightIconButton,
+  onBackClick,
+  backIconSrc,
 }: TopNavigationPropTypes) => {
   const navigate = useNavigate();
 
   const handleBackClick = () => {
+    if (onBackClick) {
+      onBackClick();
+      return;
+    }
+
     navigate(-1);
   };
 
@@ -49,7 +58,11 @@ const TopNavigation = ({
         aria-label="이전 페이지로 이동"
         className="text-primary h-[1.5rem] w-[1.5rem]"
       >
-        <FontAwesomeIcon icon={faAngleLeft} />
+        {backIconSrc ? (
+          <img src={backIconSrc} alt="" className="h-full w-full" />
+        ) : (
+          <FontAwesomeIcon icon={faAngleLeft} />
+        )}
       </button>
 
       <h1 className="text-center heading-lg-semibold text-primary">{title}</h1>

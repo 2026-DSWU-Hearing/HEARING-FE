@@ -1,4 +1,4 @@
-import { Outlet, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 
 import Communication from '@/pages/communication/Communication';
 import Home from '@/pages/home/Home';
@@ -6,9 +6,6 @@ import ModeCreatePage from '@/pages/home/ModeCreatePage';
 import ModeEditPage from '@/pages/home/ModeEditPage';
 import NotificationPage from '@/pages/home/NotificationPage';
 import LiveSound from '@/pages/liveSound/LiveSound';
-import NotificationSettingPage from '@/pages/setting/NotificationSettingPage';
-import ProfileEditPage from '@/pages/setting/ProfileEditPage';
-import Setting from '@/pages/setting/Setting';
 
 import Login from '@/pages/login/Login';
 import DisabilityPage from '@/pages/onboarding/DisabilityPage';
@@ -17,15 +14,10 @@ import HwConnectPage from '@/pages/onboarding/HwConnectPage';
 import HwConnectingPage from '@/pages/onboarding/HwConnectingPage';
 import NicknamePage from '@/pages/onboarding/NicknamePage';
 import TermsPage from '@/pages/onboarding/TermsPage';
-import OnboardingFormProvider from '@/pages/onboarding/components/OnboardingFormProvider';
 
-const OnboardingProviderLayout = () => {
-  return (
-    <OnboardingFormProvider>
-      <Outlet />
-    </OnboardingFormProvider>
-  );
-};
+import NotificationSettingPage from '@/pages/setting/NotificationSettingPage';
+import ProfileEditPage from '@/pages/setting/ProfileEditPage';
+import Setting from '@/pages/setting/Setting';
 
 const AppRouter = () => {
   return (
@@ -33,14 +25,18 @@ const AppRouter = () => {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
 
-      <Route path="/onboarding" element={<OnboardingProviderLayout />}>
-        <Route path="nickname" element={<NicknamePage />} />
-        <Route path="disability" element={<DisabilityPage />} />
-        <Route path="terms" element={<TermsPage />} />
-        <Route path="hardware" element={<HwConnectPage />} />
-        <Route path="hardware/connecting" element={<HwConnectingPage />} />
-        <Route path="hardware/complete" element={<HwCompletePage />} />
-      </Route>
+      <Route path="/onboarding/nickname" element={<NicknamePage />} />
+      <Route path="/onboarding/disability" element={<DisabilityPage />} />
+      <Route path="/onboarding/terms" element={<TermsPage />} />
+      <Route path="/onboarding/hardware" element={<HwConnectPage />} />
+      <Route
+        path="/onboarding/hardware/connecting"
+        element={<HwConnectingPage />}
+      />
+      <Route
+        path="/onboarding/hardware/complete"
+        element={<HwCompletePage />}
+      />
 
       <Route path="/modes/new" element={<ModeCreatePage />} />
       <Route path="/modes/:modeId/settings" element={<ModeEditPage />} />
