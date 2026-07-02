@@ -26,10 +26,13 @@ const INITIAL_AGREEMENTS: Record<AgreementId, boolean> = {
 export const useOnboardingStore = create<OnboardingState>((set) => ({
   nickname: '',
   disabilityType: null,
-  agreements: INITIAL_AGREEMENTS,
+  agreements: { ...INITIAL_AGREEMENTS },
   isHardwareConnected: false,
+
   setNickname: (nickname) => set({ nickname }),
+
   setDisabilityType: (disabilityType) => set({ disabilityType }),
+
   toggleAgreement: (agreementId) =>
     set((state) => ({
       agreements: {
@@ -37,6 +40,7 @@ export const useOnboardingStore = create<OnboardingState>((set) => ({
         [agreementId]: !state.agreements[agreementId],
       },
     })),
+
   agreeAgreement: (agreementId) =>
     set((state) => ({
       agreements: {
@@ -44,7 +48,9 @@ export const useOnboardingStore = create<OnboardingState>((set) => ({
         [agreementId]: true,
       },
     })),
+
   setHardwareConnected: (isHardwareConnected) => set({ isHardwareConnected }),
+
   resetOnboarding: () =>
     set({
       nickname: '',

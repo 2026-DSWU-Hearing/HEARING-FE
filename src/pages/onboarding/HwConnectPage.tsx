@@ -14,6 +14,7 @@ const HwConnectPage = () => {
   );
 
   const handleConnectButtonClick = () => {
+    setHardwareConnected(false);
     navigate('/onboarding/hardware/connecting');
   };
 

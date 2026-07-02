@@ -1,11 +1,21 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import LongConfirmButton from '@/pages/onboarding/components/LongConfirmButton';
 import OnboardingLayout from '@/pages/onboarding/components/OnboardingLayout';
-import hearingIcon from '@/shared/assets/brand/hearing.svg';
+import { useOnboardingStore } from '@/pages/onboarding/stores/useOnboardingStore';
+import hearingIcon from '@/shared/assets/icons/onboarding/hearing.svg';
 
 const HwCompletePage = () => {
   const navigate = useNavigate();
+
+  const setHardwareConnected = useOnboardingStore(
+    (state) => state.setHardwareConnected,
+  );
+
+  useEffect(() => {
+    setHardwareConnected(true);
+  }, [setHardwareConnected]);
 
   return (
     <OnboardingLayout
@@ -16,27 +26,30 @@ const HwCompletePage = () => {
           <LongConfirmButton onClick={() => navigate('/')}>
             메인 화면으로 이동
           </LongConfirmButton>
+
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            className="heading-base-semibold flex h-[42px] w-full items-center justify-center rounded-pill bg-disabled text-neutral-800"
+          >
+            홈으로 이동
+          </button>
         </div>
       }
     >
       <div className="relative mx-auto mt-[96px] h-[292px] w-[292px] overflow-visible">
-        {/* 양쪽 희미한 원 */}
         <div className="absolute left-[-146px] top-1/2 h-[292px] w-[292px] -translate-y-1/2 rounded-[292px] bg-[radial-gradient(47.15%_41.1%_at_47.6%_50%,rgba(255,226,110,0.20)_0%,rgba(255,226,110,0)_100%)]" />
         <div className="absolute right-[-146px] top-1/2 h-[292px] w-[292px] -translate-y-1/2 rounded-[292px] bg-[radial-gradient(47.15%_41.1%_at_47.6%_50%,rgba(255,226,110,0.20)_0%,rgba(255,226,110,0)_100%)]" />
 
-        {/* 가운데 가장 큰 원  */}
         <div className="absolute left-1/2 top-1/2 z-10 h-[290px] w-[290px] -translate-x-1/2 -translate-y-1/2 rounded-[290px] bg-[radial-gradient(86.06%_75%_at_75%_50%,rgba(255,226,110,0)_75.96%,rgba(255,226,110,0.50)_100%)]" />
         <div className="absolute left-1/2 top-1/2 z-10 h-[290px] w-[290px] -translate-x-1/2 -translate-y-1/2 scale-x-[-1] rounded-[290px] bg-[radial-gradient(86.06%_75%_at_75%_50%,rgba(255,226,110,0)_75.96%,rgba(255,226,110,0.50)_100%)]" />
 
-        {/* 가운데 중간 원  */}
         <div className="absolute left-1/2 top-1/2 z-20 h-[214px] w-[214px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(86.06%_75%_at_75%_50%,rgba(255,226,110,0)_75.96%,rgba(255,226,110,0.35)_100%)]" />
         <div className="absolute left-1/2 top-1/2 z-20 h-[214px] w-[214px] -translate-x-1/2 -translate-y-1/2 scale-x-[-1] rounded-full bg-[radial-gradient(86.06%_75%_at_75%_50%,rgba(255,226,110,0)_75.96%,rgba(255,226,110,0.35)_100%)]" />
 
-        {/* 가운데 작은 원 */}
         <div className="absolute left-1/2 top-1/2 z-30 h-[152px] w-[152px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(75%_75%_at_75%_50%,rgba(255,226,110,0)_75.96%,rgba(255,226,110,0.15)_100%)]" />
         <div className="absolute left-1/2 top-1/2 z-30 h-[152px] w-[152px] -translate-x-1/2 -translate-y-1/2 scale-x-[-1] rounded-full bg-[radial-gradient(75%_75%_at_75%_50%,rgba(255,226,110,0)_75.96%,rgba(255,226,110,0.15)_100%)]" />
 
-        {/* 가운데 로고 */}
         <img
           src={hearingIcon}
           alt=""
