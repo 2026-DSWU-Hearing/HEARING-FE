@@ -1,13 +1,8 @@
+import type {
+  AgreementId,
+  AgreementItemTypes,
+} from '@/pages/onboarding/constants/termsAgreementConstants';
 import rightArrowIcon from '@/shared/assets/icons/onboarding/right-arrow.svg';
-
-export type AgreementId = 'service' | 'privacy' | 'sensitive' | 'notification';
-
-export interface AgreementItemTypes {
-  id: AgreementId;
-  label: string;
-  isRequired: boolean;
-  detailPath: string;
-}
 
 interface TermsAgreementListPropTypes {
   agreements: AgreementItemTypes[];
@@ -36,14 +31,19 @@ const TermsAgreementList = ({
               className="flex flex-1 items-center gap-xs text-left"
             >
               <span
-                className="
-    flex h-[20px] w-[20px] shrink-0 items-center justify-center
-    rounded-[12px] border border-disabled bg-neutral-200 p-[4px]
-  "
+                className="flex h-[20px] w-[20px] shrink-0 items-center justify-center rounded-[12px] border border-disabled bg-neutral-200 p-[4px]"
                 aria-hidden="true"
               >
                 {isChecked && (
-                  <span className="block aspect-square h-[12px] w-[12px] shrink-0 rounded-full bg-[#DF9A00]" />
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 12 12"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <circle cx="6" cy="6" r="6" fill="#DF9A00" />
+                  </svg>
                 )}
               </span>
 

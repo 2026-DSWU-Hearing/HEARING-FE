@@ -4,37 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import LongConfirmButton from '@/pages/onboarding/components/LongConfirmButton';
 import OnboardingLayout from '@/pages/onboarding/components/OnboardingLayout';
 import TermsAgreementList from '@/pages/onboarding/components/TermsAgreementList';
-import type {
-  AgreementId,
-  AgreementItemTypes,
-} from '@/pages/onboarding/components/TermsAgreementList';
-
-const AGREEMENT_ITEMS: AgreementItemTypes[] = [
-  {
-    id: 'service',
-    label: '서비스 이용약관 동의',
-    isRequired: true,
-    detailPath: '/onboarding/terms/service',
-  },
-  {
-    id: 'privacy',
-    label: '개인정보 수집 및 이용 동의',
-    isRequired: true,
-    detailPath: '/onboarding/terms/privacy',
-  },
-  {
-    id: 'sensitive',
-    label: '민감정보 수집 및 이용 동의',
-    isRequired: true,
-    detailPath: '/onboarding/terms/sensitive',
-  },
-  {
-    id: 'notification',
-    label: '소리 필터 및 모드 알림 수신 동의',
-    isRequired: false,
-    detailPath: '/onboarding/terms/notification',
-  },
-];
+import {
+  AGREEMENT_ITEMS,
+  type AgreementId,
+} from '@/pages/onboarding/constants/termsAgreementConstants';
 
 const TermsPage = () => {
   const navigate = useNavigate();
