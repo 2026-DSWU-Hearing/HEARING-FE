@@ -10,3 +10,5 @@ export interface AuthTokenResponseTypes {
 
 export type GoogleAuthResponseTypes = AuthTokenResponseTypes;
 export type GuestLoginResponseTypes = AuthTokenResponseTypes;
+
+export type LoginTypeTypes = 'guest' | 'google';
