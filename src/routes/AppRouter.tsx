@@ -14,6 +14,7 @@ import HwConnectPage from '@/pages/onboarding/HwConnectPage';
 import HwConnectingPage from '@/pages/onboarding/HwConnectingPage';
 import NicknamePage from '@/pages/onboarding/NicknamePage';
 import TermsPage from '@/pages/onboarding/TermsPage';
+import TermsDetailPage from '@/pages/onboarding/TermsDetailPage';
 
 import NotificationSettingPage from '@/pages/setting/NotificationSettingPage';
 import ProfileEditPage from '@/pages/setting/ProfileEditPage';
@@ -28,6 +29,10 @@ const AppRouter = () => {
       <Route path="/onboarding/nickname" element={<NicknamePage />} />
       <Route path="/onboarding/disability" element={<DisabilityPage />} />
       <Route path="/onboarding/terms" element={<TermsPage />} />
+      <Route
+        path="/onboarding/terms/:agreementId"
+        element={<TermsDetailPage />}
+      />
       <Route path="/onboarding/hardware" element={<HwConnectPage />} />
       <Route
         path="/onboarding/hardware/connecting"
