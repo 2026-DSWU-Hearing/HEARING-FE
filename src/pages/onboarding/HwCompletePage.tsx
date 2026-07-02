@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import LongConfirmButton from '@/pages/onboarding/components/LongConfirmButton';
 import OnboardingLayout from '@/pages/onboarding/components/OnboardingLayout';
 import { useOnboardingStore } from '@/pages/onboarding/stores/useOnboardingStore';
-import hearingIcon from '@/shared/assets/icons/onboarding/hearing.svg';
+import hearingIcon from '@/shared/assets/brand/hearing.svg';
 
 const HwCompletePage = () => {
   const navigate = useNavigate();
