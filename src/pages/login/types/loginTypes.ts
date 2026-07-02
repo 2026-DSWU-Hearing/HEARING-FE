@@ -1,13 +1,14 @@
-export interface LoginFormTypes {
-  email: string;
-  password: string;
-}
-
 export interface GoogleAuthRequestTypes {
   id_token: string;
 }
 
-export interface GoogleAuthResponseTypes {
+export interface AuthTokenResponseTypes {
   access_token: string;
   refresh_token: string;
+  token_type: string;
 }
+
+export type GoogleAuthResponseTypes = AuthTokenResponseTypes;
+export type GuestLoginResponseTypes = AuthTokenResponseTypes;
+
+export type LoginTypeTypes = 'guest' | 'google';
