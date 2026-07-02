@@ -1,11 +1,26 @@
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
+
+import TermsDetailLayout from '@/pages/onboarding/components/TermsDetailLayout';
+import { AGREEMENT_ITEMS } from '@/pages/onboarding/constants/termsAgreementConstants';
+
 const TermsDetailPage = () => {
+  const navigate = useNavigate();
+  const { agreementId } = useParams();
+
+  const agreement = AGREEMENT_ITEMS.find(({ id }) => id === agreementId);
+
+  if (!agreement) {
+    return <Navigate to="/onboarding/terms" replace />;
+  }
+
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full">
-      <h1 className="text-2xl font-bold">Terms Detail Page</h1>
-      <p className="mt-4 text-center">
-        내용 앙
-      </p>
-    </div>
+    <TermsDetailLayout
+      title={agreement.detailTitle}
+      onBackClick={() => navigate('/onboarding/terms')}
+    >
+      {agreement.detailContent}
+    </TermsDetailLayout>
   );
 };
+
 export default TermsDetailPage;

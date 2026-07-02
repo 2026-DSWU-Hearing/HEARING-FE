@@ -15,7 +15,7 @@ export const AGREEMENT_ITEMS: AgreementItemTypes[] = [
     label: '서비스 이용약관 동의',
     isRequired: true,
     detailPath: '/onboarding/terms/service',
-    detailTitle: '서비스 이용약관',
+    detailTitle: '서비스 이용약관 동의',
     detailContent: `HEARING은 사용자의 청각 보조를 돕기 위해 소리 필터, 모드 설정, 실시간 소리 감지, 양방향 소통 기능 등을 제공하는 서비스입니다.
 
 이용자는 HEARING 서비스를 이용함에 있어 다음 사항을 준수해야 합니다.

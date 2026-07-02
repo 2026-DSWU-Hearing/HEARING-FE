@@ -13,7 +13,7 @@ const TermsDetailLayout = ({
   children,
 }: TermsDetailLayoutPropTypes) => {
   return (
-    <OnboardingLayout title={title} onBackClick={onBackClick}>
+    <OnboardingLayout navigationTitle={title} onBackClick={onBackClick}>
       <section className="mt-lg flex flex-1 flex-col overflow-y-auto">
         <p className="body-base-regular whitespace-pre-line text-secondary">
           {children}
