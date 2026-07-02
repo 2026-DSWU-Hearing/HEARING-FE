@@ -1,55 +1,20 @@
-import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import LongConfirmButton from '@/pages/onboarding/components/LongConfirmButton';
 import OnboardingLayout from '@/pages/onboarding/components/OnboardingLayout';
 import TermsAgreementList from '@/pages/onboarding/components/TermsAgreementList';
-import {
-  AGREEMENT_ITEMS,
-  type AgreementId,
-} from '@/pages/onboarding/constants/termsAgreementConstants';
-
-interface TermsLocationStateTypes {
-  agreedAgreementId?: AgreementId;
-}
+import { AGREEMENT_ITEMS } from '@/pages/onboarding/constants/termsAgreementConstants';
+import { useOnboardingStore } from '@/pages/onboarding/stores/useOnboardingStore';
 
 const TermsPage = () => {
   const navigate = useNavigate();
-  const location = useLocation();
 
-  const { agreedAgreementId } =
-    (location.state as TermsLocationStateTypes | null) ?? {};
-
-  const [checkedAgreements, setCheckedAgreements] = useState<
-    Record<AgreementId, boolean>
-  >({
-    service: false,
-    privacy: false,
-    sensitive: false,
-    notification: false,
-  });
-
-  useEffect(() => {
-    if (!agreedAgreementId) return;
-
-    setCheckedAgreements((prevAgreements) => ({
-      ...prevAgreements,
-      [agreedAgreementId]: true,
-    }));
-
-    navigate('/onboarding/terms', { replace: true, state: null });
-  }, [agreedAgreementId, navigate]);
+  const agreements = useOnboardingStore((state) => state.agreements);
+  const toggleAgreement = useOnboardingStore((state) => state.toggleAgreement);
 
   const isNextButtonDisabled = AGREEMENT_ITEMS.some(
-    ({ id, isRequired }) => isRequired && !checkedAgreements[id],
+    ({ id, isRequired }) => isRequired && !agreements[id],
   );
-
-  const handleAgreementToggle = (id: AgreementId) => {
-    setCheckedAgreements((prevAgreements) => ({
-      ...prevAgreements,
-      [id]: !prevAgreements[id],
-    }));
-  };
 
   const handleNextButtonClick = () => {
     if (isNextButtonDisabled) return;
@@ -73,8 +38,8 @@ const TermsPage = () => {
       <div className="mt-auto mb-[43px] w-full">
         <TermsAgreementList
           agreements={AGREEMENT_ITEMS}
-          checkedAgreements={checkedAgreements}
-          onAgreementToggle={handleAgreementToggle}
+          checkedAgreements={agreements}
+          onAgreementToggle={toggleAgreement}
           onDetailClick={navigate}
         />
       </div>
