@@ -17,7 +17,11 @@ const TermsDetailPage = () => {
     <TermsDetailLayout
       title={agreement.detailTitle}
       onBackClick={() => navigate('/onboarding/terms')}
-      onAgreeClick={() => navigate('/onboarding/terms')}
+      onAgreeClick={() =>
+        navigate('/onboarding/terms', {
+          state: { agreedAgreementId: agreement.id },
+        })
+      }
     >
       {agreement.detailContent}
     </TermsDetailLayout>

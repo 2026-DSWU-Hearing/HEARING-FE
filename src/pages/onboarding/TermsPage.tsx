@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import LongConfirmButton from '@/pages/onboarding/components/LongConfirmButton';
 import OnboardingLayout from '@/pages/onboarding/components/OnboardingLayout';
@@ -9,8 +9,16 @@ import {
   type AgreementId,
 } from '@/pages/onboarding/constants/termsAgreementConstants';
 
+interface TermsLocationStateTypes {
+  agreedAgreementId?: AgreementId;
+}
+
 const TermsPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const { agreedAgreementId } =
+    (location.state as TermsLocationStateTypes | null) ?? {};
 
   const [checkedAgreements, setCheckedAgreements] = useState<
     Record<AgreementId, boolean>
@@ -20,6 +28,17 @@ const TermsPage = () => {
     sensitive: false,
     notification: false,
   });
+
+  useEffect(() => {
+    if (!agreedAgreementId) return;
+
+    setCheckedAgreements((prevAgreements) => ({
+      ...prevAgreements,
+      [agreedAgreementId]: true,
+    }));
+
+    navigate('/onboarding/terms', { replace: true, state: null });
+  }, [agreedAgreementId, navigate]);
 
   const isNextButtonDisabled = AGREEMENT_ITEMS.some(
     ({ id, isRequired }) => isRequired && !checkedAgreements[id],
