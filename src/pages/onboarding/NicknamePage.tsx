@@ -29,7 +29,7 @@ const NicknamePage = () => {
       title="닉네임을 입력해주세요."
       onBackClick={() => navigate('/login')}
     >
-      <div className="mt-[148px]">
+      <div className="mt-[206px]">
         <TextInput
           value={nickname}
           placeholder="닉네임을 입력해주세요."
