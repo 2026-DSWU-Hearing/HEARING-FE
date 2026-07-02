@@ -14,12 +14,14 @@ const LongConfirmButton = ({
     <button
       type="button"
       className={twMerge(
-        'caption-xs-semibold h-[48px] w-full rounded-pill bg-primary-400 text-neutral-950 transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-disabled disabled:text-neutral-800',
+        'flex h-[42px] w-full items-center justify-center gap-[10px] self-stretch rounded-pill bg-primary-400 px-0 py-xs transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-disabled',
         className,
       )}
       {...props}
     >
-      {children}
+      <span className="heading-base-semibold flex flex-1 flex-col justify-center self-stretch text-center text-neutral-800">
+        {children}
+      </span>
     </button>
   );
 };
