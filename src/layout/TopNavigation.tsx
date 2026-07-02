@@ -61,7 +61,7 @@ const TopNavigation = ({
         className="aspect-square h-[32px] w-[32px] text-primary"
       >
         {backIconSrc ? (
-          <img src={backIconSrc} alt="" className="h-full w-ful p-[5px]" />
+          <img src={backIconSrc} alt="" className="h-full w-full p-[5px]" />
         ) : (
           <FontAwesomeIcon
             icon={faAngleLeft}

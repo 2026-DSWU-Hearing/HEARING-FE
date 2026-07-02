@@ -3,20 +3,23 @@ import { useNavigate } from 'react-router-dom';
 import LongConfirmButton from '@/pages/onboarding/components/LongConfirmButton';
 import OnboardingLayout from '@/pages/onboarding/components/OnboardingLayout';
 import { useOnboardingStore } from '@/pages/onboarding/stores/useOnboardingStore';
+import connectIcon from '@/shared/assets/icons/onboarding/connect.svg';
+import roundIcon from '@/shared/assets/icons/onboarding/round.svg';
 
 const HwConnectPage = () => {
   const navigate = useNavigate();
+
   const setHardwareConnected = useOnboardingStore(
     (state) => state.setHardwareConnected,
   );
 
+  const handleConnectButtonClick = () => {
+    navigate('/onboarding/hardware/connecting');
+  };
+
   const handleSkipButtonClick = () => {
     setHardwareConnected(false);
     navigate('/');
-  };
-
-  const handleConnectButtonClick = () => {
-    navigate('/onboarding/hardware/connecting');
   };
 
   return (
@@ -24,24 +27,39 @@ const HwConnectPage = () => {
       title={'하드웨어를\n연결하시겠습니까?'}
       onBackClick={() => navigate('/onboarding/terms')}
       bottomButton={
-        <div className="flex w-full flex-col gap-base">
+        <div className="flex w-full flex-col items-center gap-xs">
           <LongConfirmButton onClick={handleConnectButtonClick}>
-            연결하기
+            <span className="flex items-center justify-center gap-[10px]">
+              디바이스 연결하기
+              <img
+                src={connectIcon}
+                alt=""
+                aria-hidden="true"
+                className="h-icon-md w-icon-md"
+              />
+            </span>
           </LongConfirmButton>
 
           <button
             type="button"
             onClick={handleSkipButtonClick}
-            className="heading-base-semibold flex h-[42px] w-full items-center justify-center rounded-pill text-secondary"
+            className="body-base-regular text-center text-tertiary"
           >
             나중에 하기
           </button>
         </div>
       }
     >
-      <p className="body-base-medium mt-[206px] whitespace-pre-line text-secondary">
-        하드웨어를 연결하면{'\n'}소리 감지 알림을 더 정확하게 받을 수 있어요.
-      </p>
+      <div className="mx-auto mt-[72px] flex h-[290px] w-[290px] items-center justify-center rounded-[290px] border-[0.5px] border-neutral-500">
+        <div className="flex h-[214px] w-[214px] items-center justify-center rounded-full border-[0.5px] border-neutral-700">
+          <img
+            src={roundIcon}
+            alt=""
+            aria-hidden="true"
+            className="h-[130px] w-[130px]"
+          />
+        </div>
+      </div>
     </OnboardingLayout>
   );
 };
