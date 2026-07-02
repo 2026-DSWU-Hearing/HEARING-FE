@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 
 import type { AgreementId } from '@/pages/onboarding/constants/termsAgreementConstants';
+import type { DeviceTypes } from '@/pages/onboarding/types/deviceTypes';
 import type { DisabilityType } from '@/pages/onboarding/types/onboardingTypes';
 
 interface OnboardingState {
@@ -8,11 +9,14 @@ interface OnboardingState {
   disabilityType: DisabilityType | null;
   agreements: Record<AgreementId, boolean>;
   isHardwareConnected: boolean;
+  connectedDevice: DeviceTypes | null;
+
   setNickname: (nickname: string) => void;
   setDisabilityType: (disabilityType: DisabilityType) => void;
   toggleAgreement: (agreementId: AgreementId) => void;
   agreeAgreement: (agreementId: AgreementId) => void;
   setHardwareConnected: (isHardwareConnected: boolean) => void;
+  setConnectedDevice: (device: DeviceTypes | null) => void;
   resetOnboarding: () => void;
 }
 
@@ -28,6 +32,7 @@ export const useOnboardingStore = create<OnboardingState>((set) => ({
   disabilityType: null,
   agreements: { ...INITIAL_AGREEMENTS },
   isHardwareConnected: false,
+  connectedDevice: null,
 
   setNickname: (nickname) => set({ nickname }),
 
@@ -51,11 +56,14 @@ export const useOnboardingStore = create<OnboardingState>((set) => ({
 
   setHardwareConnected: (isHardwareConnected) => set({ isHardwareConnected }),
 
+  setConnectedDevice: (device) => set({ connectedDevice: device }),
+
   resetOnboarding: () =>
     set({
       nickname: '',
       disabilityType: null,
       agreements: { ...INITIAL_AGREEMENTS },
       isHardwareConnected: false,
+      connectedDevice: null,
     }),
 }));

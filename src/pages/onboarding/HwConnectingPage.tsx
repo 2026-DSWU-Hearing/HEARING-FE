@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
+import { getDevices } from '@/pages/onboarding/apis/deviceApi';
 import { useOnboardingStore } from '@/pages/onboarding/stores/useOnboardingStore';
 import ing1Icon from '@/shared/assets/icons/onboarding/ing1.svg';
 import ing2Icon from '@/shared/assets/icons/onboarding/ing2.svg';
 import ing3Icon from '@/shared/assets/icons/onboarding/ing3.svg';
 
 const CONNECTING_FRAME_DELAY_MS = 500;
-const CONNECTING_COMPLETE_DELAY_MS = 3000;
+const DEVICE_POLLING_INTERVAL_MS = 1000;
 
 const CONNECTING_FRAMES = [
   {
@@ -40,6 +42,17 @@ const HwConnectingPage = () => {
     (state) => state.setHardwareConnected,
   );
 
+  const setConnectedDevice = useOnboardingStore(
+    (state) => state.setConnectedDevice,
+  );
+
+  const { data: devices } = useQuery({
+    queryKey: ['devices'],
+    queryFn: getDevices,
+    refetchInterval: DEVICE_POLLING_INTERVAL_MS,
+    refetchOnWindowFocus: false,
+  });
+
   useEffect(() => {
     const intervalId = window.setInterval(() => {
       setFrameIndex((prevFrameIndex) =>
@@ -55,15 +68,16 @@ const HwConnectingPage = () => {
   }, []);
 
   useEffect(() => {
-    const timerId = window.setTimeout(() => {
-      setHardwareConnected(true);
-      navigate('/onboarding/hardware/complete');
-    }, CONNECTING_COMPLETE_DELAY_MS);
+    const connectedDevice = devices?.find((device) => device.is_connected);
 
-    return () => {
-      window.clearTimeout(timerId);
-    };
-  }, [navigate, setHardwareConnected]);
+    if (!connectedDevice) {
+      return;
+    }
+
+    setConnectedDevice(connectedDevice);
+    setHardwareConnected(true);
+    navigate('/onboarding/hardware/complete');
+  }, [devices, navigate, setConnectedDevice, setHardwareConnected]);
 
   const currentFrame = CONNECTING_FRAMES[frameIndex];
 

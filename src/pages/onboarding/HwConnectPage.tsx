@@ -13,13 +13,19 @@ const HwConnectPage = () => {
     (state) => state.setHardwareConnected,
   );
 
+  const setConnectedDevice = useOnboardingStore(
+    (state) => state.setConnectedDevice,
+  );
+
   const handleConnectButtonClick = () => {
     setHardwareConnected(false);
+    setConnectedDevice(null);
     navigate('/onboarding/hardware/connecting');
   };
 
   const handleSkipButtonClick = () => {
     setHardwareConnected(false);
+    setConnectedDevice(null);
     navigate('/');
   };
 
