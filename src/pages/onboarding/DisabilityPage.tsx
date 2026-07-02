@@ -1,5 +1,5 @@
 import type { ComponentType, SVGProps } from 'react';
-import { useState } from 'react';
+
 import { useNavigate } from 'react-router-dom';
 
 import DisabilityOptionButton from '@/pages/onboarding/components/DisabilityOptionButton';
@@ -7,6 +7,7 @@ import LongConfirmButton from '@/pages/onboarding/components/LongConfirmButton';
 import OnboardingLayout from '@/pages/onboarding/components/OnboardingLayout';
 import DeafIcon from '@/shared/components/icons/onboarding/DeafIcon';
 import HohIcon from '@/shared/components/icons/onboarding/HohIcon';
+import { useOnboardingStore } from '@/pages/onboarding/stores/useOnboardingStore';
 
 type DisabilityType = 'deaf' | 'hardOfHearing';
 
@@ -21,10 +22,12 @@ const DISABILITY_OPTIONS = [
 
 const DisabilityPage = () => {
   const navigate = useNavigate();
-  const [selectedDisabilityType, setSelectedDisabilityType] =
-    useState<DisabilityType | null>(null);
+  const disabilityType = useOnboardingStore((state) => state.disabilityType);
+  const setDisabilityType = useOnboardingStore(
+    (state) => state.setDisabilityType,
+  );
 
-  const isNextButtonDisabled = selectedDisabilityType === null;
+  const isNextButtonDisabled = disabilityType === null;
 
   const handleNextButtonClick = () => {
     if (isNextButtonDisabled) return;
@@ -51,8 +54,8 @@ const DisabilityPage = () => {
             key={value}
             label={label}
             Icon={Icon}
-            isSelected={selectedDisabilityType === value}
-            onClick={() => setSelectedDisabilityType(value)}
+            isSelected={disabilityType === value}
+            onClick={() => setDisabilityType(value)}
           />
         ))}
       </div>

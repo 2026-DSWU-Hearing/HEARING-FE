@@ -1,14 +1,15 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import LongConfirmButton from '@/pages/onboarding/components/LongConfirmButton';
 import OnboardingLayout from '@/pages/onboarding/components/OnboardingLayout';
 import { MAX_NICKNAME_LENGTH } from '@/pages/onboarding/constants/onboardingConstants';
 import TextInput from '@/shared/components/TextInput';
+import { useOnboardingStore } from '@/pages/onboarding/stores/useOnboardingStore';
 
 const NicknamePage = () => {
   const navigate = useNavigate();
-  const [nickname, setNickname] = useState('');
+  const nickname = useOnboardingStore((state) => state.nickname);
+  const setNickname = useOnboardingStore((state) => state.setNickname);
 
   const isNicknameEmpty = nickname.trim().length === 0;
   const isNicknameTooLong = nickname.length > MAX_NICKNAME_LENGTH;

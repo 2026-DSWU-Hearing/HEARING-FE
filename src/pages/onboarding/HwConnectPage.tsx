@@ -1,27 +1,48 @@
 import { useNavigate } from 'react-router-dom';
 
+import LongConfirmButton from '@/pages/onboarding/components/LongConfirmButton';
+import OnboardingLayout from '@/pages/onboarding/components/OnboardingLayout';
+import { useOnboardingStore } from '@/pages/onboarding/stores/useOnboardingStore';
+
 const HwConnectPage = () => {
   const navigate = useNavigate();
+  const setHardwareConnected = useOnboardingStore(
+    (state) => state.setHardwareConnected,
+  );
+
+  const handleSkipButtonClick = () => {
+    setHardwareConnected(false);
+    navigate('/');
+  };
+
+  const handleConnectButtonClick = () => {
+    navigate('/onboarding/hardware/connecting');
+  };
 
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center gap-base bg-neutral-950 text-primary">
-      <h1 className="title-lg-semibold">하드웨어를 연결하시겠습니까?</h1>
+    <OnboardingLayout
+      title={'하드웨어를\n연결하시겠습니까?'}
+      onBackClick={() => navigate('/onboarding/terms')}
+      bottomButton={
+        <div className="flex w-full flex-col gap-base">
+          <LongConfirmButton onClick={handleConnectButtonClick}>
+            연결하기
+          </LongConfirmButton>
 
-      <div className="flex gap-sm">
-        <button type="button" onClick={() => navigate('/onboarding/terms')}>
-          이전
-        </button>
-        <button type="button" onClick={() => navigate('/')}>
-          나중에 하기
-        </button>
-        <button
-          type="button"
-          onClick={() => navigate('/onboarding/hardware/connecting')}
-        >
-          연결하기
-        </button>
-      </div>
-    </main>
+          <button
+            type="button"
+            onClick={handleSkipButtonClick}
+            className="heading-base-semibold flex h-[42px] w-full items-center justify-center rounded-pill text-secondary"
+          >
+            나중에 하기
+          </button>
+        </div>
+      }
+    >
+      <p className="body-base-medium mt-[206px] whitespace-pre-line text-secondary">
+        하드웨어를 연결하면{'\n'}소리 감지 알림을 더 정확하게 받을 수 있어요.
+      </p>
+    </OnboardingLayout>
   );
 };
 
