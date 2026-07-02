@@ -1,8 +1,8 @@
-import type { ButtonHTMLAttributes } from 'react';
+import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 interface LongConfirmButtonPropTypes extends ButtonHTMLAttributes<HTMLButtonElement> {
-  children: string;
+  children: ReactNode;
 }
 
 const LongConfirmButton = ({
@@ -19,7 +19,7 @@ const LongConfirmButton = ({
       )}
       {...props}
     >
-      <span className="heading-base-semibold flex flex-1 flex-col justify-center self-stretch text-center text-neutral-800">
+      <span className="heading-base-semibold flex flex-1 items-center justify-center self-stretch text-center text-neutral-800">
         {children}
       </span>
     </button>

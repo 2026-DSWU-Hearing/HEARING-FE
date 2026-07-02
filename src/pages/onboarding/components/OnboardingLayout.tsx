@@ -6,6 +6,7 @@ import backArrowIcon from '@/shared/assets/icons/onboarding/back-arow.svg';
 interface OnboardingLayoutPropTypes extends PropsWithChildren {
   title?: string;
   navigationTitle?: string;
+  navigationTitleAlign?: 'center' | 'left';
   onBackClick: () => void;
   bottomButton?: ReactNode;
 }
@@ -13,6 +14,7 @@ interface OnboardingLayoutPropTypes extends PropsWithChildren {
 const OnboardingLayout = ({
   title,
   navigationTitle = '',
+  navigationTitleAlign = 'center',
   onBackClick,
   bottomButton,
   children,
@@ -22,6 +24,7 @@ const OnboardingLayout = ({
       <section className="inline-flex min-h-dvh w-full flex-col bg-neutral-950 px-base pb-[98px]">
         <TopNavigation
           title={navigationTitle}
+          titleAlign={navigationTitleAlign}
           backIconSrc={backArrowIcon}
           onBackClick={onBackClick}
         />

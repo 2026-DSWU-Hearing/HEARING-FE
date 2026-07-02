@@ -14,6 +14,7 @@ interface RightIconButtonTypes {
 
 interface TopNavigationPropTypes {
   title?: string;
+  titleAlign?: 'center' | 'left';
   rightText?: string;
   onRightClick?: () => void;
   rightVariant?: 'default' | 'active';
@@ -26,6 +27,7 @@ interface TopNavigationPropTypes {
 
 const TopNavigation = ({
   title = '',
+  titleAlign = 'center',
   rightText,
   onRightClick,
   rightVariant = 'default',
@@ -68,7 +70,15 @@ const TopNavigation = ({
         )}
       </button>
 
-      <h1 className="text-center heading-lg-semibold text-primary">{title}</h1>
+      <h1
+        className={
+          titleAlign === 'left'
+            ? 'heading-xl-semibold -ml-sm justify-self-start text-left text-primary'
+            : 'heading-lg-semibold justify-self-center text-center text-primary'
+        }
+      >
+        {title}
+      </h1>
 
       {/* 우측 버튼이 없어도 3번째 컬럼(64px)을 차지해 제목 중앙 정렬을 유지한다.
           우선순위: 아이콘 버튼 > 텍스트 버튼 > 빈 placeholder. */}
