@@ -17,6 +17,7 @@ const TermsDetailPage = () => {
     <TermsDetailLayout
       title={agreement.detailTitle}
       onBackClick={() => navigate('/onboarding/terms')}
+      onAgreeClick={() => navigate('/onboarding/terms')}
     >
       {agreement.detailContent}
     </TermsDetailLayout>

@@ -37,7 +37,7 @@ const TermsDetailLayout = ({
     >
       <section className="flex flex-1 flex-col items-start gap-lg">
         <div className="flex h-[549px] w-full flex-col items-start gap-[10px] self-stretch overflow-y-auto rounded-xl bg-neutral-900/50 p-lg [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <p className="body-base-regular whitespace-pre-line text-secondary">
+          <p className="body-base-medium whitespace-pre-line text-primary">
             {children}
           </p>
         </div>
