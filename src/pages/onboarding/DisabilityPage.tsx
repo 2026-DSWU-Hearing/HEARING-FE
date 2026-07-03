@@ -5,10 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import DisabilityOptionButton from '@/pages/onboarding/components/DisabilityOptionButton';
 import LongConfirmButton from '@/pages/onboarding/components/LongConfirmButton';
 import OnboardingLayout from '@/pages/onboarding/components/OnboardingLayout';
+import type { DisabilityType } from '@/pages/onboarding/types/onboardingTypes';
 import DeafIcon from '@/shared/components/icons/onboarding/DeafIcon';
 import HohIcon from '@/shared/components/icons/onboarding/HohIcon';
-
-type DisabilityType = 'deaf' | 'hardOfHearing';
 
 const DISABILITY_OPTIONS = [
   { label: '농인', value: 'deaf', Icon: DeafIcon },
