@@ -13,26 +13,37 @@ interface RightIconButtonTypes {
 }
 
 interface TopNavigationPropTypes {
-  title: string;
+  title?: string;
+  titleAlign?: 'center' | 'left';
   rightText?: string;
   onRightClick?: () => void;
   rightVariant?: 'default' | 'active';
   isRightDisabled?: boolean;
   // rightIconButton 이 있으면 rightText 보다 우선해서 렌더한다.
   rightIconButton?: RightIconButtonTypes;
+  onBackClick?: () => void;
+  backIconSrc?: string;
 }
 
 const TopNavigation = ({
-  title,
+  title = '',
+  titleAlign = 'center',
   rightText,
   onRightClick,
   rightVariant = 'default',
   isRightDisabled = false,
   rightIconButton,
+  onBackClick,
+  backIconSrc,
 }: TopNavigationPropTypes) => {
   const navigate = useNavigate();
 
   const handleBackClick = () => {
+    if (onBackClick) {
+      onBackClick();
+      return;
+    }
+
     navigate(-1);
   };
 
@@ -42,17 +53,32 @@ const TopNavigation = ({
   }[rightVariant];
 
   return (
-    <header className="grid w-full grid-cols-[64px_1fr_64px] items-center pt-[2.75rem] px-[1.03rem] mb-2xl">
+    <header className="mb-2xl grid w-full grid-cols-[64px_1fr_64px] items-center px-[1.03rem] pt-[2.75rem]">
       <button
         type="button"
         onClick={handleBackClick}
         aria-label="이전 페이지로 이동"
-        className="text-primary h-[1.5rem] w-[1.5rem]"
+        className="aspect-square h-[32px] w-[32px] text-primary"
       >
-        <FontAwesomeIcon icon={faAngleLeft} />
+        {backIconSrc ? (
+          <img src={backIconSrc} alt="" className="h-full w-full p-[5px]" />
+        ) : (
+          <FontAwesomeIcon
+            icon={faAngleLeft}
+            className="h-full w-full p-[5px]"
+          />
+        )}
       </button>
 
-      <h1 className="text-center heading-lg-semibold text-primary">{title}</h1>
+      <h1
+        className={
+          titleAlign === 'left'
+            ? 'heading-xl-semibold -ml-sm justify-self-start text-left text-primary'
+            : 'heading-lg-semibold justify-self-center text-center text-primary'
+        }
+      >
+        {title}
+      </h1>
 
       {/* 우측 버튼이 없어도 3번째 컬럼(64px)을 차지해 제목 중앙 정렬을 유지한다.
           우선순위: 아이콘 버튼 > 텍스트 버튼 > 빈 placeholder. */}

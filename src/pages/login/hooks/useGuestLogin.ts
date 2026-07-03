@@ -13,7 +13,7 @@ export const useGuestLogin = () => {
       setAuthTokens(access_token, refresh_token);
       setLoginType('guest');
 
-      navigate('/');
+      navigate('/onboarding/nickname');
     },
     onError: (error) => {
       console.error('게스트 로그인 실패:', error);
