@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes } from 'react';
 import { twMerge } from 'tailwind-merge';
 
-interface SkipButtonPropTypes extends ButtonHTMLAttributes<HTMLButtonElement> {}
+type SkipButtonPropTypes = ButtonHTMLAttributes<HTMLButtonElement>;
 
 const SkipButton = ({ className, ...props }: SkipButtonPropTypes) => {
   return (
