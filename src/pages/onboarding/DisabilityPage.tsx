@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import DisabilityOptionButton from '@/pages/onboarding/components/DisabilityOptionButton';
 import LongConfirmButton from '@/pages/onboarding/components/LongConfirmButton';
 import OnboardingLayout from '@/pages/onboarding/components/OnboardingLayout';
+import OnboardingTopNavigation from '@/pages/onboarding/components/OnboardingTopNavigation';
 import DeafIcon from '@/shared/components/icons/onboarding/DeafIcon';
 import HohIcon from '@/shared/components/icons/onboarding/HohIcon';
 import { useOnboardingStore } from '@/pages/onboarding/stores/useOnboardingStore';
@@ -40,7 +41,11 @@ const DisabilityPage = () => {
   return (
     <OnboardingLayout
       title={'장애 유형을\n선택해주세요.'}
-      onBackClick={() => navigate('/onboarding/nickname')}
+      topNavigation={
+        <OnboardingTopNavigation
+          onBackClick={() => navigate('/onboarding/nickname')}
+        />
+      }
       bottomButton={
         <LongConfirmButton
           disabled={isNextButtonDisabled}

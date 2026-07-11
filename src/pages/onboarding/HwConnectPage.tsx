@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 
 import LongConfirmButton from '@/pages/onboarding/components/LongConfirmButton';
 import OnboardingLayout from '@/pages/onboarding/components/OnboardingLayout';
+import OnboardingTopNavigation from '@/pages/onboarding/components/OnboardingTopNavigation';
 import SkipButton from '@/pages/onboarding/components/SkipButton';
 import { useOnboardingStore } from '@/pages/onboarding/stores/useOnboardingStore';
 import connectIcon from '@/shared/assets/icons/onboarding/connect.svg';
@@ -27,7 +28,11 @@ const HwConnectPage = () => {
   return (
     <OnboardingLayout
       title={'하드웨어를\n연결하시겠습니까?'}
-      onBackClick={() => navigate('/onboarding/terms')}
+      topNavigation={
+        <OnboardingTopNavigation
+          onBackClick={() => navigate('/onboarding/terms')}
+        />
+      }
       bottomButton={
         <div className="flex w-full flex-col items-center gap-xs">
           <LongConfirmButton onClick={handleConnectButtonClick}>

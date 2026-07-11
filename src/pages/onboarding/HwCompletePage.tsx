@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import LongConfirmButton from '@/pages/onboarding/components/LongConfirmButton';
 import OnboardingLayout from '@/pages/onboarding/components/OnboardingLayout';
+import OnboardingTopNavigation from '@/pages/onboarding/components/OnboardingTopNavigation';
 import { useOnboardingStore } from '@/pages/onboarding/stores/useOnboardingStore';
 import hearingIcon from '@/shared/assets/brand/hearing.svg';
 
@@ -20,7 +21,11 @@ const HwCompletePage = () => {
   return (
     <OnboardingLayout
       title="연결 완료!"
-      onBackClick={() => navigate('/onboarding/hardware')}
+      topNavigation={
+        <OnboardingTopNavigation
+          onBackClick={() => navigate('/onboarding/hardware')}
+        />
+      }
       bottomButton={
         <div className="flex w-full flex-col gap-xs">
           <LongConfirmButton onClick={() => navigate('/')}>

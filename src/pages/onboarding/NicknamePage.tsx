@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 
 import LongConfirmButton from '@/pages/onboarding/components/LongConfirmButton';
 import OnboardingLayout from '@/pages/onboarding/components/OnboardingLayout';
+import OnboardingTopNavigation from '@/pages/onboarding/components/OnboardingTopNavigation';
 import { MAX_NICKNAME_LENGTH } from '@/pages/onboarding/constants/onboardingConstants';
 import TextInput from '@/shared/components/TextInput';
 import { useOnboardingStore } from '@/pages/onboarding/stores/useOnboardingStore';
@@ -28,7 +29,9 @@ const NicknamePage = () => {
   return (
     <OnboardingLayout
       title="닉네임을 입력해주세요."
-      onBackClick={() => navigate('/login')}
+      topNavigation={
+        <OnboardingTopNavigation onBackClick={() => navigate('/login')} />
+      }
     >
       <div className="mt-[206px]">
         <TextInput

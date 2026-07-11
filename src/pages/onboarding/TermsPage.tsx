@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 
 import LongConfirmButton from '@/pages/onboarding/components/LongConfirmButton';
 import OnboardingLayout from '@/pages/onboarding/components/OnboardingLayout';
+import OnboardingTopNavigation from '@/pages/onboarding/components/OnboardingTopNavigation';
 import TermsAgreementList from '@/pages/onboarding/components/TermsAgreementList';
 import { AGREEMENT_ITEMS } from '@/pages/onboarding/constants/termsAgreementConstants';
 import { useOnboardingStore } from '@/pages/onboarding/stores/useOnboardingStore';
@@ -43,7 +44,11 @@ const TermsPage = () => {
   return (
     <OnboardingLayout
       title={'고객님\n환영합니다!'}
-      onBackClick={() => navigate('/onboarding/disability')}
+      topNavigation={
+        <OnboardingTopNavigation
+          onBackClick={() => navigate('/onboarding/disability')}
+        />
+      }
       bottomButton={
         <LongConfirmButton
           disabled={isNextButtonDisabled}
