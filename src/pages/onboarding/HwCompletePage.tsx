@@ -26,8 +26,6 @@ const HwCompletePage = () => {
           <LongConfirmButton onClick={() => navigate('/')}>
             메인 화면으로 이동
           </LongConfirmButton>
-
-        
         </div>
       }
     >

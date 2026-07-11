@@ -1,4 +1,3 @@
-// src/pages/onboarding/hooks/useDeviceConnectionPolling.ts
 import { useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
