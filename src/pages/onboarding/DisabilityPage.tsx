@@ -8,15 +8,17 @@ import OnboardingLayout from '@/pages/onboarding/components/OnboardingLayout';
 import DeafIcon from '@/shared/components/icons/onboarding/DeafIcon';
 import HohIcon from '@/shared/components/icons/onboarding/HohIcon';
 import { useOnboardingStore } from '@/pages/onboarding/stores/useOnboardingStore';
-
-type DisabilityType = 'deaf' | 'hardOfHearing';
+import {
+  DISABILITY_TYPE,
+  type DisabilityTypeTypes,
+} from '@/pages/setting/constants/disabilityType';
 
 const DISABILITY_OPTIONS = [
-  { label: '농인', value: 'deaf', Icon: DeafIcon },
-  { label: '난청인', value: 'hardOfHearing', Icon: HohIcon },
+  { label: '농인', value: DISABILITY_TYPE.DEAF, Icon: DeafIcon },
+  { label: '난청인', value: DISABILITY_TYPE.HARD_OF_HEARING, Icon: HohIcon },
 ] satisfies {
   label: string;
-  value: DisabilityType;
+  value: DisabilityTypeTypes;
   Icon: ComponentType<SVGProps<SVGSVGElement>>;
 }[];
 

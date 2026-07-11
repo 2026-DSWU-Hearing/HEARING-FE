@@ -13,3 +13,8 @@ export interface UpdateHapticRequestTypes {
 export interface UpdatePushEnabledRequestTypes {
   push_enabled: boolean;
 }
+
+/** PATCH /users/me/agreement 요청 바디 (약관 동의 수정) */
+export interface UpdateAgreementRequestTypes {
+  terms_agreed: boolean;
+}

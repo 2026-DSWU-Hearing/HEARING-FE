@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 
 import LongConfirmButton from '@/pages/onboarding/components/LongConfirmButton';
 import OnboardingLayout from '@/pages/onboarding/components/OnboardingLayout';
+import SkipButton from '@/pages/onboarding/components/SkipButton';
 import { useOnboardingStore } from '@/pages/onboarding/stores/useOnboardingStore';
 import connectIcon from '@/shared/assets/icons/onboarding/connect.svg';
 import roundIcon from '@/shared/assets/icons/onboarding/round.svg';
@@ -9,23 +10,17 @@ import roundIcon from '@/shared/assets/icons/onboarding/round.svg';
 const HwConnectPage = () => {
   const navigate = useNavigate();
 
-  const setHardwareConnected = useOnboardingStore(
-    (state) => state.setHardwareConnected,
-  );
-
-  const setConnectedDevice = useOnboardingStore(
-    (state) => state.setConnectedDevice,
+  const resetHardwareConnection = useOnboardingStore(
+    (state) => state.resetHardwareConnection,
   );
 
   const handleConnectButtonClick = () => {
-    setHardwareConnected(false);
-    setConnectedDevice(null);
+    resetHardwareConnection();
     navigate('/onboarding/hardware/connecting');
   };
 
   const handleSkipButtonClick = () => {
-    setHardwareConnected(false);
-    setConnectedDevice(null);
+    resetHardwareConnection();
     navigate('/');
   };
 
@@ -47,13 +42,7 @@ const HwConnectPage = () => {
             </span>
           </LongConfirmButton>
 
-          <button
-            type="button"
-            onClick={handleSkipButtonClick}
-            className="body-base-regular text-center text-tertiary"
-          >
-            나중에 하기
-          </button>
+          <SkipButton onClick={handleSkipButtonClick} />
         </div>
       }
     >
