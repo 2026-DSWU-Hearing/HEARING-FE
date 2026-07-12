@@ -3,7 +3,7 @@ import { usePatchDevice } from '@/pages/setting/hooks/usePatchDevice';
 import { usePostDevice } from '@/pages/setting/hooks/usePostDevice';
 import { useDeleteDevice } from '@/pages/setting/hooks/useDeleteDevice';
 import { useModal } from '@/shared/hooks/useModal';
-import { generateMockMacAddress } from '@/pages/setting/utils/generateMockMacAddress';
+import { DEVICE_MAC_ADDRESS } from '@/pages/setting/constants/deviceMac';
 import { CONNECTION_STATUS } from '@/pages/setting/constants/connectionStatus';
 
 /**
@@ -53,8 +53,8 @@ export const useDeviceSection = () => {
 
   const handleRegisterSubmit = (nickname: string) => {
     if (isMutating) return;
-    // TODO(api): 실제 BLE 페어링 시 generateMockMacAddress()를 페어링 MAC으로 교체.
-    createDevice({ nickname, mac_address: generateMockMacAddress() });
+    // 단일 기기 전제이므로 실제 ESP32의 고정 MAC 상수를 사용한다. (교체 지점: deviceMac.ts)
+    createDevice({ nickname, mac_address: DEVICE_MAC_ADDRESS });
   };
 
   const handleDeleteClick = () => deleteModal.open();
