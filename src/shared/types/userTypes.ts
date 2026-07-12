@@ -6,6 +6,7 @@ export interface UserTypes {
   haptic_strength: number;
   do_not_disturb: boolean;
   push_enabled: boolean;
+  terms_agreed: boolean;
 }
 
 export interface UpdateDoNotDisturbRequestTypes {

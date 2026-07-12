@@ -40,6 +40,7 @@
 | `haptic_strength` | integer        | required |
 | `do_not_disturb`  | boolean        | required |
 | `push_enabled`    | boolean        | required |
+| `terms_agreed`    | boolean        | required |
 
 ---
 
@@ -51,7 +52,7 @@
 | POST   | `/auth/login`           | 로그인                | ❌                      |
 | GET    | `/auth/email-available` | 이메일 사용 가능 여부 | ❌                      |
 | POST   | `/auth/google`          | 구글 로그인           | ❌                      |
-| POST   | `/auth/demo`            | 데모 로그인           | ❌                      |
+| POST   | `/auth/guest`           | 게스트 로그인         | ❌                      |
 | POST   | `/auth/refresh`         | 토큰 재발급           | ❌ (refresh_token 사용) |
 | POST   | `/auth/logout`          | 로그아웃              | ✅                      |
 
@@ -100,7 +101,7 @@
 
 - **Response** `200` → `TokenResponse`
 
-### POST `/auth/demo`
+### POST `/auth/guest`
 
 - **Request Body**: 없음
 - **Response** `200` → `TokenResponse`
@@ -192,6 +193,8 @@
 - **Response** `200` → `UserResponse`
 
 ### PATCH `/users/me/agreement`
+
+> 기본값이 `false`로 변경됨 (기존 테스트 편의용 `true` 기본값 제거). 온보딩에서 필수 약관 동의 완료 시 `terms_agreed: true`로 호출 필요.
 
 - **Request Body** (`AgreementUpdate`)
 

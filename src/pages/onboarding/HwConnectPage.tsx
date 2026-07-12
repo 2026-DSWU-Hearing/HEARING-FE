@@ -2,6 +2,8 @@ import { useNavigate } from 'react-router-dom';
 
 import LongConfirmButton from '@/pages/onboarding/components/LongConfirmButton';
 import OnboardingLayout from '@/pages/onboarding/components/OnboardingLayout';
+import OnboardingTopNavigation from '@/pages/onboarding/components/OnboardingTopNavigation';
+import SkipButton from '@/pages/onboarding/components/SkipButton';
 import { useOnboardingStore } from '@/pages/onboarding/stores/useOnboardingStore';
 import connectIcon from '@/shared/assets/icons/onboarding/connect.svg';
 import roundIcon from '@/shared/assets/icons/onboarding/round.svg';
@@ -9,30 +11,28 @@ import roundIcon from '@/shared/assets/icons/onboarding/round.svg';
 const HwConnectPage = () => {
   const navigate = useNavigate();
 
-  const setHardwareConnected = useOnboardingStore(
-    (state) => state.setHardwareConnected,
-  );
-
-  const setConnectedDevice = useOnboardingStore(
-    (state) => state.setConnectedDevice,
+  const resetHardwareConnection = useOnboardingStore(
+    (state) => state.resetHardwareConnection,
   );
 
   const handleConnectButtonClick = () => {
-    setHardwareConnected(false);
-    setConnectedDevice(null);
+    resetHardwareConnection();
     navigate('/onboarding/hardware/connecting');
   };
 
   const handleSkipButtonClick = () => {
-    setHardwareConnected(false);
-    setConnectedDevice(null);
+    resetHardwareConnection();
     navigate('/');
   };
 
   return (
     <OnboardingLayout
       title={'하드웨어를\n연결하시겠습니까?'}
-      onBackClick={() => navigate('/onboarding/terms')}
+      topNavigation={
+        <OnboardingTopNavigation
+          onBackClick={() => navigate('/onboarding/terms')}
+        />
+      }
       bottomButton={
         <div className="flex w-full flex-col items-center gap-xs">
           <LongConfirmButton onClick={handleConnectButtonClick}>
@@ -47,13 +47,7 @@ const HwConnectPage = () => {
             </span>
           </LongConfirmButton>
 
-          <button
-            type="button"
-            onClick={handleSkipButtonClick}
-            className="body-base-regular text-center text-tertiary"
-          >
-            나중에 하기
-          </button>
+          <SkipButton onClick={handleSkipButtonClick} />
         </div>
       }
     >
