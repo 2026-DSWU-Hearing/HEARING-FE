@@ -5,7 +5,7 @@ import SettingSectionTitle from '@/pages/setting/components/SettingSectionTitle'
 import SettingCard from '@/pages/setting/components/SettingCard';
 import HapticSlider from '@/pages/setting/components/device/HapticSlider';
 import { SettingCardSkeleton } from '@/pages/setting/components/SettingSkeleton';
-import { useGetUsers } from '@/pages/setting/hooks/useGetUsers';
+import { useGetUsers } from '@/shared/hooks/useGetUsers';
 import { usePatchHaptic } from '@/pages/setting/hooks/usePatchHaptic';
 
 /**

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { postGoogleAuth } from '@/pages/login/apis/authApi';
 import { setAuthTokens, setLoginType } from '@/pages/login/utils/tokenStorage';
-import { getUsers } from '@/pages/setting/apis/getUsers';
+import { getUsers } from '@/shared/apis/getUsers';
 
 export const useGoogleAuth = () => {
   const navigate = useNavigate();

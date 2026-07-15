@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell } from '@fortawesome/free-solid-svg-icons';
 import DoNotDisturbButton from '@/pages/home/components/mode/DoNotDisturbButton';
 import { useHomeModeContext } from '@/pages/home/hooks/useHomeModeContext';
-import { useGetUsers } from '@/pages/setting/hooks/useGetUsers';
+import { useGetUsers } from '@/shared/hooks/useGetUsers';
 
 const HomeHeader = () => {
   const navigate = useNavigate();

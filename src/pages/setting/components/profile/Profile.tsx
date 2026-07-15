@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 
-import { useGetUsers } from '@/pages/setting/hooks/useGetUsers';
+import { useGetUsers } from '@/shared/hooks/useGetUsers';
 import { ProfileSkeleton } from '@/pages/setting/components/SettingSkeleton';
 import { getDisabilityLabel } from '@/pages/setting/constants/disabilityType';
 
