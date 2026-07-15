@@ -14,7 +14,7 @@ import { useDeviceSection } from '@/pages/setting/hooks/useDeviceSection';
 /**
  * 나의 디바이스 섹션. 등록 여부·연결 여부로 3상태를 분기한다.
  * - 미등록: "디바이스 등록" 버튼
- * - 등록 + 연결 해제: "디바이스 연결하기" 버튼 + 삭제 버튼
+ * - 등록 + 연결 해제: 자동 연결 안내 문구 + 삭제 버튼
  * - 등록 + 연결: 디바이스 카드(이름·배터리·연결 상태) + "연결 해제하기" + 삭제 버튼
  * 조회·매핑·등록/연결/해제/삭제/이름변경 로직은 useDeviceSection 훅에 있다.
  */
@@ -34,7 +34,6 @@ const DeviceSection = () => {
     deleteModal,
     handleEditClick,
     handleNameSubmit,
-    handleConnectClick,
     handleDisconnectClick,
     handleConfirmDisconnect,
     handleRegisterClick,
@@ -81,11 +80,9 @@ const DeviceSection = () => {
 
       {isRegistered && !isConnected && (
         <div className="flex flex-col gap-sm">
-          <ConnectDeviceBtn
-            label="디바이스 연결하기"
-            onClick={handleConnectClick}
-            disabled={isMutating}
-          />
+          <p className="flex items-center rounded-xl bg-neutral-900 px-base py-base body-base-regular text-secondary">
+            디바이스 찾는 중...
+          </p>
           <DeleteDeviceBtn onClick={handleDeleteClick} />
         </div>
       )}

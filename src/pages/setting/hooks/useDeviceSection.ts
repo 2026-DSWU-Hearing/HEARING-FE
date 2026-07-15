@@ -43,12 +43,6 @@ export const useDeviceSection = () => {
     updateDevice({ deviceId: device.id, deviceData: { is_connected: false } });
   };
 
-  const handleConnectClick = () => {
-    // 등록된(연결 해제 상태) 기기를 다시 연결한다. 미등록 상태에선 이 핸들러가 호출되지 않는다.
-    if (!device || isMutating) return;
-    updateDevice({ deviceId: device.id, deviceData: { is_connected: true } });
-  };
-
   const handleRegisterClick = () => registerModal.open();
 
   const handleRegisterSubmit = (nickname: string) => {
@@ -88,7 +82,6 @@ export const useDeviceSection = () => {
     deleteModal,
     handleEditClick,
     handleNameSubmit,
-    handleConnectClick,
     handleDisconnectClick,
     handleConfirmDisconnect,
     handleRegisterClick,
