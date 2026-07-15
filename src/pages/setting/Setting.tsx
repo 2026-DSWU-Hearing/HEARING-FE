@@ -1,4 +1,3 @@
-import { useFcmToken } from '@/pages/setting/hooks/useFcmToken';
 import NotificationSettingBar from '@/pages/setting/components/NotificationSettingBar';
 import Profile from '@/pages/setting/components/profile/Profile';
 import DeviceSection from '@/pages/setting/components/device/DeviceSection';
@@ -6,8 +5,6 @@ import HapticSection from '@/pages/setting/components/device/HapticSection';
 import SettingHeader from './components/SettingHeader';
 
 const Setting = () => {
-  const { handleRequestPermission } = useFcmToken();
-
   return (
     <div className="flex min-h-dvh flex-col px-[1rem] pb-[9.5rem]">
       <SettingHeader />
@@ -20,14 +17,6 @@ const Setting = () => {
         <DeviceSection />
         <HapticSection />
       </div>
-      {/* 나중에 회원가입 쪽으로 이동할 예정 */}
-      <button
-        type="button"
-        onClick={handleRequestPermission}
-        className="mt-2xl rounded bg-neutral-800 px-4 py-2 text-white"
-      >
-        알림 권한 요청
-      </button>
     </div>
   );
 };
