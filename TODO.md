@@ -1,5 +1,15 @@
 # 오늘 할 일
 
+- [x] 게스트 로그인 시 소리 필터링에 리치님 반가워요 라고 뜨는 것 수정
+- [x] 구글 로그인도 이름을 온보딩에서 설정한 대로 수정 -> 설정 페이지에는 제대로 뜨는지 확인해야 함
+- [] 알림 설정 동의 안 했는데 설정 페이지에서 앱 푸시 알림이 디폴트로 켜져있음 -> 온보딩과 상태 연결,,
+- [] 하드웨어 배터리 실시간으로 보이게 수정해야 함 (100% -> 99%로 줄어들면 실제로 반영되어야..)
+- [] wifi 연결도 실시간으로
+- [] 하드웨어 연결하기 -> 가짜 연결인데 이거 실제 연결로 수정하도록 / 연결 demo로 표시되는 거
+- [] 실시간 소리 감지 -> 실제로 수정하기 (mock 데이터로 되어 있는 거)
+- [] home에서 skeleton ui 모드랑 소리 부분 동시에 뜨게 (지금 따로 뜨는 것 같음)
+- [] home에서 만약 로딩 실패?햇을 때 어떻게 띄울지 조금 생각..
+
 # Home 부분
 
 - [ ] (보류) context API 사용한 부분을 zustand로 바꾸는 게 좋을지 검토하기 → 검토 결과 현 시점 비권장. 페이지 간 상태 공유나 영속화(persist) 필요 시 재검토. (보고서: ~/.claude/plans/zustand-migration-review.md)
@@ -10,12 +20,8 @@
 
 > 배경: 현재는 백엔드 `DEV_AUTH_BYPASS=true` 덕분에 인증 헤더 없이 토큰 등록이 됨. 로그인이 붙고 bypass가 false가 되면 인증 헤더 없는 요청은 401 → axios 인터셉터가 `/login`으로 리다이렉트함. 아래 작업으로 정식 인증 흐름으로 전환해야 함.
 
-- [x] **access token 저장 연결**: 로그인 성공 시 `setAuthTokens`가 `ACCESS_TOKEN_KEY('accessToken')`로 저장하고, `src/shared/apis/axios.ts` 요청 인터셉터가 `getAccessToken()`으로 읽어 `Authorization: Bearer`로 자동 부착함. (#72에서 axios가 `'token'` 키를 읽던 불일치 버그 수정 완료. WebSocket 인증도 같은 `getAccessToken()` 재사용.)
-- [ ] **`/login` 라우트 추가**: `axios.ts` 응답 인터셉터가 401 시 `window.location.href = '/login'`으로 보내는데 현재 해당 라우트가 없어 "No routes matched" 경고 발생. 로그인 페이지 라우트 등록 필요. (`src/routes/AppRouter.tsx`)
 - [ ] **FCM 토큰 등록 시점 이동**: 설정 페이지 버튼 → 로그인/디바이스 연결 플로우 안으로 이동. "로그인 + 디바이스 연결 완료" 후 알림 허용 버튼을 띄우고, 허용 시 `requestFcmToken` → `postFcmToken` 호출. (현 `useFcmToken` 훅 그대로 재사용 가능)
 - [ ] **토큰 갱신/만료 대응**: FCM 토큰은 변경될 수 있음. 로그인할 때마다 또는 앱 진입 시 토큰 재발급 후 서버에 재전송하는 정책 검토. 로그아웃 시 서버에서 토큰 제거(엔드포인트 백엔드와 협의).
-
-- [x] ~~(보류) FCM foreground 알림 표시~~ → **해소(#72)**: 앱이 켜져 있을 때(포그라운드)는 FCM 대신 WebSocket(`useDetectionSocket`) 인앱 토스트로 전환. FCM+WS 알림 중복 문제 해결. FCM 토큰 등록/백그라운드 SW(`firebase-messaging-sw.js`)는 그대로 유지(앱 꺼졌을 때 알림용).
 
 # 실시간 소리 감지 알림 (WebSocket)
 
