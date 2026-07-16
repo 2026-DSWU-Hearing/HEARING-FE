@@ -385,14 +385,24 @@
 
 ### POST `/devices`
 
+> ⚠️ **변경 예정 (BE 합의 완료, 미배포)** — `mac_address`를 optional로 변경.
+> 웹(PWA)은 보안상 BLE 페어링으로도 기기의 MAC을 얻을 수 없어 프론트가 아는 값이 아니다.
+> MAC은 ESP32가 서버에 접속하며 직접 알린다.
+> 프론트는 이미 `nickname`만 전송하도록 수정되어 있어, 배포 전까지 등록은 422로 실패한다.
+> (실패 시 등록 모달이 유지되며 사유가 표시된다.)
+>
+> 또한 현재 서버는 `mac_address`를 전역 unique로 취급해, 이미 등록된 MAC은
+> `409 CONFLICT`(`"이미 등록된 MAC 주소입니다"`)를 반환한다.
+
 - **Request Body** (`DeviceCreate`)
 
-  | 필드          | 타입   | 필수 |
-  | ------------- | ------ | ---- |
-  | `nickname`    | string | ✅   |
-  | `mac_address` | string | ✅   |
+  | 필드          | 타입   | 필수                |
+  | ------------- | ------ | ------------------- |
+  | `nickname`    | string | ✅                  |
+  | `mac_address` | string | ⚠️ 현재 ✅ → 변경 예정 ❌ |
 
 - **Response** `200` → `DeviceResponse`
+- **Response** `409` → `{ code: "CONFLICT", message: string }` (MAC 중복)
 
 ### PATCH `/devices/{device_id}`
 
