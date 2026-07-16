@@ -2,6 +2,7 @@ import NotificationSettingBar from '@/pages/setting/components/NotificationSetti
 import Profile from '@/pages/setting/components/profile/Profile';
 import DeviceSection from '@/pages/setting/components/device/DeviceSection';
 import HapticSection from '@/pages/setting/components/device/HapticSection';
+import LogoutButton from '@/pages/setting/components/LogoutButton';
 import SettingHeader from './components/SettingHeader';
 
 const Setting = () => {
@@ -17,6 +18,8 @@ const Setting = () => {
         <DeviceSection />
         <HapticSection />
       </div>
+
+      <LogoutButton />
     </div>
   );
 };
