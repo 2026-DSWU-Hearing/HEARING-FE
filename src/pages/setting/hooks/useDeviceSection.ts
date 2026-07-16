@@ -1,12 +1,10 @@
-import { useEffect, useState } from 'react';
-
 import { useGetDevices } from '@/pages/setting/hooks/useGetDevices';
 import { usePatchDevice } from '@/pages/setting/hooks/usePatchDevice';
 import { usePostDevice } from '@/pages/setting/hooks/usePostDevice';
 import { useDeleteDevice } from '@/pages/setting/hooks/useDeleteDevice';
 import { useModal } from '@/shared/hooks/useModal';
+import { useDeviceConnectionWait } from '@/shared/hooks/useDeviceConnectionWait';
 import { CONNECTION_STATUS } from '@/pages/setting/constants/connectionStatus';
-import { DEVICE_CONNECT_TIMEOUT_MS } from '@/pages/setting/constants/deviceStatus';
 import { DEVICE_MESSAGE } from '@/pages/setting/constants/deviceMessages';
 
 /**
@@ -36,32 +34,16 @@ export const useDeviceSection = () => {
   const isRegistered = device !== undefined;
   const isConnected = device?.is_connected ?? false;
 
-  // 등록 성공 시각. null이면 대기 중이 아니다(이미 연결됐거나 예전에 등록한 기기).
-  // 서버 응답만으로는 "방금 등록해 기다리는 중"과 "예전에 등록했는데 기기가 꺼진 상태"를
-  // 구분할 수 없다(둘 다 is_connected: false). 그래서 등록 시각을 프론트가 들고 있는다.
-  const [registeredAt, setRegisteredAt] = useState<number | null>(null);
-  const [isTimedOut, setIsTimedOut] = useState(false);
+  const {
+    isWaiting: isWaitingForConnection,
+    startWaiting,
+    retryWaiting,
+    resetWaiting,
+  } = useDeviceConnectionWait(isConnected);
 
   const nameModal = useModal();
   const registerModal = useModal();
   const deleteModal = useModal();
-
-  // 대기 시간을 초과하면 실패 안내로 전환한다. 무한 대기로 사용자가 갇히는 것을 막는다.
-  // registeredAt이 바뀌면(재시도) 이전 타이머는 정리되므로 새 대기가 즉시 실패로 뒤집히지 않는다.
-  useEffect(() => {
-    if (registeredAt === null) return;
-
-    const timer = setTimeout(
-      () => setIsTimedOut(true),
-      DEVICE_CONNECT_TIMEOUT_MS,
-    );
-    return () => clearTimeout(timer);
-  }, [registeredAt]);
-
-  // 기기가 붙으면 isConnected가 true가 되어 대기가 자동으로 끝난다.
-  // registeredAt을 따로 비울 필요가 없다(파생값이므로 state 동기화 불필요).
-  const isWaitingForConnection =
-    registeredAt !== null && !isTimedOut && !isConnected;
 
   const handleEditClick = () => nameModal.open();
 
@@ -87,19 +69,11 @@ export const useDeviceSection = () => {
       {
         // 등록 성공 여부는 여기서만 알 수 있으므로 모달을 닫는 책임도 호출부에 둔다.
         onSuccess: () => {
-          setRegisteredAt(Date.now());
-          setIsTimedOut(false);
+          startWaiting();
           handleCloseRegisterModal();
         },
       },
     );
-  };
-
-  // 재시도는 타이머만 리셋한다. 등록은 이미 성공했고 문제는 하드웨어 연결이므로
-  // 기기를 다시 등록할 필요가 없다.
-  const handleRetryClick = () => {
-    setRegisteredAt(Date.now());
-    setIsTimedOut(false);
   };
 
   const handleDeleteClick = () => deleteModal.open();
@@ -107,13 +81,8 @@ export const useDeviceSection = () => {
   const handleConfirmDelete = () => {
     if (!device || isMutating) return;
 
-    removeDevice(device.id, {
-      // 삭제 후 재등록할 때 이전 대기 상태가 남아있지 않도록 정리한다.
-      onSuccess: () => {
-        setRegisteredAt(null);
-        setIsTimedOut(false);
-      },
-    });
+    // 삭제 후 재등록할 때 이전 대기 상태가 남아있지 않도록 정리한다.
+    removeDevice(device.id, { onSuccess: resetWaiting });
   };
 
   // API 응답(snake_case)을 UI 표시값으로 매핑한다.
@@ -146,7 +115,7 @@ export const useDeviceSection = () => {
     handleRegisterClick,
     handleCloseRegisterModal,
     handleRegisterSubmit,
-    handleRetryClick,
+    handleRetryClick: retryWaiting,
     handleDeleteClick,
     handleConfirmDelete,
   };

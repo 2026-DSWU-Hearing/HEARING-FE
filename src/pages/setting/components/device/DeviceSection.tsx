@@ -7,7 +7,7 @@ import DeviceStatusGrid from '@/pages/setting/components/device/DeviceStatusGrid
 import ConnectDeviceBtn from '@/pages/setting/components/device/ConnectDeviceBtn';
 import DeleteDeviceBtn from '@/pages/setting/components/device/DeleteDeviceBtn';
 import DeviceNameEditModal from '@/pages/setting/components/device/DeviceNameEditModal';
-import DeviceRegisterModal from '@/pages/setting/components/device/DeviceRegisterModal';
+import DeviceRegisterModal from '@/shared/components/DeviceRegisterModal';
 import { SettingCardSkeleton } from '@/pages/setting/components/SettingSkeleton';
 import { DEVICE_MESSAGE } from '@/pages/setting/constants/deviceMessages';
 import { useDeviceSection } from '@/pages/setting/hooks/useDeviceSection';
