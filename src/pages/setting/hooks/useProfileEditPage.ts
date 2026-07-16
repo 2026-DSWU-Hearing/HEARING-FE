@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { useGetUsers } from '@/pages/setting/hooks/useGetUsers';
+import { useGetUsers } from '@/shared/hooks/useGetUsers';
 import { usePatchUsers } from '@/pages/setting/hooks/usePatchUsers';
 import {
   toDisabilityType,

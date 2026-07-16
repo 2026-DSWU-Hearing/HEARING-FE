@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import TopNavigation from '@/layout/TopNavigation';
 import NotificationToggleBar from '@/pages/setting/components/NotificationToggleBar';
-import { useGetUsers } from '@/pages/setting/hooks/useGetUsers';
+import { useGetUsers } from '@/shared/hooks/useGetUsers';
 import { usePatchPushEnabled } from '@/pages/setting/hooks/usePatchPushEnabled';
 
 const NotificationSettingPage = () => {

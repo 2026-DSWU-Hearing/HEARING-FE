@@ -78,9 +78,20 @@ export const getCurrentFcmToken = async (): Promise<string | null> => {
   }
 };
 
-export const requestFcmToken = async (): Promise<string | null> => {
-  const permission = await Notification.requestPermission();
-  if (permission !== 'granted') return null;
+// 비보안 컨텍스트나 일부 인앱 브라우저엔 Notification API 자체가 없다.
+export const isNotificationSupported = () => typeof Notification !== 'undefined';
 
-  return getCurrentFcmToken();
+// 알림은 선택 기능이므로 권한 요청이 실패해도 호출부로 예외를 던지지 않는다.
+export const requestFcmToken = async (): Promise<string | null> => {
+  if (!isNotificationSupported()) return null;
+
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') return null;
+
+    return getCurrentFcmToken();
+  } catch (error) {
+    console.error('[FCM] 알림 권한 요청 실패:', error);
+    return null;
+  }
 };

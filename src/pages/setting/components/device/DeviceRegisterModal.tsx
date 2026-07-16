@@ -14,7 +14,7 @@ const DEVICE_NAME_MAX_LENGTH = 10;
 
 /**
  * 디바이스 등록 모달.
- * 기기 이름(닉네임)만 입력받는다. mac_address는 등록 핸들러에서 임시 생성한다.
+ * 기기 이름(닉네임)만 입력받는다. mac_address는 등록 핸들러에서 고정 상수로 지정한다.
  * DeviceNameEditModal과 동일한 오버레이 골격(배경 클릭·ESC 닫기)을 차용한다.
  */
 const DeviceRegisterModal = ({

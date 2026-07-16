@@ -1,19 +1,20 @@
 import { useState, useCallback } from 'react';
 
 import { postFcmToken } from '@/shared/apis/postFcmToken';
-import { requestFcmToken } from '@/shared/firebase/settingFCM';
+import { isNotificationSupported, requestFcmToken } from '@/shared/firebase/settingFCM';
 
-const getInitialPermission = (): NotificationPermission =>
-  typeof Notification !== 'undefined' ? Notification.permission : 'default';
+const getCurrentPermission = (): NotificationPermission =>
+  isNotificationSupported() ? Notification.permission : 'default';
 
 export const useFcmToken = () => {
   const [token, setToken] = useState<string | null>(null);
-  const [permission, setPermission] = useState<NotificationPermission>(getInitialPermission);
+  const [permission, setPermission] = useState<NotificationPermission>(getCurrentPermission);
 
   // 사용자 제스처(버튼 클릭)에서 호출해야 한다. 브라우저는 자동 권한 요청을 막는다.
+  // 알림은 선택 기능이라 어떤 실패에도 예외를 던지지 않는다. 호출부의 흐름을 막지 않기 위함이다.
   const handleRequestPermission = useCallback(async () => {
     const fcmToken = await requestFcmToken();
-    setPermission(Notification.permission);
+    setPermission(getCurrentPermission());
 
     if (!fcmToken) return;
     setToken(fcmToken);
