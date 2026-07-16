@@ -1,11 +1,11 @@
 import { useGetDevices } from '@/pages/setting/hooks/useGetDevices';
 import { usePatchDevice } from '@/pages/setting/hooks/usePatchDevice';
-import { usePostDevice } from '@/pages/setting/hooks/usePostDevice';
+import { usePostDevice } from '@/shared/hooks/usePostDevice';
 import { useDeleteDevice } from '@/pages/setting/hooks/useDeleteDevice';
 import { useModal } from '@/shared/hooks/useModal';
 import { useDeviceConnectionWait } from '@/shared/hooks/useDeviceConnectionWait';
 import { CONNECTION_STATUS } from '@/pages/setting/constants/connectionStatus';
-import { DEVICE_MESSAGE } from '@/pages/setting/constants/deviceMessages';
+import { DEVICE_MESSAGE } from '@/shared/constants/deviceMessages';
 
 /**
  * 나의 디바이스 섹션의 조회·매핑·등록/삭제/이름변경 로직을 모은 커스텀 훅.

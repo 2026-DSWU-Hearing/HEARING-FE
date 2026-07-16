@@ -9,7 +9,7 @@ import DeleteDeviceBtn from '@/pages/setting/components/device/DeleteDeviceBtn';
 import DeviceNameEditModal from '@/pages/setting/components/device/DeviceNameEditModal';
 import DeviceRegisterModal from '@/shared/components/DeviceRegisterModal';
 import { SettingCardSkeleton } from '@/pages/setting/components/SettingSkeleton';
-import { DEVICE_MESSAGE } from '@/pages/setting/constants/deviceMessages';
+import { DEVICE_MESSAGE } from '@/shared/constants/deviceMessages';
 import { useDeviceSection } from '@/pages/setting/hooks/useDeviceSection';
 
 /**
