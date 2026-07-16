@@ -3,7 +3,7 @@ import { usePatchDevice } from '@/pages/setting/hooks/usePatchDevice';
 import { usePostDevice } from '@/pages/setting/hooks/usePostDevice';
 import { useDeleteDevice } from '@/pages/setting/hooks/useDeleteDevice';
 import { useModal } from '@/shared/hooks/useModal';
-import { generateMockMacAddress } from '@/pages/setting/utils/generateMockMacAddress';
+import { DEVICE_MAC_ADDRESS } from '@/pages/setting/constants/deviceMac';
 import { CONNECTION_STATUS } from '@/pages/setting/constants/connectionStatus';
 
 /**
@@ -43,18 +43,12 @@ export const useDeviceSection = () => {
     updateDevice({ deviceId: device.id, deviceData: { is_connected: false } });
   };
 
-  const handleConnectClick = () => {
-    // 등록된(연결 해제 상태) 기기를 다시 연결한다. 미등록 상태에선 이 핸들러가 호출되지 않는다.
-    if (!device || isMutating) return;
-    updateDevice({ deviceId: device.id, deviceData: { is_connected: true } });
-  };
-
   const handleRegisterClick = () => registerModal.open();
 
   const handleRegisterSubmit = (nickname: string) => {
     if (isMutating) return;
-    // TODO(api): 실제 BLE 페어링 시 generateMockMacAddress()를 페어링 MAC으로 교체.
-    createDevice({ nickname, mac_address: generateMockMacAddress() });
+    // 단일 기기 전제이므로 실제 ESP32의 고정 MAC 상수를 사용한다. (교체 지점: deviceMac.ts)
+    createDevice({ nickname, mac_address: DEVICE_MAC_ADDRESS });
   };
 
   const handleDeleteClick = () => deleteModal.open();
@@ -88,7 +82,6 @@ export const useDeviceSection = () => {
     deleteModal,
     handleEditClick,
     handleNameSubmit,
-    handleConnectClick,
     handleDisconnectClick,
     handleConfirmDisconnect,
     handleRegisterClick,

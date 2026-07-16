@@ -3,11 +3,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell } from '@fortawesome/free-solid-svg-icons';
 import DoNotDisturbButton from '@/pages/home/components/mode/DoNotDisturbButton';
 import { useHomeModeContext } from '@/pages/home/hooks/useHomeModeContext';
+import { useGetUsers } from '@/shared/hooks/useGetUsers';
 
 const HomeHeader = () => {
   const navigate = useNavigate();
   const { isDoNotDisturb, isDoNotDisturbPending, handleDoNotDisturbToggle } =
     useHomeModeContext();
+  const { data: user } = useGetUsers();
 
   const handleBellClick = () => {
     navigate('/notifications');
@@ -29,7 +31,7 @@ const HomeHeader = () => {
       {/* 하단 행: 인사 문구 + 방해금지 모드 버튼 */}
       <div className="flex items-end justify-between">
         <p className="heading-base-semibold text-secondary">
-          리치님 반가워요
+          {user?.nickname ? `${user.nickname}님 ` : ''}반가워요
           <br />
           환경에 맞는 모드를 선택하세요
         </p>
