@@ -15,7 +15,10 @@ import { DEVICE_CONNECT_TIMEOUT_MS } from '@/shared/constants/deviceConnection';
  * @param isConnected 서버가 알려준 현재 연결 여부
  * @param startsImmediately 마운트하자마자 대기를 시작할지 여부.
  *   온보딩의 연결 대기 페이지처럼 "이 화면에 온 것 자체가 등록 성공"인 경우에 쓴다.
- *   설정 페이지처럼 같은 화면에서 등록하는 경우에는 startWaiting을 직접 호출한다.
+ *
+ *   ⚠️ 마운트 시점에만 평가된다. 이후 이 값이 false → true로 바뀌어도 대기가 시작되지 않으므로
+ *   반드시 상수로만 넘길 것. 사용자 동작에 따라 대기를 시작해야 한다면
+ *   (설정 페이지처럼 같은 화면에서 등록하는 경우) 이 옵션 대신 startWaiting()을 직접 호출한다.
  */
 export const useDeviceConnectionWait = (
   isConnected: boolean,
@@ -42,8 +45,10 @@ export const useDeviceConnectionWait = (
 
   // 기기가 붙으면 isConnected가 true가 되어 대기가 자동으로 끝난다.
   // registeredAt을 따로 비울 필요가 없다(파생값이므로 state 동기화 불필요).
+  // 두 값 모두 registeredAt을 확인해, 대기를 시작한 적 없으면 어느 쪽도 참이 되지 않음을
+  // 이 자리에서 바로 드러낸다.
   const isWaiting = registeredAt !== null && !isTimedOut && !isConnected;
-  const isTimedOutWaiting = isTimedOut && !isConnected;
+  const isTimedOutWaiting = registeredAt !== null && isTimedOut && !isConnected;
 
   /** 대기를 시작한다. 등록 성공 시점에 호출한다. */
   const startWaiting = useCallback(() => {
