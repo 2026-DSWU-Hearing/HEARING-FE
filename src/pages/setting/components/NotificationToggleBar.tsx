@@ -2,16 +2,24 @@ interface NotificationToggleBarPropTypes {
   title: string;
   isOn: boolean;
   onToggle: () => void;
+  /** 제목 아래에 덧붙일 안내 문구. 미지정 시 표시하지 않는다. */
+  description?: string;
 }
 
 const NotificationToggleBar = ({
   title,
   isOn,
   onToggle,
+  description,
 }: NotificationToggleBarPropTypes) => {
   return (
-    <div className="flex items-center justify-between rounded-xl bg-neutral-900 px-lg py-lg">
-      <span className="body-lg-regular text-primary">{title}</span>
+    <div className="flex items-center justify-between gap-base rounded-xl bg-neutral-900 px-lg py-lg">
+      <div className="flex flex-col gap-xxs">
+        <span className="body-lg-regular text-primary">{title}</span>
+        {description && (
+          <span className="body-sm-regular text-secondary">{description}</span>
+        )}
+      </div>
 
       {/* 토글(스위치) 영역만 label로 감싸 이 부분에서만 클릭이 동작하게 한다 */}
       <label
