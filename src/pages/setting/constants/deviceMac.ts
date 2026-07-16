@@ -4,4 +4,4 @@
  * 웹(PWA)은 보안상 BLE 페어링으로도 실제 MAC을 얻을 수 없어, 이 값을 직접 지정한다.
  * TODO(hardware): 실제 ESP32 보드의 MAC(XX:XX:XX:XX:XX:XX, 대문자 hex)으로 아래 값을 교체할 것.
  */
-export const DEVICE_MAC_ADDRESS = 'AA:BB:CC:DD:EE:FF';
+export const DEVICE_MAC_ADDRESS = '44:1B:F6:D4:47:F0';
