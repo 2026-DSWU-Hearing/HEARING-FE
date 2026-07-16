@@ -50,4 +50,11 @@ export const useDeviceConnectionPolling = () => {
     setConnectedDevice(null);
     setHardwareConnected(false);
   }, [isError, setConnectedDevice, setHardwareConnected]);
+
+  // 대기/타임아웃 판단에 쓰도록 현재 연결 여부를 알린다.
+  const isConnected = Array.isArray(devices)
+    ? devices.some((device) => device.is_connected)
+    : false;
+
+  return { isConnected };
 };

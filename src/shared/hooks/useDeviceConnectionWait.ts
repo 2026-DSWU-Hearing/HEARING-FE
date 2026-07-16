@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { DEVICE_CONNECT_TIMEOUT_MS } from '@/shared/constants/deviceConnection';
 
@@ -13,10 +13,19 @@ import { DEVICE_CONNECT_TIMEOUT_MS } from '@/shared/constants/deviceConnection';
  * 폴링 주기가 화면마다 다르기 때문이다(온보딩은 즉각 반응이 필요해 1초, 설정은 5초).
  *
  * @param isConnected 서버가 알려준 현재 연결 여부
+ * @param startsImmediately 마운트하자마자 대기를 시작할지 여부.
+ *   온보딩의 연결 대기 페이지처럼 "이 화면에 온 것 자체가 등록 성공"인 경우에 쓴다.
+ *   설정 페이지처럼 같은 화면에서 등록하는 경우에는 startWaiting을 직접 호출한다.
  */
-export const useDeviceConnectionWait = (isConnected: boolean) => {
+export const useDeviceConnectionWait = (
+  isConnected: boolean,
+  startsImmediately = false,
+) => {
   // null이면 대기 중이 아니다(등록한 적 없거나, 이미 연결됐거나, 예전에 등록한 기기).
-  const [registeredAt, setRegisteredAt] = useState<number | null>(null);
+  // lazy initializer로 넘겨 Date.now()가 첫 렌더에만 실행되게 한다(렌더는 순수해야 한다).
+  const [registeredAt, setRegisteredAt] = useState<number | null>(() =>
+    startsImmediately ? Date.now() : null,
+  );
   const [isTimedOut, setIsTimedOut] = useState(false);
 
   // 대기 시간을 초과하면 실패로 전환한다. 무한 대기로 사용자가 갇히는 것을 막는다.
@@ -37,16 +46,16 @@ export const useDeviceConnectionWait = (isConnected: boolean) => {
   const isTimedOutWaiting = isTimedOut && !isConnected;
 
   /** 대기를 시작한다. 등록 성공 시점에 호출한다. */
-  const startWaiting = () => {
+  const startWaiting = useCallback(() => {
     setRegisteredAt(Date.now());
     setIsTimedOut(false);
-  };
+  }, []);
 
   /** 대기를 초기화한다. 기기 삭제 등 대기 자체가 무의미해진 시점에 호출한다. */
-  const resetWaiting = () => {
+  const resetWaiting = useCallback(() => {
     setRegisteredAt(null);
     setIsTimedOut(false);
-  };
+  }, []);
 
   return {
     /** 연결을 기다리는 중 */
