@@ -20,7 +20,10 @@ const LiveSound = () => {
           statusLabel={statusLabel}
           onListeningToggleClick={handleListeningToggleClick}
         />
-        <SoundRateBlock soundRateList={soundRateList} />
+        <SoundRateBlock
+          isListening={isListening}
+          soundRateList={soundRateList}
+        />
       </section>
     </main>
   );
