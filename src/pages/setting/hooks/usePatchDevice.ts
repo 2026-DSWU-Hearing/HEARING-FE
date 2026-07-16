@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { patchDevice } from '@/pages/setting/apis/patchDevice';
-import type { UpdateDeviceRequestTypes } from '@/pages/setting/types/deviceApiTypes';
+import type { UpdateDeviceRequestTypes } from '@/shared/types/deviceApiTypes';
 
 // 기기 이름을 수정하는 mutation 훅.
 // 인자가 여러 개이므로 객체로 묶어 받는다.

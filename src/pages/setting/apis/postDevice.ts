@@ -1,7 +1,7 @@
 import type {
   CreateDeviceRequestTypes,
   DeviceResponseTypes,
-} from '@/pages/setting/types/deviceApiTypes';
+} from '@/shared/types/deviceApiTypes';
 import http from '@/shared/apis/axios';
 
 /** 기기 등록 */

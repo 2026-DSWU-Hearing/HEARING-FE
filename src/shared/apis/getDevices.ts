@@ -1,4 +1,4 @@
-import type { DeviceResponseTypes } from '@/pages/setting/types/deviceApiTypes';
+import type { DeviceResponseTypes } from '@/shared/types/deviceApiTypes';
 import http from '@/shared/apis/axios';
 
 /** 기기 목록 조회 */

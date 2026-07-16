@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getDevices } from '@/pages/setting/apis/getDevices';
+import { getDevices } from '@/shared/apis/getDevices';
 import { DEVICE_STATUS_POLLING_INTERVAL_MS } from '@/pages/setting/constants/deviceStatus';
 
 // 기기 목록을 조회하는 query 훅.

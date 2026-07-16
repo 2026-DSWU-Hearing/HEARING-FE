@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
-import { getDevices } from '@/pages/onboarding/apis/deviceApi';
+import { getDevices } from '@/shared/apis/getDevices';
 import { DEVICE_POLLING_INTERVAL_MS } from '@/pages/onboarding/constants/hardwareConstants';
 import { useOnboardingStore } from '@/pages/onboarding/stores/useOnboardingStore';
 import { getAccessToken } from '@/pages/login/utils/tokenStorage';
