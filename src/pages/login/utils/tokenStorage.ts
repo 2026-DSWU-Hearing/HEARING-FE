@@ -17,6 +17,8 @@ export const setLoginType = (loginType: LoginTypeTypes) => {
 
 export const getAccessToken = () => localStorage.getItem(ACCESS_TOKEN_KEY);
 
+export const getRefreshToken = () => localStorage.getItem(REFRESH_TOKEN_KEY);
+
 export const removeAuthTokens = () => {
   localStorage.removeItem(ACCESS_TOKEN_KEY);
   localStorage.removeItem(REFRESH_TOKEN_KEY);

@@ -7,16 +7,18 @@ import DeviceStatusGrid from '@/pages/setting/components/device/DeviceStatusGrid
 import ConnectDeviceBtn from '@/pages/setting/components/device/ConnectDeviceBtn';
 import DeleteDeviceBtn from '@/pages/setting/components/device/DeleteDeviceBtn';
 import DeviceNameEditModal from '@/pages/setting/components/device/DeviceNameEditModal';
-import DeviceRegisterModal from '@/pages/setting/components/device/DeviceRegisterModal';
+import DeviceRegisterModal from '@/shared/components/DeviceRegisterModal';
 import { SettingCardSkeleton } from '@/pages/setting/components/SettingSkeleton';
+import { DEVICE_MESSAGE } from '@/shared/constants/deviceMessages';
 import { useDeviceSection } from '@/pages/setting/hooks/useDeviceSection';
 
 /**
- * 나의 디바이스 섹션. 등록 여부·연결 여부로 3상태를 분기한다.
+ * 나의 디바이스 섹션. 등록 여부·연결 여부·대기 시간으로 4상태를 분기한다.
  * - 미등록: "디바이스 등록" 버튼
- * - 등록 + 연결 해제: 자동 연결 안내 문구 + 삭제 버튼
- * - 등록 + 연결: 디바이스 카드(이름·배터리·연결 상태) + "연결 해제하기" + 삭제 버튼
- * 조회·매핑·등록/연결/해제/삭제/이름변경 로직은 useDeviceSection 훅에 있다.
+ * - 등록 + 연결 대기 중: "기기 연결 중..." + 삭제 버튼
+ * - 등록 + 대기 시간 초과: 실패 안내 + "다시 찾기" + 삭제 버튼
+ * - 등록 + 연결: 디바이스 카드(이름·배터리·연결 상태) + 삭제 버튼
+ * 조회·매핑·등록/삭제/이름변경 로직은 useDeviceSection 훅에 있다.
  */
 const DeviceSection = () => {
   const {
@@ -25,19 +27,21 @@ const DeviceSection = () => {
     connectionStatus,
     isConnected,
     isRegistered,
+    isWaitingForConnection,
     isLoading,
     isError,
     isMutating,
+    isCreating,
+    registerErrorMessage,
     nameModal,
-    disconnectModal,
     registerModal,
     deleteModal,
     handleEditClick,
     handleNameSubmit,
-    handleDisconnectClick,
-    handleConfirmDisconnect,
     handleRegisterClick,
+    handleCloseRegisterModal,
     handleRegisterSubmit,
+    handleRetryClick,
     handleDeleteClick,
     handleConfirmDelete,
   } = useDeviceSection();
@@ -64,11 +68,7 @@ const DeviceSection = () => {
 
   return (
     <section className="flex flex-col gap-sm">
-      <SettingSectionTitle
-        title="나의 디바이스"
-        actionLabel={isConnected ? '연결 해제하기' : undefined}
-        onActionClick={isConnected ? handleDisconnectClick : undefined}
-      />
+      <SettingSectionTitle title="나의 디바이스" />
 
       {!isRegistered && (
         <ConnectDeviceBtn
@@ -78,11 +78,28 @@ const DeviceSection = () => {
         />
       )}
 
-      {isRegistered && !isConnected && (
+      {isRegistered && !isConnected && isWaitingForConnection && (
         <div className="flex flex-col gap-sm">
-          <p className="flex items-center rounded-xl bg-neutral-900 px-base py-base body-base-regular text-secondary">
-            디바이스 찾는 중...
+          <p
+            role="status"
+            className="flex items-center rounded-xl bg-neutral-900 px-base py-base body-base-regular text-secondary"
+          >
+            {DEVICE_MESSAGE.CONNECTING}
           </p>
+          <DeleteDeviceBtn onClick={handleDeleteClick} />
+        </div>
+      )}
+
+      {isRegistered && !isConnected && !isWaitingForConnection && (
+        <div className="flex flex-col gap-sm">
+          <p className="flex items-center whitespace-pre-line rounded-xl bg-neutral-900 px-base py-base body-base-regular text-secondary">
+            {DEVICE_MESSAGE.CONNECT_FAILED}
+          </p>
+          <ConnectDeviceBtn
+            label="다시 찾기"
+            onClick={handleRetryClick}
+            disabled={isMutating}
+          />
           <DeleteDeviceBtn onClick={handleDeleteClick} />
         </div>
       )}
@@ -114,21 +131,12 @@ const DeviceSection = () => {
 
       {registerModal.isOpen && (
         <DeviceRegisterModal
-          onClose={registerModal.close}
+          onClose={handleCloseRegisterModal}
           onSubmit={handleRegisterSubmit}
+          isPending={isCreating}
+          errorMessage={registerErrorMessage}
         />
       )}
-
-      <ConfirmModal
-        isOpen={disconnectModal.isOpen}
-        message="연결을 해제하시겠습니까?"
-        onConfirm={handleConfirmDisconnect}
-        onCancel={disconnectModal.close}
-        onClose={disconnectModal.close}
-        confirmText="해제"
-        cancelText="취소"
-        confirmDisabled={isMutating}
-      />
 
       <ConfirmModal
         isOpen={deleteModal.isOpen}

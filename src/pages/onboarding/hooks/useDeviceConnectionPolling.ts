@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
-import { getDevices } from '@/pages/onboarding/apis/deviceApi';
+import { getDevices } from '@/shared/apis/getDevices';
 import { DEVICE_POLLING_INTERVAL_MS } from '@/pages/onboarding/constants/hardwareConstants';
 import { useOnboardingStore } from '@/pages/onboarding/stores/useOnboardingStore';
 import { getAccessToken } from '@/pages/login/utils/tokenStorage';
@@ -50,4 +50,11 @@ export const useDeviceConnectionPolling = () => {
     setConnectedDevice(null);
     setHardwareConnected(false);
   }, [isError, setConnectedDevice, setHardwareConnected]);
+
+  // 대기/타임아웃 판단에 쓰도록 현재 연결 여부를 알린다.
+  const isConnected = Array.isArray(devices)
+    ? devices.some((device) => device.is_connected)
+    : false;
+
+  return { isConnected };
 };
