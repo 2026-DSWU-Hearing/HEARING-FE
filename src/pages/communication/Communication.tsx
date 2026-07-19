@@ -1,54 +1,37 @@
-import { useEffect, useState } from 'react';
-
-import CommunicationHeader from '@/pages/communication/components/CommunicationHeader';
 import ChatContainer from '@/pages/communication/components/chat/ChatContainer';
+import CommunicationHeader from '@/pages/communication/components/CommunicationHeader';
+import ConversationSavedNotice from '@/pages/communication/components/ConversationSavedNotice';
 import ConversationEndButton from '@/pages/communication/components/control/ConversationEndButton';
 import RecordingButton from '@/pages/communication/components/control/RecordingButton';
-import type { ConversationTypes } from '@/pages/communication/types/communication-Types';
-
-interface CommunicationMockDataTypes {
-  conversation: ConversationTypes;
-}
+import { useCommunicationPage } from '@/pages/communication/hooks/useCommunicationPage';
 
 const Communication = () => {
-  const [conversation, setConversation] = useState<ConversationTypes | null>(
-    null,
-  );
-  const [isListening, setIsListening] = useState(false);
-
-  useEffect(() => {
-    const fetchMockData = async () => {
-      const response = await fetch('/data/communicationMock.json');
-      const data: CommunicationMockDataTypes = await response.json();
-
-      setConversation(data.conversation);
-    };
-
-    fetchMockData();
-  }, []);
-
-  const handleOpenHistory = () => {
-    console.log('대화기록 열기');
-  };
-
-  const handleOpenFavoriteAnswer = () => {
-    console.log('자주 쓰는 답변 열기');
-  };
-
-  const handleToggleRecording = () => {
-    setIsListening((prev) => !prev);
-  };
-
-  const handleEndConversation = () => {
-    console.log('대화 종료');
-  };
+  const {
+    conversation,
+    bubbles,
+    isListening,
+    draftReply,
+    draftListening,
+    isSavedNoticeOpen,
+    handleOpenHistory,
+    handleOpenFavoriteAnswer,
+    handleToggleRecording,
+    handleDraftReplyChange,
+    handleDraftListeningChange,
+    handleSubmitReply,
+    handleEndConversation,
+  } = useCommunicationPage();
 
   if (!conversation) {
-    return <div className="p-4 text-sm text-gray-500">로딩 중...</div>;
+    return (
+      <div className="body-base-medium flex min-h-dvh items-center justify-center bg-neutral-950 text-secondary">
+        로딩 중...
+      </div>
+    );
   }
 
   return (
-    <main className="flex min-h-screen flex-col bg-white">
+    <main className="flex min-h-dvh flex-col bg-neutral-950">
       <CommunicationHeader
         locationName={conversation.locationName}
         onOpenHistory={handleOpenHistory}
@@ -57,18 +40,29 @@ const Communication = () => {
 
       <section className="flex flex-1 flex-col justify-end overflow-y-auto">
         <ChatContainer
-          bubbles={conversation.bubbles}
+          bubbles={bubbles}
           isListening={isListening}
+          draftReply={draftReply}
+          draftListening={draftListening}
+          onDraftReplyChange={handleDraftReplyChange}
+          onDraftListeningChange={handleDraftListeningChange}
+          onSubmitReply={handleSubmitReply}
         />
       </section>
 
-      <div className="flex shrink-0 items-center justify-center gap-3 px-4 py-4">
+      {/* 하단 탭바(BottomNavigation)가 h-[5.1875rem]짜리 fixed라 문서 흐름엔 안 잡혀서,
+          "탭바 위 2.81rem"을 만들려면 탭바 높이(5.1875rem)까지 더해서 띄워야 한다. */}
+      <div className="flex shrink-0 items-center justify-center gap-xl px-base pb-[7.9975rem] pt-base">
         <RecordingButton
           isRecording={isListening}
           onToggle={handleToggleRecording}
         />
-        <ConversationEndButton onClick={handleEndConversation} />
+        {isListening && (
+          <ConversationEndButton onClick={handleEndConversation} />
+        )}
       </div>
+
+      <ConversationSavedNotice isOpen={isSavedNoticeOpen} />
     </main>
   );
 };

@@ -1,0 +1,54 @@
+import type { KeyboardEvent } from 'react';
+
+import { useAutoGrowTextarea } from '@/shared/hooks/useAutoGrowTextarea';
+
+interface ChatInputBubblePropTypes {
+  value: string;
+  onChange: (value: string) => void;
+  onSubmit: () => void;
+}
+
+const PLACEHOLDER = '텍스트 입력';
+
+// 대화의 다음 차례를 기다리는 오른쪽(내) 버블. 실제로 텍스트를 입력할 수 있는
+// textarea를 버블 모양으로 감싼 형태다. Enter를 누르면 입력값을 확정 버블로 올리고 비운다.
+// 버블의 패딩/모양은 바깥 wrapper가 담당하고, 안쪽 textarea는 패딩 없이 텍스트 폭만큼만
+// 채워서 좌우/상하 여백이 항상 대칭이 되게 한다. 너비는 고정값이 아니라 입력된 텍스트
+// 길이에 맞춰 늘어나고(useAutoGrowTextarea), 최대 폭(75%)을 넘으면 줄바꿈되며 높이가 늘어난다.
+const ChatInputBubble = ({ value, onChange, onSubmit }: ChatInputBubblePropTypes) => {
+  const { textareaRef, measureRef } = useAutoGrowTextarea(value, PLACEHOLDER);
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    // 한글 등 IME로 조합 중일 때 Enter를 누르면 조합 확정용 keydown이 한 번 더 발생해서,
+    // 이걸 그대로 두면 같은 답변이 버블 두 개로 겹쳐 올라간다. 조합 중이면 무시한다.
+    if (event.key !== 'Enter' || event.nativeEvent.isComposing) return;
+
+    event.preventDefault();
+    onSubmit();
+  };
+
+  return (
+    <div className="relative flex justify-end">
+      <div className="flex min-h-[1.75rem] min-w-[5.75rem] max-w-[75%] items-center gap-[0.625rem] rounded-2xl rounded-br-sm bg-primary-400 px-lg py-base">
+        <textarea
+          ref={textareaRef}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder={PLACEHOLDER}
+          aria-label="답변 입력"
+          rows={1}
+          className="heading-2xl-semibold resize-none overflow-hidden border-none bg-transparent p-0 text-right text-neutral-700 placeholder:text-neutral-700 outline-none"
+        />
+      </div>
+      {/* 텍스트 실제 폭을 재기 위한 숨김 요소. 화면엔 보이지 않고 textarea와 같은 폰트 스타일만 공유한다. */}
+      <span
+        ref={measureRef}
+        aria-hidden="true"
+        className="heading-2xl-semibold invisible absolute left-0 top-0 -z-10 whitespace-pre"
+      />
+    </div>
+  );
+};
+
+export default ChatInputBubble;
