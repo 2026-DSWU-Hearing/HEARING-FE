@@ -1,11 +1,14 @@
 import type { KeyboardEvent } from 'react';
 
 import { useAutoGrowTextarea } from '@/shared/hooks/useAutoGrowTextarea';
+import { useRiseAnimation } from '@/shared/hooks/useRiseAnimation';
 
 interface ChatInputBubblePropTypes {
   value: string;
   onChange: (value: string) => void;
   onSubmit: () => void;
+  // 반대쪽(ListeningBubble)에 입력이 들어오기 시작하면 true로 바뀌어 등장 애니메이션을 튼다.
+  riseTrigger: boolean;
 }
 
 const PLACEHOLDER = '텍스트 입력';
@@ -15,8 +18,14 @@ const PLACEHOLDER = '텍스트 입력';
 // 버블의 패딩/모양은 바깥 wrapper가 담당하고, 안쪽 textarea는 패딩 없이 텍스트 폭만큼만
 // 채워서 좌우/상하 여백이 항상 대칭이 되게 한다. 너비는 고정값이 아니라 입력된 텍스트
 // 길이에 맞춰 늘어나고(useAutoGrowTextarea), 최대 폭(75%)을 넘으면 줄바꿈되며 높이가 늘어난다.
-const ChatInputBubble = ({ value, onChange, onSubmit }: ChatInputBubblePropTypes) => {
+const ChatInputBubble = ({
+  value,
+  onChange,
+  onSubmit,
+  riseTrigger,
+}: ChatInputBubblePropTypes) => {
   const { textareaRef, measureRef } = useAutoGrowTextarea(value, PLACEHOLDER);
+  const isRising = useRiseAnimation(riseTrigger);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     // 한글 등 IME로 조합 중일 때 Enter를 누르면 조합 확정용 keydown이 한 번 더 발생해서,
@@ -28,8 +37,13 @@ const ChatInputBubble = ({ value, onChange, onSubmit }: ChatInputBubblePropTypes
   };
 
   return (
-    <div className="relative flex justify-end">
-      <div className="flex min-h-[1.75rem] min-w-[5.75rem] max-w-[75%] items-center gap-[0.625rem] rounded-2xl rounded-br-sm bg-primary-400 px-lg py-base">
+    // self-stretch: 부모(전체 컨테이너)의 align-items가 flex-start라 기본적으로는
+    // 내용 너비만큼만 차지하는데, 그러면 이 안의 justify-end가 의미가 없어진다.
+    // 이 줄만은 항상 전체 너비를 차지하도록 stretch로 고정한다.
+    <div
+      className={`relative flex w-full justify-end self-stretch ${isRising ? 'animate-bubble-rise' : ''}`}
+    >
+      <div className="flex min-h-[1.75rem] min-w-[5.75rem] max-w-[75%] items-center gap-[0.625rem] overflow-hidden rounded-2xl rounded-br-sm bg-primary-400 px-lg py-base">
         <textarea
           ref={textareaRef}
           value={value}
@@ -38,7 +52,7 @@ const ChatInputBubble = ({ value, onChange, onSubmit }: ChatInputBubblePropTypes
           placeholder={PLACEHOLDER}
           aria-label="답변 입력"
           rows={1}
-          className="heading-2xl-semibold resize-none overflow-hidden border-none bg-transparent p-0 text-right text-neutral-700 placeholder:text-neutral-700 outline-none"
+          className="heading-2xl-semibold max-w-full resize-none overflow-hidden border-none bg-transparent p-0 text-right text-neutral-700 placeholder:text-neutral-700 outline-none"
         />
       </div>
       {/* 텍스트 실제 폭을 재기 위한 숨김 요소. 화면엔 보이지 않고 textarea와 같은 폰트 스타일만 공유한다. */}

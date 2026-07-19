@@ -19,6 +19,7 @@ const Communication = () => {
     handleDraftReplyChange,
     handleDraftListeningChange,
     handleSubmitReply,
+    handleSubmitListening,
     handleEndConversation,
   } = useCommunicationPage();
 
@@ -31,14 +32,20 @@ const Communication = () => {
   }
 
   return (
-    <main className="flex min-h-dvh flex-col bg-neutral-950">
+    // h-dvh(고정 높이) + overflow-hidden: 채팅 내용이 길어져도 main 자체는 화면 높이를 벗어나지
+    // 않는다. 그래야 아래 section의 overflow-y-auto가 내부적으로만 스크롤되고,
+    // 헤더/하단 버튼 줄이 화면 스크롤에 밀려 움직이지 않는다.
+    <main className="flex h-dvh flex-col overflow-hidden bg-neutral-950">
       <CommunicationHeader
         locationName={conversation.locationName}
         onOpenHistory={handleOpenHistory}
         onOpenFavoriteAnswer={handleOpenFavoriteAnswer}
       />
 
-      <section className="flex flex-1 flex-col justify-end overflow-y-auto">
+      {/* min-h-0: flex item 기본값(min-height:auto)이 내용 크기만큼 자라려는 걸 막아야
+          overflow-y-auto가 실제로 내부 스크롤로 동작한다(안 그러면 section 자체가 늘어나
+          main 전체가 길어지고, 그 여파로 헤더가 위로 밀려 올라간다). */}
+      <section className="flex min-h-0 flex-1 flex-col justify-end overflow-y-auto">
         <ChatContainer
           bubbles={bubbles}
           isListening={isListening}
@@ -47,6 +54,7 @@ const Communication = () => {
           onDraftReplyChange={handleDraftReplyChange}
           onDraftListeningChange={handleDraftListeningChange}
           onSubmitReply={handleSubmitReply}
+          onSubmitListening={handleSubmitListening}
         />
       </section>
 
