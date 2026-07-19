@@ -1,15 +1,17 @@
 import type { KeyboardEvent } from 'react';
 
 import { useAutoGrowTextarea } from '@/shared/hooks/useAutoGrowTextarea';
-import { useRiseAnimation } from '@/shared/hooks/useRiseAnimation';
 
 interface ListeningBubblePropTypes {
   isListening: boolean;
   value: string;
   onChange: (value: string) => void;
   onSubmit: () => void;
-  // 반대쪽(ChatInputBubble)에 입력이 들어오기 시작하면 true로 바뀌어 등장 애니메이션을 튼다.
-  riseTrigger: boolean;
+  // 반대쪽(ChatInputBubble)에 입력이 들어와서 이 버블이 그 아래에 새로 태어난 경우 true.
+  // ChatContainer가 key를 바꿔 이 컴포넌트를 다시 mount시키므로, true일 때 등장 애니메이션만 틀어주면 된다.
+  isSpawning: boolean;
+  // 화면상 위/아래 순서(CSS order). DOM 순서는 항상 고정이고 이 값으로만 시각적 순서를 바꾼다.
+  order: number;
 }
 
 // 대화의 다음 차례를 기다리는 왼쪽(상대방) 버블.
@@ -24,11 +26,11 @@ const ListeningBubble = ({
   value,
   onChange,
   onSubmit,
-  riseTrigger,
+  isSpawning,
+  order,
 }: ListeningBubblePropTypes) => {
   const placeholder = isListening ? '듣는 중..' : '텍스트 입력';
   const { textareaRef, measureRef } = useAutoGrowTextarea(value, placeholder);
-  const isRising = useRiseAnimation(riseTrigger);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     // 한글 등 IME로 조합 중일 때 Enter를 누르면 조합 확정용 keydown이 한 번 더 발생해서,
@@ -44,9 +46,10 @@ const ListeningBubble = ({
     // 내용 너비만큼만 차지하는데, 그러면 이 안의 justify-start가 의미가 없어진다.
     // 이 줄만은 항상 전체 너비를 차지하도록 stretch로 고정한다.
     <div
-      className={`relative flex w-full justify-start self-stretch ${isRising ? 'animate-bubble-rise' : ''}`}
+      style={{ order }}
+      className={`relative flex w-full justify-start self-stretch ${isSpawning ? 'animate-bubble-rise' : ''}`}
     >
-      <div className="flex min-h-[1.75rem] min-w-[5.75rem] max-w-[75%] items-center justify-end gap-[0.625rem] overflow-hidden rounded-2xl rounded-bl-sm px-lg py-base [background:linear-gradient(0deg,rgba(255,255,255,0.20)_0%,rgba(255,255,255,0.20)_100%),var(--color-neutral-700)]">
+      <div className="flex min-h-[1.75rem] min-w-[5.75rem] max-w-[75%] items-center justify-center gap-[0.625rem] overflow-hidden rounded-2xl rounded-bl-sm px-lg py-base [background:linear-gradient(0deg,rgba(255,255,255,0.20)_0%,rgba(255,255,255,0.20)_100%),var(--color-neutral-700)]">
         <textarea
           ref={textareaRef}
           value={value}

@@ -1,7 +1,6 @@
 import ChatContainer from '@/pages/communication/components/chat/ChatContainer';
 import CommunicationHeader from '@/pages/communication/components/CommunicationHeader';
 import ConversationSavedNotice from '@/pages/communication/components/ConversationSavedNotice';
-import ConversationEndButton from '@/pages/communication/components/control/ConversationEndButton';
 import RecordingButton from '@/pages/communication/components/control/RecordingButton';
 import { useCommunicationPage } from '@/pages/communication/hooks/useCommunicationPage';
 
@@ -60,14 +59,12 @@ const Communication = () => {
 
       {/* 하단 탭바(BottomNavigation)가 h-[5.1875rem]짜리 fixed라 문서 흐름엔 안 잡혀서,
           "탭바 위 2.81rem"을 만들려면 탭바 높이(5.1875rem)까지 더해서 띄워야 한다. */}
-      <div className="flex shrink-0 items-center justify-center gap-xl px-base pb-[7.9975rem] pt-base">
+      <div className="flex shrink-0 items-center justify-center px-base pb-[7.9975rem] pt-base">
         <RecordingButton
           isRecording={isListening}
           onToggle={handleToggleRecording}
+          onEndConversation={handleEndConversation}
         />
-        {isListening && (
-          <ConversationEndButton onClick={handleEndConversation} />
-        )}
       </div>
 
       <ConversationSavedNotice isOpen={isSavedNoticeOpen} />
