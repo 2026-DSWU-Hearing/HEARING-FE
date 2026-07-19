@@ -38,7 +38,7 @@ const Communication = () => {
         onOpenFavoriteAnswer={handleOpenFavoriteAnswer}
       />
 
-      <section className="flex min-h-0 flex-1 flex-col justify-end overflow-y-auto">
+      <section className="flex min-h-0 flex-1 flex-col justify-end overflow-x-hidden overflow-y-auto">
         <ChatContainer
           bubbles={bubbles}
           isListening={isListening}

@@ -47,7 +47,7 @@ const ListeningBubble = ({
     // 이 줄만은 항상 전체 너비를 차지하도록 stretch로 고정한다.
     <div
       style={{ order }}
-      className={`relative flex w-full justify-start self-stretch ${isSpawning ? 'animate-bubble-rise' : ''}`}
+      className={`relative flex w-full justify-start self-stretch overflow-hidden ${isSpawning ? 'animate-bubble-rise' : ''}`}
     >
       <div className="card-listening-bubble flex min-h-[1.75rem] min-w-[5.75rem] max-w-[75%] items-center justify-center gap-[0.625rem] overflow-hidden rounded-2xl rounded-bl-sm px-lg py-base">
         <textarea

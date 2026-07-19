@@ -37,7 +37,7 @@ const ChatInputBubble = ({
 
     <div
       style={{ order }}
-      className={`relative flex w-full justify-end self-stretch ${isSpawning ? 'animate-bubble-rise' : ''}`}
+      className={`relative flex w-full justify-end self-stretch overflow-hidden ${isSpawning ? 'animate-bubble-rise' : ''}`}
     >
       <div className="flex min-h-[1.75rem] min-w-[5.75rem] max-w-[75%] items-center justify-center gap-[0.625rem] overflow-hidden rounded-2xl rounded-br-sm bg-primary-400 px-lg py-base">
         <textarea
