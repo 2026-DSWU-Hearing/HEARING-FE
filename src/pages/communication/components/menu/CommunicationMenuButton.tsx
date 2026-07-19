@@ -19,7 +19,7 @@ const CommunicationMenuButton = ({
       className="flex h-2xl w-2xl shrink-0 items-center justify-center rounded-2xl bg-neutral-700 p-sm"
     >
       <EllipsisIcon
-        className={`h-icon-md w-icon-md ${isOpen ? 'text-tertiary' : 'text-secondary'}`}
+        className={`h-icon-md w-icon-md shrink-0 ${isOpen ? 'text-tertiary' : 'text-secondary'}`}
       />
     </button>
   );
