@@ -9,9 +9,7 @@ interface CommunicationMenuPropTypes {
   onOpenFavoriteAnswer: () => void;
 }
 
-// 헤더 '...' 버튼을 누르면 뜨는 드롭다운. 대화기록/자주 쓰는 답변 두 항목만 노출한다.
-// 각 항목의 실제 화면(리스트/즐겨찾기)은 아직 구현 전이라 클릭 시 메뉴만 닫고
-// 상위에서 넘겨준 콜백(현재는 콘솔 로그)을 호출한다.
+
 const CommunicationMenu = ({
   isOpen,
   onClose,

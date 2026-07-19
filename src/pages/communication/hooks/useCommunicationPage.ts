@@ -1,22 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 
-import type {
-  ChatBubbleTypes,
-  ConversationTypes,
-} from '@/pages/communication/types/communication-Types';
-
-interface CommunicationMockDataTypes {
-  conversation: ConversationTypes;
-}
+import { useGetCommunicationMock } from '@/pages/communication/hooks/useGetCommunicationMock';
+import type { ChatBubbleTypes } from '@/pages/communication/types/communication-Types';
 
 // '대화가 저장되었습니다' 안내가 화면에 떠 있는 시간(ms)
 const SAVED_NOTICE_DURATION = 2000;
 
 // 양방향 소통(Communication) 페이지의 상태/핸들러를 모아둔 훅.
 export const useCommunicationPage = () => {
-  const [conversation, setConversation] = useState<ConversationTypes | null>(
-    null,
-  );
+  const { data } = useGetCommunicationMock();
+  const conversation = data?.conversation ?? null;
+
   const [bubbles, setBubbles] = useState<ChatBubbleTypes[]>([]);
   const [isListening, setIsListening] = useState(false);
   const [draftReply, setDraftReply] = useState('');
@@ -30,23 +24,17 @@ export const useCommunicationPage = () => {
     null,
   );
 
+  // 목데이터의 기존 대화기록은 화면에 쌓아두지 않고, id 채번 기준으로만 사용한다.
+  // 실제로 화면에는 Enter로 새로 보낸 답변부터 쌓인다.
   useEffect(() => {
-    const fetchMockData = async () => {
-      const response = await fetch('/data/communicationMock.json');
-      const data: CommunicationMockDataTypes = await response.json();
+    if (!conversation) return;
 
-      setConversation(data.conversation);
-      // 목데이터의 기존 대화기록은 화면에 쌓아두지 않고, id 채번 기준으로만 사용한다.
-      // 실제로 화면에는 Enter로 새로 보낸 답변부터 쌓인다.
-      nextBubbleIdRef.current =
-        data.conversation.bubbles.reduce(
-          (maxId, bubble) => Math.max(maxId, bubble.id),
-          0,
-        ) + 1;
-    };
-
-    fetchMockData();
-  }, []);
+    nextBubbleIdRef.current =
+      conversation.bubbles.reduce(
+        (maxId, bubble) => Math.max(maxId, bubble.id),
+        0,
+      ) + 1;
+  }, [conversation]);
 
   // 언마운트 시 남아있는 안내 타이머를 정리한다.
   useEffect(() => {

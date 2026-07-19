@@ -5,8 +5,7 @@ interface CommunicationMenuButtonPropTypes {
   onClick: () => void;
 }
 
-// 헤더 우측의 '더보기(...)' 버튼. 누르면 대화기록/자주 쓰는 답변 메뉴가 펼쳐진다.
-// 메뉴가 열려있는 동안(isOpen)에는 점 색이 한 톤 어둡게 바뀌어 눌린 상태를 나타낸다.
+
 const CommunicationMenuButton = ({
   isOpen,
   onClick,

@@ -39,3 +39,9 @@ export interface FavoriteAnswerTypes {
   id: number;
   content: string;
 }
+
+export interface GetCommunicationMockResponseTypes {
+  conversation: ConversationTypes;
+  favoriteAnswers: FavoriteAnswerTypes[];
+  conversationHistories: ConversationHistoryTypes[];
+}

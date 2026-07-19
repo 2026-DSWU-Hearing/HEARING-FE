@@ -7,10 +7,9 @@ interface ListeningBubblePropTypes {
   value: string;
   onChange: (value: string) => void;
   onSubmit: () => void;
-  // 반대쪽(ChatInputBubble)에 입력이 들어와서 이 버블이 그 아래에 새로 태어난 경우 true.
-  // ChatContainer가 key를 바꿔 이 컴포넌트를 다시 mount시키므로, true일 때 등장 애니메이션만 틀어주면 된다.
+  
   isSpawning: boolean;
-  // 화면상 위/아래 순서(CSS order). DOM 순서는 항상 고정이고 이 값으로만 시각적 순서를 바꾼다.
+
   order: number;
 }
 

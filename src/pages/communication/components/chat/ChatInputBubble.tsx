@@ -6,8 +6,7 @@ interface ChatInputBubblePropTypes {
   value: string;
   onChange: (value: string) => void;
   onSubmit: () => void;
-  // 반대쪽(ListeningBubble)에 입력이 들어와서 이 버블이 그 아래에 새로 태어난 경우 true.
-  // ChatContainer가 key를 바꿔 이 컴포넌트를 다시 mount시키므로, true일 때 등장 애니메이션만 틀어주면 된다.
+
   isSpawning: boolean;
   // 화면상 위/아래 순서(CSS order). DOM 순서는 항상 고정이고 이 값으로만 시각적 순서를 바꾼다.
   order: number;
@@ -15,11 +14,7 @@ interface ChatInputBubblePropTypes {
 
 const PLACEHOLDER = '텍스트 입력';
 
-// 대화의 다음 차례를 기다리는 오른쪽(내) 버블. 실제로 텍스트를 입력할 수 있는
-// textarea를 버블 모양으로 감싼 형태다. Enter를 누르면 입력값을 확정 버블로 올리고 비운다.
-// 버블의 패딩/모양은 바깥 wrapper가 담당하고, 안쪽 textarea는 패딩 없이 텍스트 폭만큼만
-// 채워서 좌우/상하 여백이 항상 대칭이 되게 한다. 너비는 고정값이 아니라 입력된 텍스트
-// 길이에 맞춰 늘어나고(useAutoGrowTextarea), 최대 폭(75%)을 넘으면 줄바꿈되며 높이가 늘어난다.
+
 const ChatInputBubble = ({
   value,
   onChange,
@@ -30,8 +25,7 @@ const ChatInputBubble = ({
   const { textareaRef, measureRef } = useAutoGrowTextarea(value, PLACEHOLDER);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
-    // 한글 등 IME로 조합 중일 때 Enter를 누르면 조합 확정용 keydown이 한 번 더 발생해서,
-    // 이걸 그대로 두면 같은 답변이 버블 두 개로 겹쳐 올라간다. 조합 중이면 무시한다.
+
     if (event.key !== 'Enter' || event.nativeEvent.isComposing) return;
 
     event.preventDefault();
@@ -39,9 +33,7 @@ const ChatInputBubble = ({
   };
 
   return (
-    // self-stretch: 부모(전체 컨테이너)의 align-items가 flex-start라 기본적으로는
-    // 내용 너비만큼만 차지하는데, 그러면 이 안의 justify-end가 의미가 없어진다.
-    // 이 줄만은 항상 전체 너비를 차지하도록 stretch로 고정한다.
+
     <div
       style={{ order }}
       className={`relative flex w-full justify-end self-stretch ${isSpawning ? 'animate-bubble-rise' : ''}`}
@@ -58,7 +50,7 @@ const ChatInputBubble = ({
           className="heading-2xl-semibold max-w-full resize-none overflow-hidden border-none bg-transparent p-0 text-right text-neutral-700 placeholder:text-neutral-700 outline-none"
         />
       </div>
-      {/* 텍스트 실제 폭을 재기 위한 숨김 요소. 화면엔 보이지 않고 textarea와 같은 폰트 스타일만 공유한다. */}
+  
       <span
         ref={measureRef}
         aria-hidden="true"
