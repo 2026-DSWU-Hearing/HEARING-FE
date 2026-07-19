@@ -58,8 +58,8 @@ const Communication = () => {
       </section>
 
       {/* 하단 탭바(BottomNavigation)가 h-[5.1875rem]짜리 fixed라 문서 흐름엔 안 잡혀서,
-          "탭바 위 2.81rem"을 만들려면 탭바 높이(5.1875rem)까지 더해서 띄워야 한다. */}
-      <div className="flex shrink-0 items-center justify-center px-base pb-[7.9975rem] pt-base">
+          "탭바 위 1rem"을 만들려면 탭바 높이(5.1875rem)까지 더해서 띄워야 한다. */}
+      <div className="flex shrink-0 items-center justify-center px-base pb-[6.1875rem] pt-base">
         <RecordingButton
           isRecording={isListening}
           onToggle={handleToggleRecording}

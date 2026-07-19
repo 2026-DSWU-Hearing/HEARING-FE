@@ -40,7 +40,7 @@ const RecordingButton = ({
             isRecording ? '' : 'invisible'
           }`}
         >
-          말해주세요
+          말해주세요!
         </span>
       </div>
 

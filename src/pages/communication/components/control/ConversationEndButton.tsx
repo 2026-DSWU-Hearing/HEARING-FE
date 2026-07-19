@@ -12,9 +12,9 @@ const ConversationEndButton = ({ onClick }: ConversationEndButtonPropTypes) => {
         type="button"
         onClick={onClick}
         aria-label="대화 종료"
-        className="flex h-[4rem] w-[4rem] items-center justify-center rounded-pill bg-[#F0342F]/20 p-sm text-state-alert transition-all active:scale-[0.98]"
+        className="flex h-[4rem] w-[4rem] items-center justify-center rounded-pill card-false p-sm text-state-alert transition-all active:scale-[0.98]"
       >
-        <CloseIcon className="h-[1.23613rem] w-[1.23613rem]" />
+        <CloseIcon className="h-[2.25rem] w-[2.25rem]" />
       </button>
       <span className="body-base-medium text-center text-state-alert">
         대화 종료
