@@ -49,7 +49,7 @@ const ListeningBubble = ({
       style={{ order }}
       className={`relative flex w-full justify-start self-stretch ${isSpawning ? 'animate-bubble-rise' : ''}`}
     >
-      <div className="flex min-h-[1.75rem] min-w-[5.75rem] max-w-[75%] items-center justify-center gap-[0.625rem] overflow-hidden rounded-2xl rounded-bl-sm px-lg py-base [background:linear-gradient(0deg,rgba(255,255,255,0.20)_0%,rgba(255,255,255,0.20)_100%),var(--color-neutral-700)]">
+      <div className="card-listening-bubble flex min-h-[1.75rem] min-w-[5.75rem] max-w-[75%] items-center justify-center gap-[0.625rem] overflow-hidden rounded-2xl rounded-bl-sm px-lg py-base">
         <textarea
           ref={textareaRef}
           value={value}

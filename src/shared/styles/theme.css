@@ -143,6 +143,13 @@
     color-mix(in srgb, var(--color-primary-100) 40%, transparent) 100%
   );
   --gradient-default: linear-gradient(to bottom, #fdd043 0%, #82a6e6 100%);
+  --gradient-listening-bubble:
+    linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.2) 0%,
+      rgba(255, 255, 255, 0.2) 100%
+    ),
+    var(--color-neutral-700);
 }
 
 /* layout */
@@ -344,6 +351,10 @@
 
 @utility card-true-bottomsheet {
   background-image: var(--gradient-card-true-bottomsheet);
+}
+
+@utility card-listening-bubble {
+  background: var(--gradient-listening-bubble);
 }
 
 @utility gradient-default {
