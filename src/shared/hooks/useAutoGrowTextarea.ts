@@ -23,13 +23,15 @@ export const useAutoGrowTextarea = (value: string, placeholder: string) => {
     const remeasure = () => {
       if (!active) return;
 
-      textarea.style.height = 'auto';
-      textarea.style.height = `${textarea.scrollHeight}px`;
-
       measure.textContent = value || placeholder;
       // 측정용 span은 순수 글자 폭만 재기 때문에, 실제 textarea에서 커서(caret)가 앉을
       // 자리가 없어서 마지막 글자가 다음 줄로 밀려나 버린다. 여유폭을 살짝 더해준다.
       textarea.style.width = `${measure.offsetWidth + 6}px`;
+
+      // 너비가 바뀌면 줄바꿈되는 위치도 달라지므로, height는 width를 반영한 뒤에 재야
+      // scrollHeight가 정확하다. 순서를 바꾸면 이전 너비 기준의 줄 수로 계산돼 버린다.
+      textarea.style.height = 'auto';
+      textarea.style.height = `${textarea.scrollHeight}px`;
     };
 
     // 렌더 직후(페인트 전) 바로 한 번 측정해서 크기가 튀는 게 안 보이게 한다.

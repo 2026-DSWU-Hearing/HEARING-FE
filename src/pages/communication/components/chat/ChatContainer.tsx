@@ -1,12 +1,9 @@
 import { useEffect, useState } from 'react';
 
-import ChatBubble from '@/pages/communication/components/chat/ChatBubble';
 import ChatInputBubble from '@/pages/communication/components/chat/ChatInputBubble';
 import ListeningBubble from '@/pages/communication/components/chat/ListeningBubble';
-import type { ChatBubbleTypes } from '@/pages/communication/types/communication-Types';
 
 interface ChatContainerPropTypes {
-  bubbles: ChatBubbleTypes[];
   isListening: boolean;
   draftReply: string;
   draftListening: string;
@@ -20,16 +17,9 @@ interface ChatContainerPropTypes {
 const BUBBLE_CONTAINER_CLASSNAME =
   'flex flex-col items-start justify-center gap-[0.625rem] self-stretch p-base';
 
-// 제출되어 위로 올라간(historical) 채팅 버블 하나하나를 감싸는 컨테이너.
-// 컨테이너의 align-items로 좌/우를 결정하기 때문에, 버블 방향마다 컨테이너 자체를 다르게 써야
-// 실제로 화면 좌/우에 붙는다(버블 자신은 stretch되지 않아 부모의 justify-end만으론 안 먹힘).
-const LEFT_HISTORY_BUBBLE_CONTAINER_CLASSNAME =
-  'flex flex-col items-start justify-center gap-[0.625rem] self-stretch p-base';
-const RIGHT_HISTORY_BUBBLE_CONTAINER_CLASSNAME =
-  'flex flex-col items-end gap-[0.625rem] self-stretch p-base';
-
+// 기본 텍스트 입력 버블 쌍(대화기록과 별도, 스크롤 영역 밖에 고정 배치).
+// 위로 스크롤해서 지난 대화기록을 보더라도 이 영역은 항상 화면 하단에 그대로 보인다.
 const ChatContainer = ({
-  bubbles,
   isListening,
   draftReply,
   draftListening,
@@ -42,7 +32,7 @@ const ChatContainer = ({
   const isListeningTyping = draftListening.length > 0;
 
   // 마지막으로 입력해서 위로 올라간 쪽을 기억해뒀다가, 양쪽 다 비어있는(idle) 동안에도
-  // 그 순서를 그대로 유지한다. 처음(둘 다 입력한 적 없음)엔 왼쪽이 위인 기본값을 쓴다.
+  // 그 순서를 그대로 유지한다. 처음(둘 다 입력한 적 없음)엔 오른쪽이 위인 기본값을 쓴다.
   const [lastActiveSide, setLastActiveSide] = useState<'left' | 'right'>(
     'right',
   );
@@ -89,20 +79,7 @@ const ChatContainer = ({
   );
 
   return (
-    <div className="flex flex-col justify-end px-xs py-base">
-      {bubbles.map((bubble) => (
-        <div
-          key={bubble.id}
-          className={
-            bubble.direction === 'right'
-              ? RIGHT_HISTORY_BUBBLE_CONTAINER_CLASSNAME
-              : LEFT_HISTORY_BUBBLE_CONTAINER_CLASSNAME
-          }
-        >
-          <ChatBubble bubble={bubble} />
-        </div>
-      ))}
-
+    <div className="shrink-0 px-xs py-base">
       <div className={BUBBLE_CONTAINER_CLASSNAME}>
         {listeningBubble}
         {inputBubble}

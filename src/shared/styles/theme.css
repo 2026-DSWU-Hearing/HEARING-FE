@@ -322,6 +322,16 @@
   opacity: var(--opacity-invisible);
 }
 
+/* 스크롤은 되지만 스크롤바는 안 보이게. 브라우저별로 다 처리해줘야 해서 유틸리티로 뺐다. */
+@utility scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 /* glass effect */
 @utility tag-glass-effect {
   background-color: var(--glass-tag-background);

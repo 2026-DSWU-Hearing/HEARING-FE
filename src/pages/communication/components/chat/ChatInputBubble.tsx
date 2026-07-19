@@ -6,14 +6,13 @@ interface ChatInputBubblePropTypes {
   value: string;
   onChange: (value: string) => void;
   onSubmit: () => void;
-
+  // 반대쪽(ListeningBubble)에 입력이 들어와서 이 버블이 그 아래에 새로 태어난 경우 true.
   isSpawning: boolean;
   // 화면상 위/아래 순서(CSS order). DOM 순서는 항상 고정이고 이 값으로만 시각적 순서를 바꾼다.
   order: number;
 }
 
 const PLACEHOLDER = '텍스트 입력';
-
 
 const ChatInputBubble = ({
   value,
@@ -25,8 +24,12 @@ const ChatInputBubble = ({
   const { textareaRef, measureRef } = useAutoGrowTextarea(value, PLACEHOLDER);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
-
-    if (event.key !== 'Enter' || event.shiftKey || event.nativeEvent.isComposing)
+    // Shift+Enter는 줄바꿈, 조합(IME) 중 Enter는 무시하고, 그 외 Enter만 제출한다.
+    if (
+      event.key !== 'Enter' ||
+      event.shiftKey ||
+      event.nativeEvent.isComposing
+    )
       return;
 
     event.preventDefault();
@@ -34,7 +37,6 @@ const ChatInputBubble = ({
   };
 
   return (
-
     <div
       style={{ order }}
       className={`relative flex w-full justify-end self-stretch overflow-hidden ${isSpawning ? 'animate-bubble-rise' : ''}`}
@@ -51,7 +53,7 @@ const ChatInputBubble = ({
           className="heading-2xl-semibold max-w-full resize-none overflow-hidden border-none bg-transparent p-0 text-right text-neutral-700 placeholder:text-neutral-700 outline-none"
         />
       </div>
-  
+
       <span
         ref={measureRef}
         aria-hidden="true"

@@ -25,9 +25,11 @@ export const useCommunicationPage = () => {
   );
 
   // 목데이터의 기존 대화기록은 화면에 쌓아두지 않고, id 채번 기준으로만 사용한다.
-  // 실제로 화면에는 Enter로 새로 보낸 답변부터 쌓인다.
+  // 실제 화면에는 Enter로 새로 보낸 메시지부터 쌓인다. 이미 한 번 채번했다면(포커스 복귀
+  // 등으로 재요청되어 conversation 참조가 바뀌어도) 다시 덮어쓰지 않는다 - 덮어쓰면
+  // 이미 로컬에 쌓인 버블 id와 겹칠 수 있다.
   useEffect(() => {
-    if (!conversation) return;
+    if (!conversation || nextBubbleIdRef.current !== 0) return;
 
     nextBubbleIdRef.current =
       conversation.bubbles.reduce(
