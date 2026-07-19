@@ -34,7 +34,8 @@ const ListeningBubble = ({
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     // 한글 등 IME로 조합 중일 때 Enter를 누르면 조합 확정용 keydown이 한 번 더 발생해서,
     // 이걸 그대로 두면 같은 내용이 버블 두 개로 겹쳐 올라간다. 조합 중이면 무시한다.
-    if (event.key !== 'Enter' || event.nativeEvent.isComposing) return;
+    if (event.key !== 'Enter' || event.shiftKey || event.nativeEvent.isComposing)
+      return;
 
     event.preventDefault();
     onSubmit();

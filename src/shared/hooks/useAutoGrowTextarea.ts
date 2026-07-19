@@ -12,11 +12,17 @@ export const useAutoGrowTextarea = (value: string, placeholder: string) => {
   const measureRef = useRef<HTMLSpanElement>(null);
 
   useLayoutEffect(() => {
+    // document.fonts.ready는 비동기라서, 그 전에 컴포넌트가 언마운트되면 이미 사라진
+    // DOM에 스타일을 넣으려는 시도가 될 수 있다. active 플래그로 언마운트 이후 실행을 막는다.
+    let active = true;
+
     const textarea = textareaRef.current;
     const measure = measureRef.current;
     if (!textarea || !measure) return;
 
     const remeasure = () => {
+      if (!active) return;
+
       textarea.style.height = 'auto';
       textarea.style.height = `${textarea.scrollHeight}px`;
 
@@ -31,7 +37,13 @@ export const useAutoGrowTextarea = (value: string, placeholder: string) => {
 
     // Pretendard 폰트가 늦게 로드되면 그 전엔 대체 폰트 기준으로 측정돼서 폭이 부정확할 수 있다.
     // 폰트 로드가 끝나면 실제 폭 기준으로 한 번 더 재측정한다.
-    document.fonts.ready.then(remeasure);
+    document.fonts.ready.then(() => {
+      remeasure();
+    });
+
+    return () => {
+      active = false;
+    };
   }, [value, placeholder]);
 
   return { textareaRef, measureRef };
