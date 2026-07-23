@@ -360,13 +360,14 @@
 
 > 모든 엔드포인트 인증 필요.
 
-| 메서드 | 경로                              | 설명                |
-| ------ | --------------------------------- | ------------------- |
-| GET    | `/devices`                        | 기기 목록 조회      |
-| POST   | `/devices`                        | 기기 등록           |
-| PATCH  | `/devices/{device_id}`            | 기기 정보 수정      |
-| DELETE | `/devices/{device_id}`            | 기기 삭제           |
-| POST   | `/devices/{device_id}/detections` | 소리 감지 결과 전송 |
+| 메서드 | 경로                              | 설명                     |
+| ------ | --------------------------------- | ------------------------ |
+| GET    | `/devices`                        | 기기 목록 조회           |
+| POST   | `/devices/connect`                | 기기를 현재 계정에 연결  |
+| POST   | `/devices`                        | 기기 등록 (닉네임)       |
+| PATCH  | `/devices/{device_id}`            | 기기 이름(닉네임) 수정   |
+| DELETE | `/devices/{device_id}`            | 기기 연결 해제           |
+| POST   | `/devices/{device_id}/detections` | 소리 감지 결과 전송      |
 
 ### GET `/devices`
 
@@ -374,50 +375,62 @@
 
 #### DeviceResponse
 
-| 필드            | 타입            | 비고     |
-| --------------- | --------------- | -------- |
-| `id`            | integer         | required |
-| `nickname`      | string          | required |
-| `mac_address`   | string          | required |
-| `battery_level` | integer \| null | required |
-| `is_connected`  | boolean         | required |
-| `last_seen_at`  | string \| null  | required |
+| 필드             | 타입            | 비고                                             |
+| ---------------- | --------------- | ------------------------------------------------ |
+| `id`             | integer         | required                                         |
+| `nickname`       | string          | required. 미지정 시 기본값 `Hear:ing Neckband`   |
+| `battery_level`  | integer \| null | required                                         |
+| `is_connected`   | boolean         | required. 서버가 ESP32 WS 접속으로 판단          |
+| `is_active_user` | boolean         | required. 요청 계정이 현재 이 기기의 활성 사용자인지 |
+| `last_seen_at`   | string \| null  | required. 연결됐을 때만 값이 있음                |
+
+> 기기는 실제 넥밴드 1대이며 여러 계정이 번갈아 연결할 수 있다. `is_active_user`는
+> "연결은 됐지만 지금 이 기기를 쓰는 게 나인지"를 구분한다. B가 연결하면 활성 사용자가
+> A→B로 넘어가고, 이후 알림·진동에 B의 설정이 적용된다.
+> `mac_address`는 응답에 포함되지 않는다(프론트가 쓰지 않고, MAC은 ESP32↔서버 사이의 값).
+
+### POST `/devices/connect`
+
+기기를 현재 로그인한 계정에 연결한다. 서버가 요청 시점의 ESP32 WebSocket 접속 상태를
+즉시 확인해 성공/실패를 동기 응답한다(프론트가 연결을 폴링하며 기다리지 않는다).
+
+- **Request Body**: 없음 (로그인 토큰만 사용)
+- **Response** `200` → `DeviceResponse` (연결 성공. 활성 사용자가 이 계정으로 넘어옴)
+- **Response** `409` → 기기가 서버에 접속해 있지 않음. 프론트는 자체 안내 문구와 "다시 시도" 버튼을 보여준다.
 
 ### POST `/devices`
 
-> ⚠️ **변경 예정 (BE 합의 완료, 미배포)** — `mac_address`를 optional로 변경.
-> 웹(PWA)은 보안상 BLE 페어링으로도 기기의 MAC을 얻을 수 없어 프론트가 아는 값이 아니다.
-> MAC은 ESP32가 서버에 접속하며 직접 알린다.
-> 프론트는 이미 `nickname`만 전송하도록 수정되어 있어, 배포 전까지 등록은 422로 실패한다.
-> (실패 시 등록 모달이 유지되며 사유가 표시된다.)
->
-> 또한 현재 서버는 `mac_address`를 전역 unique로 취급해, 이미 등록된 MAC은
-> `409 CONFLICT`(`"이미 등록된 MAC 주소입니다"`)를 반환한다.
+> 새 연결 흐름(`POST /devices/connect`)에서는 프론트가 이 엔드포인트를 직접 호출하지 않는다.
+> 백엔드가 API를 유지하기로 해 프론트 코드(`postDevice`/`DeviceRegisterModal`)는 보존하지만,
+> 현재 사용자 흐름은 "연결하기"뿐이다.
 
 - **Request Body** (`DeviceCreate`)
 
-  | 필드          | 타입   | 필수                |
-  | ------------- | ------ | ------------------- |
-  | `nickname`    | string | ✅                  |
-  | `mac_address` | string | ⚠️ 현재 ✅ → 변경 예정 ❌ |
+  | 필드       | 타입   | 필수 |
+  | ---------- | ------ | ---- |
+  | `nickname` | string | ✅   |
 
 - **Response** `200` → `DeviceResponse`
-- **Response** `409` → `{ code: "CONFLICT", message: string }` (MAC 중복)
 
 ### PATCH `/devices/{device_id}`
+
+기기 이름(닉네임)을 수정한다. 설정의 기기 카드에서 연필 버튼 → 이름 수정 모달 → 저장 시 호출.
 
 - **Path Params**: `device_id` (integer, required)
 - **Request Body** (`DeviceUpdate`)
 
-  | 필드            | 타입            | 필수 |
-  | --------------- | --------------- | ---- |
-  | `nickname`      | string \| null  | ❌   |
-  | `battery_level` | integer \| null | ❌   |
-  | `is_connected`  | boolean \| null | ❌   |
+  | 필드       | 타입           | 필수 |
+  | ---------- | -------------- | ---- |
+  | `nickname` | string \| null | ❌   |
+
+  > `battery_level`·`is_connected`는 하드웨어의 사실이라 프론트가 보내지 않는다(오용 방지).
 
 - **Response** `200` → `DeviceResponse`
 
 ### DELETE `/devices/{device_id}`
+
+기기 자체 삭제가 아니라 **현재 계정의 연결 해제**다. 현재 계정이 활성 사용자면 연결을 끊고,
+활성 사용자가 아니어도 성공으로 응답한다.
 
 - **Path Params**: `device_id` (integer, required)
 - **Response** `200`

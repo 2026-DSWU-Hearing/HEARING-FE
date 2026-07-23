@@ -1,7 +1,7 @@
 import { faMicrochip } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-interface ConnectDeviceBtnPropTypes {
+interface ConnectDeviceButtonPropTypes {
   onClick: () => void;
   /** 버튼 텍스트. 미지정 시 "디바이스 연결하기" */
   label?: string;
@@ -9,17 +9,13 @@ interface ConnectDeviceBtnPropTypes {
   disabled?: boolean;
 }
 
-/**
- * 디바이스 연결/등록 시 표시하는 골드 그라데이션 버튼.
- * 그라데이션은 이 버튼에서만 쓰여 전역 토큰 대신 인라인(arbitrary value)으로 처리한다.
- * 반투명 그라데이션(primary-300 위 → primary-500 아래, 알파 0.70) 뒤에
- * 불투명 베이스(rgba(255,209,66,0.20))를 깔아 Figma 스펙을 그대로 재현한다.
- */
-const ConnectDeviceBtn = ({
+// 디바이스 연결/등록 시 표시하는 골드 그라데이션 버튼.
+
+const ConnectDeviceButton = ({
   onClick,
   label = '디바이스 연결하기',
   disabled = false,
-}: ConnectDeviceBtnPropTypes) => {
+}: ConnectDeviceButtonPropTypes) => {
   return (
     <button
       type="button"
@@ -40,4 +36,4 @@ const ConnectDeviceBtn = ({
   );
 };
 
-export default ConnectDeviceBtn;
+export default ConnectDeviceButton;
