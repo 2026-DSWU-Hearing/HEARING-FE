@@ -10,6 +10,10 @@ import {
 import type { AuthTokenResponseTypes } from '@/pages/login/types/loginTypes';
 import type { InternalAxiosRequestConfig } from 'axios';
 
+interface RetryableRequestConfigTypes extends InternalAxiosRequestConfig {
+  _retry?: boolean;
+}
+
 const LOGIN_PATH = '/login';
 
 const http = axios.create({
@@ -81,9 +85,7 @@ http.interceptors.request.use((config) => {
 http.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config as
-      | (InternalAxiosRequestConfig & { _retry?: boolean })
-      | undefined;
+    const originalRequest = error.config as RetryableRequestConfigTypes | undefined;
 
     if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
       originalRequest._retry = true;

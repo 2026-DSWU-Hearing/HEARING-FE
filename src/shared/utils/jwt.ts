@@ -1,6 +1,10 @@
+interface JwtPayloadTypes {
+  exp?: number;
+}
+
 const EXPIRY_BUFFER_MS = 5000;
 
-const decodeJwtPayload = (token: string): { exp?: number } | null => {
+const decodeJwtPayload = (token: string): JwtPayloadTypes | null => {
   const base64Url = token.split('.')[1];
   if (!base64Url) return null;
 
@@ -12,7 +16,7 @@ const decodeJwtPayload = (token: string): { exp?: number } | null => {
         .map((char) => `%${char.charCodeAt(0).toString(16).padStart(2, '0')}`)
         .join(''),
     );
-    return JSON.parse(json) as { exp?: number };
+    return JSON.parse(json) as JwtPayloadTypes;
   } catch {
     return null;
   }
