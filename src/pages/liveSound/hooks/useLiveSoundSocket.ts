@@ -76,9 +76,11 @@ export const useLiveSoundSocket = ({
   const droppedChunkCountRef = useRef(0);
 
   // 화면 상태는 건드리지 않고 세션 자원(타이머·마이크·소켓)만 해제한다.
-  // 정리 도중 도착하는 콜백을 무시하도록 세션 번호를 먼저 올린다.
-  const releaseSession = useCallback(async () => {
+  // 정리 도중 도착하는 콜백을 무시하도록 세션 번호를 먼저 올리고, 그 값을 반환한다.
+  // 호출부는 정리가 끝난 뒤 이 값이 아직 최신인지 보고 자기 작업이 유효한지 판단한다.
+  const releaseSession = useCallback(async (): Promise<number> => {
     sessionIdRef.current += 1;
+    const releasedSessionId = sessionIdRef.current;
 
     if (readyTimerRef.current) {
       clearTimeout(readyTimerRef.current);
@@ -114,6 +116,8 @@ export const useLiveSoundSocket = ({
       socket.close(NORMAL_CLOSE_CODE);
     }
     socketRef.current = null;
+
+    return releasedSessionId;
   }, []);
 
   // 사용자 토글, 소켓 종료, 언마운트가 동시에 부를 수 있어 멱등해야 한다.
@@ -122,9 +126,13 @@ export const useLiveSoundSocket = ({
       if (isStoppingRef.current) return;
       isStoppingRef.current = true;
 
-      await releaseSession();
+      const releasedSessionId = await releaseSession();
 
       isStoppingRef.current = false;
+
+      // 정리하는 동안(마이크 close는 수 ms 걸린다) 사용자가 다시 시작했다면
+      // 세션 번호가 더 올라가 있다. 새 세션의 connecting을 idle/error로 덮어쓰지 않는다.
+      if (sessionIdRef.current !== releasedSessionId) return;
 
       setStatus(nextStatus);
       if (message) setAlertMessage(message);
@@ -151,6 +159,9 @@ export const useLiveSoundSocket = ({
     setAlertMessage('');
     onSessionStartRef.current();
 
+    // 진행 중인 stop이 깨어났을 때 곧바로 stale임을 알도록 여기서 동기적으로 올린다.
+    // (releaseSession의 증가만 믿으면 stop이 그보다 먼저 깨어나 상태를 덮어쓴다.)
+    sessionIdRef.current += 1;
     authRefreshAttemptsRef.current = 0;
 
     const connect = async () => {

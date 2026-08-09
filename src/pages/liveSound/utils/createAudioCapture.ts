@@ -54,7 +54,9 @@ export const createAudioCapture = async ({
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: {
       channelCount: CHANNEL_COUNT,
-      sampleRate: TARGET_SAMPLE_RATE,
+      // 16kHz를 못 주는 장치에서 거부되지 않도록 선호값으로만 요청한다.
+      // 어떤 레이트로 열리든 resampleLinear가 16kHz로 맞춘다.
+      sampleRate: { ideal: TARGET_SAMPLE_RATE },
       // 브라우저 기본값은 음성 통화용이라 환경음 분류에 쓸 원 신호를 변형할 수 있다.
       // 우선 끄고 실기기에서 정확도를 검증한다.
       echoCancellation: false,
@@ -63,8 +65,9 @@ export const createAudioCapture = async ({
     },
   });
 
-  const audioContext = createAudioContext();
-  const { sampleRate: contextSampleRate } = audioContext;
+  // 아래 try 블록 안에서 생성한다. 여기서 던지면 이미 연 마이크가 정리되지 않는다.
+  let audioContext: AudioContext | null = null;
+  let contextSampleRate = TARGET_SAMPLE_RATE;
 
   let sourceNode: MediaStreamAudioSourceNode | null = null;
   let workletNode: AudioWorkletNode | null = null;
@@ -101,11 +104,11 @@ export const createAudioCapture = async ({
   };
 
   // 오디오 렌더 스레드에서 버퍼링하므로 메인 스레드가 바빠도 소리가 끊기지 않는다.
-  const startWithWorklet = async (): Promise<boolean> => {
-    if (!audioContext.audioWorklet) return false;
+  const startWithWorklet = async (context: AudioContext): Promise<boolean> => {
+    if (!context.audioWorklet) return false;
 
     try {
-      await audioContext.audioWorklet.addModule(WORKLET_MODULE_URL);
+      await context.audioWorklet.addModule(WORKLET_MODULE_URL);
     } catch (error) {
       console.warn(
         '[LiveSound] 오디오 워크릿 로드 실패, ScriptProcessor로 폴백합니다:',
@@ -116,7 +119,7 @@ export const createAudioCapture = async ({
 
     if (isStopped) return false;
 
-    workletNode = new AudioWorkletNode(audioContext, WORKLET_PROCESSOR_NAME);
+    workletNode = new AudioWorkletNode(context, WORKLET_PROCESSOR_NAME);
     workletNode.port.onmessage = (event: MessageEvent<Float32Array>) => {
       handleSamples(event.data);
     };
@@ -128,8 +131,8 @@ export const createAudioCapture = async ({
   };
 
   // deprecated지만 워크릿을 못 쓰는 구형 환경에서 유일한 대안이다(메인 스레드에서 동작).
-  const startWithScriptProcessor = () => {
-    scriptProcessorNode = audioContext.createScriptProcessor(
+  const startWithScriptProcessor = (context: AudioContext) => {
+    scriptProcessorNode = context.createScriptProcessor(
       SCRIPT_PROCESSOR_BUFFER_SIZE,
       CHANNEL_COUNT,
       CHANNEL_COUNT,
@@ -142,12 +145,12 @@ export const createAudioCapture = async ({
 
     // destination까지 연결돼야 onaudioprocess가 발화하는데, 그대로 연결하면 하울링이 난다.
     // gain 0인 노드를 경유시켜 소리는 막고 콜백만 살린다.
-    silentGainNode = audioContext.createGain();
+    silentGainNode = context.createGain();
     silentGainNode.gain.value = 0;
 
     sourceNode?.connect(scriptProcessorNode);
     scriptProcessorNode.connect(silentGainNode);
-    silentGainNode.connect(audioContext.destination);
+    silentGainNode.connect(context.destination);
   };
 
   const stop = async () => {
@@ -174,12 +177,15 @@ export const createAudioCapture = async ({
     stream.getTracks().forEach((track) => track.stop());
 
     // await하지 않으면 StrictMode 이중 마운트에서 오디오 장치 경합이 난다.
-    if (audioContext.state !== 'closed') {
+    if (audioContext && audioContext.state !== 'closed') {
       await audioContext.close();
     }
   };
 
   try {
+    audioContext = createAudioContext();
+    contextSampleRate = audioContext.sampleRate;
+
     // iOS는 컨텍스트를 suspended로 두는 경우가 있어 명시적으로 깨운다.
     if (audioContext.state === 'suspended') {
       await audioContext.resume();
@@ -187,9 +193,9 @@ export const createAudioCapture = async ({
 
     sourceNode = audioContext.createMediaStreamSource(stream);
 
-    const isWorkletReady = await startWithWorklet();
+    const isWorkletReady = await startWithWorklet(audioContext);
     if (!isWorkletReady) {
-      startWithScriptProcessor();
+      startWithScriptProcessor(audioContext);
     }
 
     return {

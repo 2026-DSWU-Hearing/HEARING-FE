@@ -15,7 +15,9 @@ export const CHUNK_SAMPLE_COUNT =
 export const SCRIPT_PROCESSOR_BUFFER_SIZE = 2048;
 
 // public/에 있어 번들되지 않고 URL로 직접 로드된다.
-export const WORKLET_MODULE_URL = '/livesoundAudioWorklet.js';
+// 서브 경로 배포에서도 찾을 수 있도록 base 경로를 붙인다.
+// (로드에 실패하면 조용히 ScriptProcessor로 폴백해 오디오가 메인 스레드로 내려간다.)
+export const WORKLET_MODULE_URL = `${import.meta.env.BASE_URL}livesoundAudioWorklet.js`;
 export const WORKLET_PROCESSOR_NAME = 'livesound-processor';
 
 // 송신 큐가 이 크기(약 1초치)를 넘으면 전송이 밀린 것으로 보고 청크를 버린다.
