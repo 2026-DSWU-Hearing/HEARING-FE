@@ -3,6 +3,7 @@ import LiveSoundButton from './LiveSoundButton';
 
 interface LiveSoundAnimationAreaPropTypes {
   isListening: boolean;
+  isConnecting: boolean;
   statusLabel: string;
   onListeningToggleClick: () => void;
 }
@@ -10,6 +11,7 @@ interface LiveSoundAnimationAreaPropTypes {
 // 중앙 감지 영역: 동심원 애니메이션 + 상태 라벨 + 시작/중지 버튼을 한 덩어리로 묶는다.
 const LiveSoundAnimationArea = ({
   isListening,
+  isConnecting,
   statusLabel,
   onListeningToggleClick,
 }: LiveSoundAnimationAreaPropTypes) => {
@@ -21,6 +23,7 @@ const LiveSoundAnimationArea = ({
       </h2>
       <LiveSoundButton
         isListening={isListening}
+        isConnecting={isConnecting}
         onListeningToggleClick={onListeningToggleClick}
       />
     </div>
