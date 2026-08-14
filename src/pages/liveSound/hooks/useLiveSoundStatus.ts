@@ -1,9 +1,11 @@
 import { useCallback, useState } from 'react';
 
 import { LIVE_SOUND_STATUS_LABEL } from '../constants/liveSoundStatusLabel';
-import { MAX_SOUND_RATE_COUNT } from '../constants/soundRateDisplay';
 import type { LiveSoundStatusTypes } from '../types/liveSoundStatusTypes';
-import type { LiveSoundClassificationTypes } from '../types/liveSoundSocketTypes';
+import type {
+  LiveSoundClassificationTypes,
+  LiveSoundSoundItemTypes,
+} from '../types/liveSoundSocketTypes';
 import type { SoundRateTypes } from '../types/soundRateTypes';
 
 import { useLiveSoundSocket } from './useLiveSoundSocket';
@@ -21,47 +23,28 @@ interface UseLiveSoundStatusReturnTypes {
 // 분류 결과(confidence 0~1)를 화면용 비율(rate %)로 매핑.
 const toSoundRate = ({
   sound_id,
-  name,
+  sound_name,
   confidence,
-}: LiveSoundClassificationTypes): SoundRateTypes => ({
-  // 이벤트 id가 아니라 소리 "종류"의 식별자라 중복 판별 키로 쓸 수 있다.
+}: LiveSoundSoundItemTypes): SoundRateTypes => ({
   id: String(sound_id),
-  label: name,
+  label: sound_name,
   rate: Math.round(confidence * 100),
 });
 
-const mergeSoundRate = (
-  previousList: SoundRateTypes[],
-  incoming: SoundRateTypes,
-): SoundRateTypes[] => {
-  const [head] = previousList;
-  // 같은 값이 다시 오면 배열 참조를 유지해 React가 리렌더를 건너뛰게 한다.
-  // 정수 %로 반올림하므로 confidence가 미세하게 흔들려도 갱신되지 않는다.
-  if (head?.id === incoming.id && head.rate === incoming.rate)
-    return previousList;
-
-  // 같은 소리가 계속 감지되는 게 정상이라 중복은 제거하고 최신 값으로 갱신한다.
-  const withoutDuplicate = previousList.filter(({ id }) => id !== incoming.id);
-
-  return [incoming, ...withoutDuplicate].slice(0, MAX_SOUND_RATE_COUNT);
-};
-
 // 실시간 소리 감지 화면의 상태를 소유하는 훅.
-// 결과를 하드웨어(ESP32)용 useDetectionStore에 넣으면 목록이 섞이고 전역 토스트가 중복으로 떠서,
-// 페이지 로컬 상태로 분리했다.
+// 결과를 하드웨어(ESP32)용 useDetectionStore에 넣으면 목록이 섞이고 전역 토스트가 중복으로 떠서, 페이지 로컬 상태로 분리했다.
 export const useLiveSoundStatus = (): UseLiveSoundStatusReturnTypes => {
   const [soundRateList, setSoundRateList] = useState<SoundRateTypes[]>([]);
 
+  // 스냅샷이라 누적하지 않고 통째로 교체한다. 표시 개수와 순서는 서버를 그대로 따른다.
   const handleClassification = useCallback(
-    (classification: LiveSoundClassificationTypes) => {
-      setSoundRateList((previousList) =>
-        mergeSoundRate(previousList, toSoundRate(classification)),
-      );
+    ({ sounds }: LiveSoundClassificationTypes) => {
+      setSoundRateList(sounds.map(toSoundRate));
     },
     [],
   );
 
-  // 중지 시엔 SoundRateBlock이 카드를 숨기므로 시작할 때만 비우면 된다.
+  // 첫 메시지가 도착하기 전(connecting 구간) 지난 세션 결과가 남아 보이는 것을 막는다.
   const handleSessionStart = useCallback(() => setSoundRateList([]), []);
 
   const { status, alertMessage, startSession, stopSession, clearAlertMessage } =

@@ -1,12 +1,10 @@
 import type {
   LiveSoundClassificationTypes,
   LiveSoundServerMessageTypes,
+  LiveSoundSoundItemTypes,
   LiveSoundStartMessageTypes,
   LiveSoundStopMessageTypes,
 } from '../types/liveSoundSocketTypes';
-
-// 훅/컴포넌트는 아래 함수들만 쓰고 envelope 모양을 직접 알지 못한다.
-// 서버 형태가 확정되면 이 파일만 고치면 된다.
 
 export const buildStartMessage = (): string => {
   const message: LiveSoundStartMessageTypes = { type: 'start' };
@@ -24,21 +22,35 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null;
 
 // 단언(as)만 쓰면 서버 형태가 바뀌었을 때 화면에 NaN%가 찍히는 식으로 조용히 깨진다.
+const isSoundItem = (value: unknown): value is LiveSoundSoundItemTypes => {
+  if (!isRecord(value)) return false;
+
+  const { sound_id, sound_name, sound_category, confidence } = value;
+
+  return (
+    typeof sound_id === 'number' &&
+    Number.isFinite(sound_id) &&
+    typeof sound_name === 'string' &&
+    typeof sound_category === 'string' &&
+    typeof confidence === 'number' &&
+    // typeof NaN === 'number'라 유한값인지까지 봐야 rate 계산이 안 깨진다.
+    Number.isFinite(confidence)
+  );
+};
+
 const isClassification = (
   value: unknown,
 ): value is LiveSoundClassificationTypes => {
   if (!isRecord(value)) return false;
 
-  const { sound_id, name, category, confidence } = value;
+  const { sounds, analyzed_at } = value;
 
+  // 빈 배열은 "아무 소리도 안 들린다"는 정상 신호다.
+  // 실패로 처리하면 무음 메시지가 버려져 마지막 소리가 화면에 남는다.
   return (
-    typeof sound_id === 'number' &&
-    Number.isFinite(sound_id) &&
-    typeof name === 'string' &&
-    typeof category === 'string' &&
-    typeof confidence === 'number' &&
-    // typeof NaN === 'number'라 유한값인지까지 봐야 rate 계산이 안 깨진다.
-    Number.isFinite(confidence)
+    Array.isArray(sounds) &&
+    sounds.every(isSoundItem) &&
+    typeof analyzed_at === 'string'
   );
 };
 
