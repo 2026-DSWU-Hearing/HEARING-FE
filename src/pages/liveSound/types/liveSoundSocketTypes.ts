@@ -1,13 +1,19 @@
 // 실시간 소리 감지 WebSocket(/ws/users/me/livesound)의 메시지 타입.
-// envelope이 바뀌면 이 파일과 liveSoundProtocol.ts만 고치면 되게 격리했다.
 
-// 주의: 기존 DetectionTypes는 sound_name / sound_category를 쓰는데 여기는 name / category다.
-// 서버 스펙이 실제로 달라 두 타입을 섞어 쓰면 안 된다(백엔드에 통일 요청 예정).
-export interface LiveSoundClassificationTypes {
+// 필드명은 DetectionTypes와 같지만 구조가 달라(그쪽은 id/source/detected_at) 타입을 공유하지 않는다.
+export interface LiveSoundSoundItemTypes {
   sound_id: number;
-  name: string;
-  category: string;
+  sound_name: string;
+  sound_category: string;
   confidence: number;
+}
+
+// 개별 감지 이벤트가 아니라 그 시점에 들리는 소리 전체를 담은 스냅샷이다.
+// 매 초 최대 3개가 오고, 아무 소리도 없으면 sounds가 빈 배열로 온다.
+export interface LiveSoundClassificationTypes {
+  sounds: LiveSoundSoundItemTypes[];
+  // 화면에 감지 시각을 표시하지 않아 값을 읽지 않는다.
+  analyzed_at: string;
 }
 
 export interface LiveSoundReadyMessageTypes {
