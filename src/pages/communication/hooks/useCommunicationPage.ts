@@ -123,6 +123,8 @@ export const useCommunicationPage = () => {
   const handleEndConversation = () => {
     setIsListening(false);
 
+    if (bubbles.length === 0) return;
+
     if (savedNoticeTimerRef.current) {
       clearTimeout(savedNoticeTimerRef.current);
     }
