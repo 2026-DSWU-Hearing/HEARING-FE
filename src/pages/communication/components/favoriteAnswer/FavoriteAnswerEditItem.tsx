@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { KeyboardEvent } from 'react';
 
 import { FAVORITE_ANSWER_MESSAGE } from '@/pages/communication/constants/favoriteAnswerMessages';
@@ -17,6 +18,12 @@ const FavoriteAnswerEditItem = ({
   onDelete,
 }: FavoriteAnswerEditItemPropTypes) => {
   const { textareaRef, measureRef } = useAutoGrowTextarea(content, '');
+  const [isContentEditable, setIsContentEditable] = useState(false);
+
+  const handlePencilClick = () => {
+    setIsContentEditable(true);
+    textareaRef.current?.focus();
+  };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key !== 'Enter' || event.nativeEvent.isComposing) return;
@@ -32,12 +39,21 @@ const FavoriteAnswerEditItem = ({
         value={content}
         onChange={(event) => onChange(event.target.value)}
         onKeyDown={handleKeyDown}
+        onBlur={() => setIsContentEditable(false)}
+        readOnly={!isContentEditable}
         aria-label={FAVORITE_ANSWER_MESSAGE.EDIT}
         rows={1}
         className="body-lg-regular max-w-full resize-none overflow-hidden bg-transparent p-0 text-primary outline-none"
       />
 
-      <PencilIcon className="h-[1.03306rem] w-[1.03306rem] shrink-0 text-primary-400" />
+      <button
+        type="button"
+        onClick={handlePencilClick}
+        aria-label={FAVORITE_ANSWER_MESSAGE.EDIT}
+        className="shrink-0"
+      >
+        <PencilIcon className="h-[1.03306rem] w-[1.03306rem] text-primary-400" />
+      </button>
 
       <button
         type="button"
