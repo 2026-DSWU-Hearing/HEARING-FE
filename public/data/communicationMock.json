@@ -32,10 +32,141 @@
   "conversationHistories": [
     {
       "id": 1,
-      "title": "길 안내 대화",
-      "locationName": "성북구",
-      "startedAt": "2026-05-17 18:30",
-      "endedAt": "2026-05-17 18:40"
+      "title": "고객님 예약자 성함 부탁드립니다",
+      "locationName": "서울시 도봉구",
+      "startedAt": "2026-04-04 12:10",
+      "endedAt": "2026-04-04 12:18",
+      "bubbles": [
+        {
+          "id": 1,
+          "direction": "left",
+          "inputType": "stt",
+          "content": "고객님 예약자 성함 부탁드립니다"
+        },
+        {
+          "id": 2,
+          "direction": "right",
+          "inputType": "text",
+          "content": "양수빈입니다."
+        },
+        {
+          "id": 3,
+          "direction": "left",
+          "inputType": "stt",
+          "content": "확인되었습니다. 2번 테이블로 안내드릴게요."
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "죄송한데, 여기 좌석 있나요.",
+      "locationName": "서울시 도봉구",
+      "startedAt": "2026-04-03 19:40",
+      "endedAt": "2026-04-03 19:45",
+      "bubbles": [
+        {
+          "id": 1,
+          "direction": "left",
+          "inputType": "stt",
+          "content": "죄송한데, 여기 좌석 있나요."
+        },
+        {
+          "id": 2,
+          "direction": "right",
+          "inputType": "favorite_answer",
+          "content": "잠시만 기다려 주세요."
+        },
+        {
+          "id": 3,
+          "direction": "right",
+          "inputType": "text",
+          "content": "네, 안쪽에 자리 있습니다."
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "여기 혹시 무슨 일이 있었나요?",
+      "locationName": "서울시 도봉구",
+      "startedAt": "2026-04-01 09:20",
+      "endedAt": "2026-04-01 09:26",
+      "bubbles": [
+        {
+          "id": 1,
+          "direction": "left",
+          "inputType": "stt",
+          "content": "여기 혹시 무슨 일이 있었나요?"
+        },
+        {
+          "id": 2,
+          "direction": "right",
+          "inputType": "text",
+          "content": "저도 방금 와서 잘 모르겠어요."
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "안녕하세요. 제 이름은 요미입니다.",
+      "locationName": "서울시 도봉구",
+      "startedAt": "2026-03-28 15:05",
+      "endedAt": "2026-03-28 15:12",
+      "bubbles": [
+        {
+          "id": 1,
+          "direction": "right",
+          "inputType": "text",
+          "content": "안녕하세요. 제 이름은 요미입니다."
+        },
+        {
+          "id": 2,
+          "direction": "left",
+          "inputType": "stt",
+          "content": "반갑습니다. 어떤 도움이 필요하세요?"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "저는 농인입니다.",
+      "locationName": "서울시 도봉구",
+      "startedAt": "2026-03-22 11:30",
+      "endedAt": "2026-03-22 11:34",
+      "bubbles": [
+        {
+          "id": 1,
+          "direction": "right",
+          "inputType": "favorite_answer",
+          "content": "저는 농인입니다."
+        },
+        {
+          "id": 2,
+          "direction": "left",
+          "inputType": "stt",
+          "content": "네, 천천히 말씀해 주세요."
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "주문 도와드릴까요?",
+      "locationName": "서울시 도봉구",
+      "startedAt": "2026-03-15 18:02",
+      "endedAt": "2026-03-15 18:09",
+      "bubbles": [
+        {
+          "id": 1,
+          "direction": "left",
+          "inputType": "stt",
+          "content": "주문 도와드릴까요?"
+        },
+        {
+          "id": 2,
+          "direction": "right",
+          "inputType": "text",
+          "content": "아메리카노 한 잔 주세요."
+        }
+      ]
     }
   ]
 }

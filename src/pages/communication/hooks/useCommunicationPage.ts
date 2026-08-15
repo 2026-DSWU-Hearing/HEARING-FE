@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { useGetCommunicationMock } from '@/pages/communication/hooks/useGetCommunicationMock';
 import { useFavoriteAnswerStore } from '@/pages/communication/stores/useFavoriteAnswerStore';
@@ -13,6 +14,7 @@ const SAVED_NOTICE_DURATION = 2000;
 
 // 양방향 소통(Communication) 페이지의 상태/핸들러를 모아둔 훅.
 export const useCommunicationPage = () => {
+  const navigate = useNavigate();
   const { data } = useGetCommunicationMock();
   const conversation = data?.conversation ?? null;
 
@@ -64,9 +66,8 @@ export const useCommunicationPage = () => {
     };
   }, []);
 
-  // TODO: 대화기록 리스트 화면이 만들어지면 그쪽으로 이동시킨다.
   const handleOpenHistory = () => {
-    console.log('대화기록 열기');
+    navigate('/communication/histories');
   };
 
   // TODO: 실제 마이크 녹음 + STT 웹소켓 연동은 백엔드 API가 준비되면 이 자리에서 연결한다.

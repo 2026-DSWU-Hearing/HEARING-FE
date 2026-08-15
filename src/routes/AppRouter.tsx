@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 
 import Communication from '@/pages/communication/Communication';
+import ConversationHistoryPage from '@/pages/communication/ConversationHistoryPage';
 import Home from '@/pages/home/Home';
 import ModeCreatePage from '@/pages/home/ModeCreatePage';
 import ModeEditPage from '@/pages/home/ModeEditPage';
@@ -47,6 +48,10 @@ const AppRouter = () => {
         <Route path="/modes/:modeId/settings" element={<ModeEditPage />} />
         <Route path="/notifications" element={<NotificationPage />} />
         <Route path="/communication" element={<Communication />} />
+        <Route
+          path="/communication/histories"
+          element={<ConversationHistoryPage />}
+        />
         <Route path="/live-sound" element={<LiveSound />} />
         <Route path="/setting" element={<Setting />} />
         <Route
