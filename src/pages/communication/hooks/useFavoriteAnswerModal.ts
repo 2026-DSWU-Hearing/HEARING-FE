@@ -37,10 +37,16 @@ export const useFavoriteAnswerModal = (answers: FavoriteAnswerTypes[]) => {
     const trimmedDraft = draft.trim();
 
     if (trimmedDraft) {
-      setDraftAnswers((prev) => [
-        ...prev,
-        { id: getNextAnswerId(prev), content: trimmedDraft },
-      ]);
+      const addedAnswers = [
+        ...draftAnswers,
+        { id: getNextAnswerId(draftAnswers), content: trimmedDraft },
+      ];
+
+      setDraftAnswers(addedAnswers);
+
+      if (!isEditing) {
+        setAnswers(addedAnswers);
+      }
     }
 
     setDraft('');

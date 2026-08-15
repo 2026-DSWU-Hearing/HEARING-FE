@@ -1,3 +1,5 @@
+import type { MouseEvent } from 'react';
+
 import { motion } from 'motion/react';
 
 import FavoriteAnswerAddButton from '@/pages/communication/components/favoriteAnswer/FavoriteAnswerAddButton';
@@ -53,6 +55,11 @@ const FavoriteAnswerModal = ({
 
   useEscapeKey(true, handleEscape);
 
+  // 입력 중 이 버튼을 누르면 blur가 먼저 처리돼 버튼 종류가 바뀌고, 바뀐 버튼이 클릭을 받아버린다.
+  const handleActionMouseDown = (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+  };
+
   const handleAnswerClick = (content: string) => {
     onSelect(content);
     onClose();
@@ -87,6 +94,7 @@ const FavoriteAnswerModal = ({
           {isEditing || isDirty || isDraftTyping ? (
             <button
               type="button"
+              onMouseDown={handleActionMouseDown}
               onClick={handleComplete}
               className="body-base-regular justify-self-end text-primary-400"
             >
@@ -95,6 +103,7 @@ const FavoriteAnswerModal = ({
           ) : (
             <button
               type="button"
+              onMouseDown={handleActionMouseDown}
               onClick={handleStartEditing}
               className="body-base-regular justify-self-end text-neutral-400"
             >
