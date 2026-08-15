@@ -20,10 +20,11 @@ const FavoriteAnswerModal = ({
   onSelect,
 }: FavoriteAnswerModalPropTypes) => {
   const {
+    draftAnswers,
     isAdding,
     draft,
+    isDraftTyping,
     isEditing,
-    editingAnswers,
     isDirty,
     handleDraftChange,
     handleStartAdding,
@@ -31,9 +32,9 @@ const FavoriteAnswerModal = ({
     handleSubmitAdding,
     handleStartEditing,
     handleCancelEditing,
-    handleCompleteEditing,
-    handleEditingAnswerChange,
-    handleDeleteEditingAnswer,
+    handleComplete,
+    handleAnswerChange,
+    handleDeleteAnswer,
   } = useFavoriteAnswerModal(answers);
 
   const handleEscape = () => {
@@ -83,16 +84,14 @@ const FavoriteAnswerModal = ({
             {FAVORITE_ANSWER_MESSAGE.TITLE}
           </h2>
 
-          {isEditing ? (
-            isDirty && (
-              <button
-                type="button"
-                onClick={handleCompleteEditing}
-                className="body-base-regular justify-self-end text-primary-400"
-              >
-                {FAVORITE_ANSWER_MESSAGE.DONE}
-              </button>
-            )
+          {isEditing || isDirty || isDraftTyping ? (
+            <button
+              type="button"
+              onClick={handleComplete}
+              className="body-base-regular justify-self-end text-primary-400"
+            >
+              {FAVORITE_ANSWER_MESSAGE.DONE}
+            </button>
           ) : (
             <button
               type="button"
@@ -106,22 +105,22 @@ const FavoriteAnswerModal = ({
 
         <div className="hide-scrollbar flex w-full flex-1 flex-col gap-sm overflow-y-auto">
           {isEditing ? (
-            editingAnswers.map((editingAnswer) => (
+            draftAnswers.map((draftAnswer) => (
               <FavoriteAnswerEditItem
-                key={editingAnswer.id}
-                content={editingAnswer.content}
+                key={draftAnswer.id}
+                content={draftAnswer.content}
                 onChange={(content) =>
-                  handleEditingAnswerChange(editingAnswer.id, content)
+                  handleAnswerChange(draftAnswer.id, content)
                 }
-                onDelete={() => handleDeleteEditingAnswer(editingAnswer.id)}
+                onDelete={() => handleDeleteAnswer(draftAnswer.id)}
               />
             ))
-          ) : answers.length === 0 && !isAdding ? (
+          ) : draftAnswers.length === 0 && !isAdding ? (
             <p className="body-sm-regular mt-lg text-center text-neutral-500">
               {FAVORITE_ANSWER_MESSAGE.EMPTY}
             </p>
           ) : (
-            answers.map((answer) => (
+            draftAnswers.map((answer) => (
               <button
                 key={answer.id}
                 type="button"
@@ -133,16 +132,15 @@ const FavoriteAnswerModal = ({
             ))
           )}
 
-          {!isEditing &&
-            (isAdding ? (
-              <FavoriteAnswerAddInput
-                value={draft}
-                onChange={handleDraftChange}
-                onSubmit={handleSubmitAdding}
-              />
-            ) : (
-              <FavoriteAnswerAddButton onClick={handleStartAdding} />
-            ))}
+          {isAdding ? (
+            <FavoriteAnswerAddInput
+              value={draft}
+              onChange={handleDraftChange}
+              onSubmit={handleSubmitAdding}
+            />
+          ) : (
+            <FavoriteAnswerAddButton onClick={handleStartAdding} />
+          )}
         </div>
       </motion.div>
     </>

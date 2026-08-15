@@ -1,25 +1,26 @@
 import { useState } from 'react';
 
-import { useFavoriteAnswerStore } from '@/pages/communication/stores/useFavoriteAnswerStore';
+import {
+  getNextAnswerId,
+  useFavoriteAnswerStore,
+} from '@/pages/communication/stores/useFavoriteAnswerStore';
 import type { FavoriteAnswerTypes } from '@/pages/communication/types/communication-Types';
 
 export const useFavoriteAnswerModal = (answers: FavoriteAnswerTypes[]) => {
-  const addAnswer = useFavoriteAnswerStore((state) => state.addAnswer);
   const setAnswers = useFavoriteAnswerStore((state) => state.setAnswers);
 
+  const [draftAnswers, setDraftAnswers] =
+    useState<FavoriteAnswerTypes[]>(answers);
+  const [isEditing, setIsEditing] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [draft, setDraft] = useState('');
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingAnswers, setEditingAnswers] = useState<FavoriteAnswerTypes[]>(
-    [],
-  );
 
   const isDirty =
-    editingAnswers.length !== answers.length ||
-    editingAnswers.some(
-      (editingAnswer, index) =>
-        editingAnswer.id !== answers[index].id ||
-        editingAnswer.content !== answers[index].content,
+    draftAnswers.length !== answers.length ||
+    draftAnswers.some(
+      (draftAnswer, index) =>
+        draftAnswer.id !== answers[index].id ||
+        draftAnswer.content !== answers[index].content,
     );
 
   const handleStartAdding = () => {
@@ -36,7 +37,10 @@ export const useFavoriteAnswerModal = (answers: FavoriteAnswerTypes[]) => {
     const trimmedDraft = draft.trim();
 
     if (trimmedDraft) {
-      addAnswer(trimmedDraft);
+      setDraftAnswers((prev) => [
+        ...prev,
+        { id: getNextAnswerId(prev), content: trimmedDraft },
+      ]);
     }
 
     setDraft('');
@@ -44,47 +48,57 @@ export const useFavoriteAnswerModal = (answers: FavoriteAnswerTypes[]) => {
   };
 
   const handleStartEditing = () => {
-    setEditingAnswers(answers);
     setIsEditing(true);
   };
 
   const handleCancelEditing = () => {
-    setEditingAnswers([]);
+    setDraftAnswers(answers);
     setIsEditing(false);
   };
 
-  const handleCompleteEditing = () => {
-    setAnswers(
-      editingAnswers
-        .map((editingAnswer) => ({
-          ...editingAnswer,
-          content: editingAnswer.content.trim(),
-        }))
-        .filter((editingAnswer) => editingAnswer.content.length > 0),
-    );
-    setEditingAnswers([]);
+  const handleComplete = () => {
+    const trimmedDraft = draft.trim();
+    const pendingAnswers = trimmedDraft
+      ? [
+          ...draftAnswers,
+          { id: getNextAnswerId(draftAnswers), content: trimmedDraft },
+        ]
+      : draftAnswers;
+
+    const completedAnswers = pendingAnswers
+      .map((pendingAnswer) => ({
+        ...pendingAnswer,
+        content: pendingAnswer.content.trim(),
+      }))
+      .filter((pendingAnswer) => pendingAnswer.content.length > 0);
+
+    setAnswers(completedAnswers);
+    setDraftAnswers(completedAnswers);
+    setDraft('');
+    setIsAdding(false);
     setIsEditing(false);
   };
 
-  const handleEditingAnswerChange = (id: number, content: string) => {
-    setEditingAnswers((prev) =>
-      prev.map((editingAnswer) =>
-        editingAnswer.id === id ? { ...editingAnswer, content } : editingAnswer,
+  const handleAnswerChange = (id: number, content: string) => {
+    setDraftAnswers((prev) =>
+      prev.map((draftAnswer) =>
+        draftAnswer.id === id ? { ...draftAnswer, content } : draftAnswer,
       ),
     );
   };
 
-  const handleDeleteEditingAnswer = (id: number) => {
-    setEditingAnswers((prev) =>
-      prev.filter((editingAnswer) => editingAnswer.id !== id),
+  const handleDeleteAnswer = (id: number) => {
+    setDraftAnswers((prev) =>
+      prev.filter((draftAnswer) => draftAnswer.id !== id),
     );
   };
 
   return {
+    draftAnswers,
     isAdding,
     draft,
+    isDraftTyping: draft.trim().length > 0,
     isEditing,
-    editingAnswers,
     isDirty,
     handleDraftChange: setDraft,
     handleStartAdding,
@@ -92,8 +106,8 @@ export const useFavoriteAnswerModal = (answers: FavoriteAnswerTypes[]) => {
     handleSubmitAdding,
     handleStartEditing,
     handleCancelEditing,
-    handleCompleteEditing,
-    handleEditingAnswerChange,
-    handleDeleteEditingAnswer,
+    handleComplete,
+    handleAnswerChange,
+    handleDeleteAnswer,
   };
 };
