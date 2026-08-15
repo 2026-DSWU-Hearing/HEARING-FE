@@ -5,6 +5,7 @@ import ChatHistoryList from '@/pages/communication/components/chat/ChatHistoryLi
 import CommunicationHeader from '@/pages/communication/components/CommunicationHeader';
 import ConversationSavedNotice from '@/pages/communication/components/ConversationSavedNotice';
 import RecordingButton from '@/pages/communication/components/control/RecordingButton';
+import FavoriteAnswerModal from '@/pages/communication/components/favoriteAnswer/FavoriteAnswerModal';
 import { useCommunicationPage } from '@/pages/communication/hooks/useCommunicationPage';
 
 const Communication = () => {
@@ -15,8 +16,12 @@ const Communication = () => {
     draftReply,
     draftListening,
     isSavedNoticeOpen,
+    favoriteAnswers,
+    isFavoriteAnswerOpen,
     handleOpenHistory,
     handleOpenFavoriteAnswer,
+    handleCloseFavoriteAnswer,
+    handleSelectFavoriteAnswer,
     handleToggleRecording,
     handleDraftReplyChange,
     handleDraftListeningChange,
@@ -78,6 +83,14 @@ const Communication = () => {
           onEndConversation={handleEndConversation}
         />
       </div>
+
+      {isFavoriteAnswerOpen && (
+        <FavoriteAnswerModal
+          answers={favoriteAnswers}
+          onClose={handleCloseFavoriteAnswer}
+          onSelect={handleSelectFavoriteAnswer}
+        />
+      )}
 
       <ConversationSavedNotice isOpen={isSavedNoticeOpen} />
     </main>

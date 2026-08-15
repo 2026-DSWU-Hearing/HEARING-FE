@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { useGetCommunicationMock } from '@/pages/communication/hooks/useGetCommunicationMock';
-import type { ChatBubbleTypes } from '@/pages/communication/types/communication-Types';
+import { useFavoriteAnswerStore } from '@/pages/communication/stores/useFavoriteAnswerStore';
+import type {
+  BubbleInputTypes,
+  ChatBubbleTypes,
+} from '@/pages/communication/types/communication-Types';
+import { useModal } from '@/shared/hooks/useModal';
 
 // '대화가 저장되었습니다' 안내가 화면에 떠 있는 시간(ms)
 const SAVED_NOTICE_DURATION = 2000;
@@ -10,6 +15,12 @@ const SAVED_NOTICE_DURATION = 2000;
 export const useCommunicationPage = () => {
   const { data } = useGetCommunicationMock();
   const conversation = data?.conversation ?? null;
+
+  const favoriteAnswers = useFavoriteAnswerStore((state) => state.answers);
+  const initializeFavoriteAnswers = useFavoriteAnswerStore(
+    (state) => state.initialize,
+  );
+  const favoriteAnswerModal = useModal();
 
   const [bubbles, setBubbles] = useState<ChatBubbleTypes[]>([]);
   const [isListening, setIsListening] = useState(false);
@@ -38,6 +49,12 @@ export const useCommunicationPage = () => {
       ) + 1;
   }, [conversation]);
 
+  useEffect(() => {
+    if (!data) return;
+
+    initializeFavoriteAnswers(data.favoriteAnswers);
+  }, [data, initializeFavoriteAnswers]);
+
   // 언마운트 시 남아있는 안내 타이머를 정리한다.
   useEffect(() => {
     return () => {
@@ -50,11 +67,6 @@ export const useCommunicationPage = () => {
   // TODO: 대화기록 리스트 화면이 만들어지면 그쪽으로 이동시킨다.
   const handleOpenHistory = () => {
     console.log('대화기록 열기');
-  };
-
-  // TODO: 자주 쓰는 답변 기능이 만들어지면 그쪽으로 연결한다.
-  const handleOpenFavoriteAnswer = () => {
-    console.log('자주 쓰는 답변 열기');
   };
 
   // TODO: 실제 마이크 녹음 + STT 웹소켓 연동은 백엔드 API가 준비되면 이 자리에서 연결한다.
@@ -72,7 +84,11 @@ export const useCommunicationPage = () => {
   };
 
   // 왼쪽/오른쪽 공통: 입력값을 trim해서 버블로 확정하고 draft를 비운다.
-  const submitBubble = (direction: 'left' | 'right', content: string) => {
+  const submitBubble = (
+    direction: 'left' | 'right',
+    content: string,
+    inputType: BubbleInputTypes = 'text',
+  ) => {
     const trimmedContent = content.trim();
     if (!trimmedContent) return;
 
@@ -82,7 +98,7 @@ export const useCommunicationPage = () => {
     const newBubble: ChatBubbleTypes = {
       id,
       direction,
-      inputType: 'text',
+      inputType,
       content: trimmedContent,
     };
 
@@ -97,6 +113,10 @@ export const useCommunicationPage = () => {
   const handleSubmitListening = () => {
     submitBubble('left', draftListening);
     setDraftListening('');
+  };
+
+  const handleSelectFavoriteAnswer = (content: string) => {
+    submitBubble('right', content, 'favorite_answer');
   };
 
   const handleEndConversation = () => {
@@ -121,8 +141,12 @@ export const useCommunicationPage = () => {
     draftReply,
     draftListening,
     isSavedNoticeOpen,
+    favoriteAnswers,
+    isFavoriteAnswerOpen: favoriteAnswerModal.isOpen,
     handleOpenHistory,
-    handleOpenFavoriteAnswer,
+    handleOpenFavoriteAnswer: favoriteAnswerModal.open,
+    handleCloseFavoriteAnswer: favoriteAnswerModal.close,
+    handleSelectFavoriteAnswer,
     handleToggleRecording,
     handleDraftReplyChange,
     handleDraftListeningChange,
