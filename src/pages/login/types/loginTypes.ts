@@ -8,6 +8,10 @@ export interface AuthTokenResponseTypes {
   token_type: string;
 }
 
+export interface LogoutRequestTypes {
+  refresh_token: string;
+}
+
 export type GoogleAuthResponseTypes = AuthTokenResponseTypes;
 export type GuestLoginResponseTypes = AuthTokenResponseTypes;
 

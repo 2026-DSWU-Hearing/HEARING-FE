@@ -11,7 +11,6 @@ import Login from '@/pages/login/Login';
 import DisabilityPage from '@/pages/onboarding/DisabilityPage';
 import HwCompletePage from '@/pages/onboarding/HwCompletePage';
 import HwConnectPage from '@/pages/onboarding/HwConnectPage';
-import HwConnectingPage from '@/pages/onboarding/HwConnectingPage';
 import NicknamePage from '@/pages/onboarding/NicknamePage';
 import TermsPage from '@/pages/onboarding/TermsPage';
 import TermsDetailPage from '@/pages/onboarding/TermsDetailPage';
@@ -39,10 +38,6 @@ const AppRouter = () => {
           element={<TermsDetailPage />}
         />
         <Route path="/onboarding/hardware" element={<HwConnectPage />} />
-        <Route
-          path="/onboarding/hardware/connecting"
-          element={<HwConnectingPage />}
-        />
         <Route
           path="/onboarding/hardware/complete"
           element={<HwCompletePage />}

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 import type { AgreementId } from '@/pages/onboarding/constants/termsAgreementConstants';
-import type { DeviceTypes } from '@/pages/onboarding/types/deviceTypes';
+import type { DeviceResponseTypes } from '@/shared/types/deviceApiTypes';
 import type { DisabilityTypeTypes } from '@/pages/setting/constants/disabilityType';
 
 interface OnboardingState {
@@ -9,14 +9,14 @@ interface OnboardingState {
   disabilityType: DisabilityTypeTypes | null;
   agreements: Record<AgreementId, boolean>;
   isHardwareConnected: boolean;
-  connectedDevice: DeviceTypes | null;
+  connectedDevice: DeviceResponseTypes | null;
 
   setNickname: (nickname: string) => void;
   setDisabilityType: (disabilityType: DisabilityTypeTypes) => void;
   toggleAgreement: (agreementId: AgreementId) => void;
   agreeAgreement: (agreementId: AgreementId) => void;
   setHardwareConnected: (isHardwareConnected: boolean) => void;
-  setConnectedDevice: (device: DeviceTypes | null) => void;
+  setConnectedDevice: (device: DeviceResponseTypes | null) => void;
   resetHardwareConnection: () => void;
   resetOnboarding: () => void;
 }

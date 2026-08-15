@@ -18,6 +18,18 @@ export const ProfileSkeleton = () => (
 );
 
 /**
+ * NotificationToggleBar(제목 + 스위치) 모양의 Skeleton.
+ * 서버에서 받은 값이 토글의 진실 원천이므로, 조회 전에는 임의의 기본값(꺼짐)을
+ * 보여주지 않고 Skeleton으로 대체해 실제와 다른 상태가 노출되는 것을 막는다.
+ */
+export const NotificationToggleBarSkeleton = () => (
+  <div className="flex items-center justify-between rounded-xl bg-neutral-900 px-lg py-lg">
+    <Skeleton width="6rem" height="1.25rem" />
+    <Skeleton width="3.25rem" height="1.75rem" borderRadius="9999px" />
+  </div>
+);
+
+/**
  * SettingCard 골격(글래스 카드 + 헤더 + 본문) 모양의 Skeleton.
  * 디바이스 카드·진동 카드 등 SettingCard를 쓰는 영역의 로딩에 재사용한다.
  */
