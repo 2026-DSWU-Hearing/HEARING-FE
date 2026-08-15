@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import ChatInputBubble from '@/pages/communication/components/chat/ChatInputBubble';
 import ListeningBubble from '@/pages/communication/components/chat/ListeningBubble';
@@ -37,13 +37,22 @@ const ChatContainer = ({
     'right',
   );
 
-  useEffect(() => {
-    if (isReplyTyping) {
+  // lastActiveSide를 effect 안에서 갱신하면 렌더 결과로부터 파생되는 상태를 effect로
+  // 되돌려 쓰는 형태(set-state-in-effect)가 된다. 입력이 실제로 들어오는 onChange 시점에
+  // 같이 갱신하면 effect 없이 동일하게 동작한다.
+  const handleDraftReplyChange = (value: string) => {
+    if (value.length > 0) {
       setLastActiveSide('right');
-    } else if (isListeningTyping) {
+    }
+    onDraftReplyChange(value);
+  };
+
+  const handleDraftListeningChange = (value: string) => {
+    if (value.length > 0) {
       setLastActiveSide('left');
     }
-  }, [isReplyTyping, isListeningTyping]);
+    onDraftListeningChange(value);
+  };
 
   // 지금 실제로 입력 중인 쪽이 있으면 그쪽을 우선하고, 둘 다 비어있으면 마지막으로
   // 입력했던 쪽(lastActiveSide)을 그대로 따른다.
@@ -60,7 +69,7 @@ const ChatContainer = ({
       key={isReplyTyping ? 'listening-below' : 'listening-default'}
       isListening={isListening}
       value={draftListening}
-      onChange={onDraftListeningChange}
+      onChange={handleDraftListeningChange}
       onSubmit={onSubmitListening}
       isSpawning={isReplyTyping}
       order={isRightOnTop ? 2 : 1}
@@ -71,7 +80,7 @@ const ChatContainer = ({
     <ChatInputBubble
       key={isListeningTyping ? 'input-below' : 'input-default'}
       value={draftReply}
-      onChange={onDraftReplyChange}
+      onChange={handleDraftReplyChange}
       onSubmit={onSubmitReply}
       isSpawning={isListeningTyping}
       order={isRightOnTop ? 1 : 2}

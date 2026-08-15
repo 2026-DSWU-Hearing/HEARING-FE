@@ -56,7 +56,7 @@ const Communication = () => {
           위로 스크롤해도 항상 화면 하단에 그대로 보이게 한다. */}
       <section
         ref={historyScrollRef}
-        className="scrollbar-hide flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto"
+        className="hide-scrollbar flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto"
       >
         <ChatHistoryList bubbles={bubbles} />
       </section>

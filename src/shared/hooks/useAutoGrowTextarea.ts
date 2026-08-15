@@ -39,7 +39,9 @@ export const useAutoGrowTextarea = (value: string, placeholder: string) => {
 
     // Pretendard 폰트가 늦게 로드되면 그 전엔 대체 폰트 기준으로 측정돼서 폭이 부정확할 수 있다.
     // 폰트 로드가 끝나면 실제 폭 기준으로 한 번 더 재측정한다.
-    document.fonts.ready.then(() => {
+    // 일부 WebView/구형 브라우저에는 document.fonts(CSS Font Loading API)가 없어서
+    // 바로 접근하면 런타임 에러가 난다. PWA/모바일 환경을 고려해 optional chaining으로 가드한다.
+    document.fonts?.ready?.then(() => {
       remeasure();
     });
 
