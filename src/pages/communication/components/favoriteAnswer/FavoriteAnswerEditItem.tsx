@@ -21,8 +21,12 @@ const FavoriteAnswerEditItem = ({
   const [isContentEditable, setIsContentEditable] = useState(false);
 
   const handlePencilClick = () => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
     setIsContentEditable(true);
-    textareaRef.current?.focus();
+    textarea.focus();
+    textarea.setSelectionRange(textarea.value.length, textarea.value.length);
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
