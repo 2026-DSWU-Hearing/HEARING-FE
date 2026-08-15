@@ -7,6 +7,7 @@ interface FavoriteAnswerState {
   isInitialized: boolean;
   initialize: (answers: FavoriteAnswerTypes[]) => void;
   addAnswer: (content: string) => void;
+  setAnswers: (answers: FavoriteAnswerTypes[]) => void;
 }
 
 const getNextAnswerId = (answers: FavoriteAnswerTypes[]) =>
@@ -28,4 +29,6 @@ export const useFavoriteAnswerStore = create<FavoriteAnswerState>((set) => ({
         { id: getNextAnswerId(state.answers), content },
       ],
     })),
+
+  setAnswers: (answers) => set({ answers }),
 }));

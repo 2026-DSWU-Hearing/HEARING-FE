@@ -2,6 +2,7 @@ import { motion } from 'motion/react';
 
 import FavoriteAnswerAddButton from '@/pages/communication/components/favoriteAnswer/FavoriteAnswerAddButton';
 import FavoriteAnswerAddInput from '@/pages/communication/components/favoriteAnswer/FavoriteAnswerAddInput';
+import FavoriteAnswerEditItem from '@/pages/communication/components/favoriteAnswer/FavoriteAnswerEditItem';
 import { FAVORITE_ANSWER_MESSAGE } from '@/pages/communication/constants/favoriteAnswerMessages';
 import { useFavoriteAnswerModal } from '@/pages/communication/hooks/useFavoriteAnswerModal';
 import type { FavoriteAnswerTypes } from '@/pages/communication/types/communication-Types';
@@ -21,15 +22,28 @@ const FavoriteAnswerModal = ({
   const {
     isAdding,
     draft,
+    isEditing,
+    editingAnswers,
+    isDirty,
     handleDraftChange,
     handleStartAdding,
     handleCancelAdding,
     handleSubmitAdding,
-  } = useFavoriteAnswerModal();
+    handleStartEditing,
+    handleCancelEditing,
+    handleCompleteEditing,
+    handleEditingAnswerChange,
+    handleDeleteEditingAnswer,
+  } = useFavoriteAnswerModal(answers);
 
   const handleEscape = () => {
     if (isAdding) {
       handleCancelAdding();
+      return;
+    }
+
+    if (isEditing) {
+      handleCancelEditing();
       return;
     }
 
@@ -45,7 +59,7 @@ const FavoriteAnswerModal = ({
 
   return (
     <>
-      <div className="fixed inset-0 z-10" onClick={onClose} />
+      <div className="fixed inset-0 z-10" onClick={handleEscape} />
 
       <motion.div
         role="dialog"
@@ -59,7 +73,7 @@ const FavoriteAnswerModal = ({
         <div className="grid w-full shrink-0 grid-cols-[4rem_1fr_4rem] items-center pb-base">
           <button
             type="button"
-            onClick={onClose}
+            onClick={isEditing ? handleCancelEditing : onClose}
             className="body-base-regular justify-self-start text-neutral-400"
           >
             {FAVORITE_ANSWER_MESSAGE.CANCEL}
@@ -69,11 +83,40 @@ const FavoriteAnswerModal = ({
             {FAVORITE_ANSWER_MESSAGE.TITLE}
           </h2>
 
-          <span className="justify-self-end" />
+          {isEditing ? (
+            isDirty && (
+              <button
+                type="button"
+                onClick={handleCompleteEditing}
+                className="body-base-regular justify-self-end text-primary-400"
+              >
+                {FAVORITE_ANSWER_MESSAGE.DONE}
+              </button>
+            )
+          ) : (
+            <button
+              type="button"
+              onClick={handleStartEditing}
+              className="body-base-regular justify-self-end text-neutral-400"
+            >
+              {FAVORITE_ANSWER_MESSAGE.EDIT}
+            </button>
+          )}
         </div>
 
         <div className="hide-scrollbar flex w-full flex-1 flex-col gap-sm overflow-y-auto">
-          {answers.length === 0 && !isAdding ? (
+          {isEditing ? (
+            editingAnswers.map((editingAnswer) => (
+              <FavoriteAnswerEditItem
+                key={editingAnswer.id}
+                content={editingAnswer.content}
+                onChange={(content) =>
+                  handleEditingAnswerChange(editingAnswer.id, content)
+                }
+                onDelete={() => handleDeleteEditingAnswer(editingAnswer.id)}
+              />
+            ))
+          ) : answers.length === 0 && !isAdding ? (
             <p className="body-sm-regular mt-lg text-center text-neutral-500">
               {FAVORITE_ANSWER_MESSAGE.EMPTY}
             </p>
@@ -90,15 +133,16 @@ const FavoriteAnswerModal = ({
             ))
           )}
 
-          {isAdding ? (
-            <FavoriteAnswerAddInput
-              value={draft}
-              onChange={handleDraftChange}
-              onSubmit={handleSubmitAdding}
-            />
-          ) : (
-            <FavoriteAnswerAddButton onClick={handleStartAdding} />
-          )}
+          {!isEditing &&
+            (isAdding ? (
+              <FavoriteAnswerAddInput
+                value={draft}
+                onChange={handleDraftChange}
+                onSubmit={handleSubmitAdding}
+              />
+            ) : (
+              <FavoriteAnswerAddButton onClick={handleStartAdding} />
+            ))}
         </div>
       </motion.div>
     </>
