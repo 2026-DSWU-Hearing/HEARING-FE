@@ -13,6 +13,9 @@ const ConversationHistoryPage = () => {
   const { data } = useGetCommunicationMock();
 
   const histories = useConversationHistoryStore((state) => state.histories);
+  const isInitialized = useConversationHistoryStore(
+    (state) => state.isInitialized,
+  );
   const initializeHistories = useConversationHistoryStore(
     (state) => state.initialize,
   );
@@ -61,12 +64,14 @@ const ConversationHistoryPage = () => {
         onRightClick={handleToggleDeleteMode}
       />
 
-      <ConversationHistoryList
-        histories={histories}
-        isDeleteMode={isDeleteMode}
-        onSelect={handleSelectHistory}
-        onDelete={handleDeleteClick}
-      />
+      {isInitialized && (
+        <ConversationHistoryList
+          histories={histories}
+          isDeleteMode={isDeleteMode}
+          onSelect={handleSelectHistory}
+          onDelete={handleDeleteClick}
+        />
+      )}
 
       <ConfirmModal
         isOpen={deleteTargetId !== null}
