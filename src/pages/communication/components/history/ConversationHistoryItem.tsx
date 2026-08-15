@@ -14,7 +14,7 @@ const CARD_CLASSNAME =
   'flex w-full shrink-0 flex-col items-center gap-base self-stretch rounded-lg bg-neutral-900 p-sm';
 const ROW_CLASSNAME =
   'flex w-full items-center justify-between gap-base px-xxs';
-const TITLE_CLASSNAME = 'body-lg-regular truncate text-left text-primary';
+const TITLE_CLASSNAME = 'body-lg-light truncate text-left text-primary';
 
 const ConversationHistoryItem = ({
   history,
