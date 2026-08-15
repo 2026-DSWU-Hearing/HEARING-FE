@@ -4,12 +4,16 @@ import type { ConversationHistoryDetailTypes } from '@/pages/communication/types
 
 interface ConversationHistoryListPropTypes {
   histories: ConversationHistoryDetailTypes[];
+  isDeleteMode: boolean;
   onSelect: (id: number) => void;
+  onDelete: (id: number) => void;
 }
 
 const ConversationHistoryList = ({
   histories,
+  isDeleteMode,
   onSelect,
+  onDelete,
 }: ConversationHistoryListPropTypes) => {
   if (histories.length === 0) {
     return (
@@ -25,7 +29,9 @@ const ConversationHistoryList = ({
         <ConversationHistoryItem
           key={history.id}
           history={history}
+          isDeleteMode={isDeleteMode}
           onClick={() => onSelect(history.id)}
+          onDelete={() => onDelete(history.id)}
         />
       ))}
     </div>
