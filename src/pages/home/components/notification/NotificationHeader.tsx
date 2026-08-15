@@ -11,6 +11,7 @@ interface NotificationHeaderPropTypes {
   hasSelection: boolean;
   // 모든 항목이 선택됐는지(전체 선택/해제 토글 라벨 기준).
   isAllSelected: boolean;
+  isDisabled: boolean;
   onTrashClick: () => void;
   onSelectAll: () => void;
   onCloseDeleteMode: () => void;
@@ -21,6 +22,7 @@ const NotificationHeader = ({
   hasNotifications,
   hasSelection,
   isAllSelected,
+  isDisabled,
   onTrashClick,
   onSelectAll,
   onCloseDeleteMode,
@@ -37,6 +39,11 @@ const NotificationHeader = ({
   };
 
   const trashColorClassName = getTrashColorClassName();
+  const trashAriaLabel = !isDeleteMode
+    ? '삭제할 알림 선택'
+    : hasSelection
+      ? '선택한 알림 삭제'
+      : '삭제 모드 닫기';
 
   return (
     // relative: 삭제모드 액션 행을 TopNavigation 의 mb-2xl 여백 공간 안에 absolute 로 겹쳐 넣기 위한 기준점.
@@ -49,11 +56,12 @@ const NotificationHeader = ({
             ? {
                 icon: faTrashCan,
                 onClick: onTrashClick,
-                ariaLabel: '알림 삭제',
+                ariaLabel: trashAriaLabel,
                 colorClassName: trashColorClassName,
               }
             : undefined
         }
+        isRightDisabled={isDisabled}
       />
 
       {/* 삭제모드일 때만: 전체 선택 / 닫기 액션 행.
@@ -64,14 +72,16 @@ const NotificationHeader = ({
           <button
             type="button"
             onClick={onSelectAll}
-            className="body-sm-regular text-secondary"
+            disabled={isDisabled}
+            className="body-sm-regular text-secondary disabled:cursor-wait disabled:text-disabled"
           >
             {isAllSelected ? '전체 해제' : '전체 선택'}
           </button>
           <button
             type="button"
             onClick={onCloseDeleteMode}
-            className="body-sm-regular text-secondary"
+            disabled={isDisabled}
+            className="body-sm-regular text-secondary disabled:cursor-wait disabled:text-disabled"
           >
             닫기
           </button>

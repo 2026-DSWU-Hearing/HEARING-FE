@@ -1,15 +1,42 @@
-// 알림 페이지에서 사용하는 알림 한 건의 타입.
-// 현재는 UI 전용 mock 이라 표시용 문자열(relativeTime/absoluteTime)을 그대로 들고 있다.
-// TODO(api): 실제 알림 목록 API 연동 시 서버는 detected_at(datetime) 등을 내려줄 가능성이 높다.
-//            그 경우 datetime 원본을 받아 포맷 함수로 relativeTime/absoluteTime 을 계산하도록 바꾼다.
-export interface NotificationItemTypes {
-  id: number;
-  // 소리명(아이콘 매핑 키로도 사용). 예: '아기 옹알이', '화재 경보'
-  soundName: string;
-  // 카테고리명(배지 색 매핑 키). 예: '생활음', '긴급'
-  category: string;
-  // 우측 상단 상대 시간 표시. 예: '1일 전'
-  relativeTime: string;
-  // 우측 하단 절대 시간 표시. 예: '26.04.09 13:01'
-  absoluteTime: string;
+import type { InfiniteData } from '@tanstack/react-query';
+
+import type { DetectionTypes } from '@/shared/types/detectionTypes';
+
+export interface NotificationListResponseTypes {
+  items: DetectionTypes[];
+  next_cursor: string | null;
+  has_next: boolean;
 }
+
+export interface NotificationDeleteRequestTypes {
+  ids: number[];
+}
+
+export interface NotificationDeleteResponseTypes {
+  deleted_count: number;
+}
+
+export interface NotificationDeleteResultTypes {
+  deletedCount: number;
+  requestedIds: number[];
+}
+
+export interface NotificationPageStateTypes {
+  isDeleteMode: boolean;
+  selectedIds: Set<number>;
+  deletionErrorMessage: string | null;
+}
+
+export type NotificationPageActionTypes =
+  | { type: 'OPEN_DELETE_MODE' }
+  | { type: 'CLOSE_DELETE_MODE' }
+  | { type: 'TOGGLE_NOTIFICATION'; id: number }
+  | { type: 'SET_SELECTED_NOTIFICATIONS'; ids: number[] }
+  | { type: 'START_DELETE' }
+  | { type: 'COMPLETE_DELETE' }
+  | { type: 'FAIL_DELETE'; message: string };
+
+export type NotificationInfiniteDataTypes = InfiniteData<
+  NotificationListResponseTypes,
+  unknown
+>;
