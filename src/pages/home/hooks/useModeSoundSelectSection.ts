@@ -5,6 +5,10 @@ import type {
   CategoryTypes,
   SoundTypes,
 } from '@/pages/home/types/soundTypes';
+import {
+  filterVisibleCategories,
+  filterVisibleSounds,
+} from '@/pages/home/utils/filterSoundCatalog';
 
 interface CategorySoundGroupTypes {
   category: CategoryTypes;
@@ -40,11 +44,18 @@ export const useModeSoundSelectSection = () => {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [openedCategoryId, setOpenedCategoryId] = useState<number | null>(null);
 
-  const sounds = useMemo(() => soundsData?.sounds ?? [], [soundsData?.sounds]);
+  const sounds = useMemo(
+    () => filterVisibleSounds(soundsData?.sounds ?? []),
+    [soundsData?.sounds],
+  );
   const hasSounds = sounds.length > 0;
+  const fetchedCategories = categoriesData?.categories;
   const categories = useMemo(
-    () => categoriesData?.categories ?? createCategoriesFromSounds(sounds),
-    [categoriesData?.categories, sounds],
+    () =>
+      fetchedCategories
+        ? filterVisibleCategories(fetchedCategories)
+        : createCategoriesFromSounds(sounds),
+    [fetchedCategories, sounds],
   );
   const trimmedSearchKeyword = searchKeyword.trim();
   const isSearching = trimmedSearchKeyword.length > 0;
