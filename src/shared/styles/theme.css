@@ -143,6 +143,13 @@
     color-mix(in srgb, var(--color-primary-100) 40%, transparent) 100%
   );
   --gradient-default: linear-gradient(to bottom, #fdd043 0%, #82a6e6 100%);
+  --gradient-listening-bubble:
+    linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.2) 0%,
+      rgba(255, 255, 255, 0.2) 100%
+    ),
+    var(--color-neutral-700);
 }
 
 /* layout */
@@ -346,6 +353,10 @@
   background-image: var(--gradient-card-true-bottomsheet);
 }
 
+@utility card-listening-bubble {
+  background: var(--gradient-listening-bubble);
+}
+
 @utility gradient-default {
   background-image: var(--gradient-default);
 }
@@ -386,4 +397,22 @@
 
 @utility animate-sound-wave {
   animation: sound-wave 2.8s ease-in-out infinite;
+}
+
+/* 양방향 소통 채팅 버블 - 한쪽에 입력이 시작되면 반대쪽 버블이 입력 중인 영역
+   "아래"에 새로 생겨난 자리에서 살짝 올라오며 나타나는 등장 애니메이션.
+   (실제로 그 자리에 새로 mount되는 요소라 살짝만 올라오면 충분하다.) */
+@keyframes bubble-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility animate-bubble-rise {
+  animation: bubble-rise 0.35s ease-out;
 }

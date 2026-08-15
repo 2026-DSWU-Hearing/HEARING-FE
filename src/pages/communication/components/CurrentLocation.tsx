@@ -1,3 +1,4 @@
+import LocationArrowIcon from '@/shared/components/icons/LocationArrowIcon';
 
 interface CurrentLocationPropTypes {
   locationName: string;
@@ -5,8 +6,9 @@ interface CurrentLocationPropTypes {
 
 const CurrentLocation = ({ locationName }: CurrentLocationPropTypes) => {
   return (
-    <div className=" px-4 py-2 text-sm font-medium text-gray-700">
-      {locationName}
+    <div className="flex items-center gap-xs text-primary">
+      <LocationArrowIcon className="h-[1.0425rem] w-[1.04294rem] shrink-0" />
+      <span className="heading-lg-semibold text-center">{locationName}</span>
     </div>
   );
 };
