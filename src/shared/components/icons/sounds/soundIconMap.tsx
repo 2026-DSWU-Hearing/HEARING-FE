@@ -168,6 +168,7 @@ export const SOUND_ICON_MAP: Record<string, IconDefinition> = {
   소음: faVolumeHigh,
   '냉난방·기계음': faFan,
   증기: faSmog,
+  음악: faMusic,
 
   // 자연
   '바람·비': faCloudShowersHeavy,

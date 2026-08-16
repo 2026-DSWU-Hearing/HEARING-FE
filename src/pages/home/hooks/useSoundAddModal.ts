@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useGetSounds } from '@/pages/home/hooks/useGetSounds';
 import type { SoundTypes } from '@/pages/home/types/soundTypes';
+import { filterVisibleSounds } from '@/pages/home/utils/filterSoundCatalog';
 import { toggleSoundId } from '@/pages/home/utils/toggleSoundId';
 import { useModal } from '@/shared/hooks/useModal';
 
@@ -22,7 +23,7 @@ export const useSoundAddModal = ({
   const cancelConfirmModal = useModal();
 
   const filteredSounds = useMemo(() => {
-    const sounds = data?.sounds ?? [];
+    const sounds = filterVisibleSounds(data?.sounds ?? []);
 
     return sounds.filter((sound) => {
       const isMatchedKeyword = sound.name.includes(searchKeyword);

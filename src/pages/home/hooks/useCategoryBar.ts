@@ -1,5 +1,6 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useGetSoundCategories } from '@/pages/home/hooks/useGetSoundCategories';
+import { filterVisibleCategories } from '@/pages/home/utils/filterSoundCatalog';
 
 interface UseCategoryBarParamTypes {
   onCategoryChange: (category: string | null) => void;
@@ -10,6 +11,10 @@ export const useCategoryBar = ({
   onCategoryChange,
 }: UseCategoryBarParamTypes) => {
   const { data, isLoading, isError } = useGetSoundCategories();
+  const categories = useMemo(
+    () => filterVisibleCategories(data?.categories ?? []),
+    [data?.categories],
+  );
 
   const handleAllCategoryClick = useCallback(() => {
     onCategoryChange(null);
@@ -23,7 +28,7 @@ export const useCategoryBar = ({
   );
 
   return {
-    categories: data?.categories ?? [],
+    categories,
     isLoading,
     isError,
     handleAllCategoryClick,
