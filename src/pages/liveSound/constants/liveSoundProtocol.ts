@@ -28,8 +28,8 @@ const isSoundItem = (value: unknown): value is LiveSoundSoundItemTypes => {
   const { sound_id, sound_name, sound_category, confidence } = value;
 
   return (
-    typeof sound_id === 'number' &&
-    Number.isFinite(sound_id) &&
+    (sound_id === null ||
+      (typeof sound_id === 'number' && Number.isFinite(sound_id))) &&
     typeof sound_name === 'string' &&
     typeof sound_category === 'string' &&
     typeof confidence === 'number' &&

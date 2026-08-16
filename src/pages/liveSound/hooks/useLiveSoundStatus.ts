@@ -2,11 +2,9 @@ import { useCallback, useState } from 'react';
 
 import { LIVE_SOUND_STATUS_LABEL } from '../constants/liveSoundStatusLabel';
 import type { LiveSoundStatusTypes } from '../types/liveSoundStatusTypes';
-import type {
-  LiveSoundClassificationTypes,
-  LiveSoundSoundItemTypes,
-} from '../types/liveSoundSocketTypes';
+import type { LiveSoundClassificationTypes } from '../types/liveSoundSocketTypes';
 import type { SoundRateTypes } from '../types/soundRateTypes';
+import { mergeLiveSoundSounds } from '../utils/mergeLiveSoundSounds';
 
 import { useLiveSoundSocket } from './useLiveSoundSocket';
 
@@ -20,26 +18,15 @@ interface UseLiveSoundStatusReturnTypes {
   handleAlertClose: () => void;
 }
 
-// 분류 결과(confidence 0~1)를 화면용 비율(rate %)로 매핑.
-const toSoundRate = ({
-  sound_id,
-  sound_name,
-  confidence,
-}: LiveSoundSoundItemTypes): SoundRateTypes => ({
-  id: String(sound_id),
-  label: sound_name,
-  rate: Math.round(confidence * 100),
-});
-
 // 실시간 소리 감지 화면의 상태를 소유하는 훅.
 // 결과를 하드웨어(ESP32)용 useDetectionStore에 넣으면 목록이 섞이고 전역 토스트가 중복으로 떠서, 페이지 로컬 상태로 분리했다.
 export const useLiveSoundStatus = (): UseLiveSoundStatusReturnTypes => {
   const [soundRateList, setSoundRateList] = useState<SoundRateTypes[]>([]);
 
-  // 스냅샷이라 누적하지 않고 통째로 교체한다. 표시 개수와 순서는 서버를 그대로 따른다.
+  // 스냅샷이라 누적하지 않고 통째로 교체한다. 같은 sound_name 중복은 병합 후 표시한다.
   const handleClassification = useCallback(
     ({ sounds }: LiveSoundClassificationTypes) => {
-      setSoundRateList(sounds.map(toSoundRate));
+      setSoundRateList(mergeLiveSoundSounds(sounds));
     },
     [],
   );

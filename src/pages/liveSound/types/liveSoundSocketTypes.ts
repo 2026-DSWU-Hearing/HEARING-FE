@@ -1,8 +1,9 @@
 // 실시간 소리 감지 WebSocket(/ws/users/me/livesound)의 메시지 타입.
 
 // 필드명은 DetectionTypes와 같지만 구조가 달라(그쪽은 id/source/detected_at) 타입을 공유하지 않는다.
+// sound_id는 백엔드 카탈로그에 없는 소리(YAMNet 분류 결과가 DB 매핑을 못 찾은 경우)일 때 null로 온다.
 export interface LiveSoundSoundItemTypes {
-  sound_id: number;
+  sound_id: number | null;
   sound_name: string;
   sound_category: string;
   confidence: number;
