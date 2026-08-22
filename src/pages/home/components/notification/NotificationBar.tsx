@@ -1,21 +1,37 @@
 import { getCategoryColor } from '@/pages/home/constants/categoryColors';
-import type { NotificationItemTypes } from '@/pages/home/types/notificationTypes';
+import {
+  formatNotificationAbsoluteTime,
+  formatNotificationRelativeTime,
+} from '@/pages/home/utils/formatNotificationTime';
 import SoundIconView from '@/shared/components/icons/sounds/SoundIconView';
 
+import type { DetectionTypes } from '@/shared/types/detectionTypes';
+
 interface NotificationBarPropTypes {
-  notification: NotificationItemTypes;
+  notification: DetectionTypes;
+  currentTime: number;
   isDeleteMode?: boolean;
   isSelected?: boolean;
+  isDisabled?: boolean;
   onSelect?: (id: number) => void;
 }
 
 const NotificationBar = ({
   notification,
+  currentTime,
   isDeleteMode = false,
   isSelected = false,
+  isDisabled = false,
   onSelect,
 }: NotificationBarPropTypes) => {
-  const { id, soundName, category, relativeTime, absoluteTime } = notification;
+  const {
+    id,
+    sound_name: soundName,
+    sound_category: category,
+    detected_at: detectedAt,
+  } = notification;
+  const relativeTime = formatNotificationRelativeTime(detectedAt, currentTime);
+  const absoluteTime = formatNotificationAbsoluteTime(detectedAt);
 
   const handleSelectClick = () => {
     onSelect?.(id);
@@ -77,8 +93,9 @@ const NotificationBar = ({
     <button
       type="button"
       onClick={handleSelectClick}
+      disabled={isDisabled}
       aria-pressed={isSelected}
-      className={`${cardClassName} cursor-pointer`}
+      className={`${cardClassName} cursor-pointer disabled:cursor-wait disabled:opacity-60`}
     >
       {cardContent}
     </button>

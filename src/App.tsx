@@ -1,6 +1,12 @@
 import { useLocation } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 
 import BottomNavigation from '@/layout/BottomNavigation';
+import { NOTIFICATION_QUERY_KEY } from '@/pages/home/constants/notificationConstants';
+import {
+  isNotificationInfiniteData,
+  mergeNotificationIntoCache,
+} from '@/pages/home/utils/notificationCache';
 import AppRouter from '@/routes/AppRouter';
 import { getAccessToken } from '@/pages/login/utils/tokenStorage';
 import { useToast } from '@/shared/components/toast/ToastContext';
@@ -9,9 +15,12 @@ import { useFcmTokenSync } from '@/shared/hooks/useFcmTokenSync';
 import { useDetectionStore } from '@/shared/stores/useDetectionStore';
 import '@/App.css';
 
-function App() {
+import type { NotificationInfiniteDataTypes } from '@/pages/home/types/notificationTypes';
+
+const App = () => {
   const { pathname } = useLocation();
   const { showToast } = useToast();
+  const queryClient = useQueryClient();
 
   // 로그인 성공 시 useGoogleAuth가 navigate('/')로 주소를 바꾸면 App이 리렌더되고,
   // 이때 토큰을 다시 읽어 useDetectionSocket에 넘겨 로그인 직후 WS 연결이 트리거된다.
@@ -30,6 +39,52 @@ function App() {
         categoryName: detection.sound_category,
       });
       pushDetection(detection);
+
+      // 알림 목록을 한 번이라도 조회한 경우에만 실시간 이벤트를 병합한다.
+      // 아직 생성되지 않은 캐시는 WS 이벤트 하나로 불완전하게 만들지 않는다.
+      const notificationQueryState =
+        queryClient.getQueryState<NotificationInfiniteDataTypes>(
+          NOTIFICATION_QUERY_KEY,
+        );
+      if (!notificationQueryState) return;
+
+      // 무한 조회가 시작할 때 캡처한 이전 pages로 WS 병합 결과를 덮어쓰지
+      // 않도록 진행 중 요청을 취소한 뒤 최신 캐시에 이벤트를 합친다.
+      void queryClient
+        .cancelQueries({ queryKey: NOTIFICATION_QUERY_KEY, exact: true })
+        .then(() => {
+          const notificationCache =
+            queryClient.getQueryData<NotificationInfiniteDataTypes>(
+              NOTIFICATION_QUERY_KEY,
+            );
+
+          if (isNotificationInfiniteData(notificationCache)) {
+            queryClient.setQueryData<NotificationInfiniteDataTypes>(
+              NOTIFICATION_QUERY_KEY,
+              (data) =>
+                data ? mergeNotificationIntoCache(data, detection) : data,
+            );
+            return;
+          }
+
+          if (notificationCache) {
+            // HMR이나 과거 구현에서 같은 키에 다른 캐시 구조가 남은 경우
+            // 잘못된 데이터를 폐기하고 Infinite Query 첫 페이지부터 다시 받는다.
+            void queryClient.resetQueries({
+              queryKey: NOTIFICATION_QUERY_KEY,
+              exact: true,
+            });
+            return;
+          }
+
+          // 최초 조회 중 이벤트가 도착해 아직 data가 없다면 서버 저장분을
+          // 놓치지 않도록 활성 쿼리를 처음부터 다시 요청한다.
+          void queryClient.invalidateQueries({
+            queryKey: NOTIFICATION_QUERY_KEY,
+            exact: true,
+            refetchType: 'active',
+          });
+        });
     },
   });
 
@@ -49,6 +104,6 @@ function App() {
       {!hideNavigation && <BottomNavigation />}
     </div>
   );
-}
+};
 
 export default App;
