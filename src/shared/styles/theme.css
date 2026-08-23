@@ -416,3 +416,91 @@
 @utility animate-bubble-rise {
   animation: bubble-rise 0.35s ease-out;
 }
+
+/* 실시간 소리 감지 - 감지된 소리 아이콘의 궤도 부유.
+   궤도 지름을 가진 래퍼를 통째로 회전시켜, 그 12시 방향에 붙은 아이콘이 원을 그리게 한다.
+   (transform의 %는 부모가 아니라 자기 자신 크기 기준이라 translateX(반지름)로는 배치할 수 없다.)
+   회전/역회전/bobbing을 한 요소에 몰면 transform이 서로 덮어써 마지막 것만 남으므로 분리해 쓴다.
+   duration은 궤도마다 달라야 해 커스텀 프로퍼티로 주입받는다. */
+@keyframes sound-orbit {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes sound-orbit-reverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+/* 궤도 회전을 상쇄해 아이콘이 기울지 않고 늘 똑바로 서 있게 한다.
+   짝이 되는 궤도와 duration을 같게 줘야 정확히 상쇄된다. */
+@keyframes sound-orbit-counter {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes sound-orbit-counter-reverse {
+  from {
+    transform: rotate(-360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+/* 궤도 회전과 별개로 위아래로 살짝 둥실거리는 움직임. */
+@keyframes sound-bob {
+  0%,
+  100% {
+    transform: translateY(-0.25rem);
+  }
+  50% {
+    transform: translateY(0.25rem);
+  }
+}
+
+@utility animate-sound-orbit {
+  animation: sound-orbit var(--orbit-duration, 30s) linear infinite;
+}
+
+@utility animate-sound-orbit-reverse {
+  animation: sound-orbit-reverse var(--orbit-duration, 30s) linear infinite;
+}
+
+@utility animate-sound-orbit-counter {
+  animation: sound-orbit-counter var(--orbit-duration, 30s) linear infinite;
+}
+
+@utility animate-sound-orbit-counter-reverse {
+  animation: sound-orbit-counter-reverse var(--orbit-duration, 30s) linear
+    infinite;
+}
+
+@utility animate-sound-bob {
+  animation: sound-bob var(--bob-duration, 3.6s) ease-in-out infinite;
+}
+
+/* 접근성: 전정기관 자극에 민감한 사용자를 위해 움직임만 멈춘다.
+   요소를 숨기지는 않는다 - 무엇이 감지됐는지의 정보가 유실되면 안 되기 때문이다.
+   @utility와 명시도가 같아 선언 순서에 의존하지 않도록 !important를 붙였다. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-sound-orbit,
+  .animate-sound-orbit-reverse,
+  .animate-sound-orbit-counter,
+  .animate-sound-orbit-counter-reverse,
+  .animate-sound-bob {
+    animation: none !important;
+  }
+}

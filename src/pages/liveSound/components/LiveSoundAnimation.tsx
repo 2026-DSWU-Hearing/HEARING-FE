@@ -1,7 +1,13 @@
 import LiveSoundIcon from '@/shared/components/icons/LiveSoundIcon';
 
+import { useOrbitSoundList } from '../hooks/useOrbitSoundList';
+import type { SoundRateTypes } from '../types/soundRateTypes';
+
+import FloatingSoundIcons from './FloatingSoundIcons';
+
 interface LiveSoundAnimationPropTypes {
   isListening: boolean;
+  soundRateList: SoundRateTypes[];
 }
 
 // 원 크기는 min(maxRem, ratio)로 반응형 처리한다.
@@ -35,7 +41,14 @@ const RING_MASK_STYLE = {
   maskImage: RING_MASK,
 };
 
-const LiveSoundAnimation = ({ isListening }: LiveSoundAnimationPropTypes) => {
+const LiveSoundAnimation = ({
+  isListening,
+  soundRateList,
+}: LiveSoundAnimationPropTypes) => {
+  // 서버 스냅샷을 그대로 쓰지 않는다. 매 초 통째로 교체돼 아이콘이 튀기 때문에
+  // 퇴장 지연과 궤도 슬롯 고정으로 완충한 목록을 받는다.
+  const orbitSoundList = useOrbitSoundList(soundRateList, isListening);
+
   return (
     <div
       className="relative flex aspect-square w-full items-center justify-center"
@@ -99,6 +112,10 @@ const LiveSoundAnimation = ({ isListening }: LiveSoundAnimationPropTypes) => {
             : {}),
         }}
       />
+
+      {/* 감지된 소리 아이콘이 링 궤도를 따라 떠다닌다.
+          중앙 아이콘(z-10)보다 낮은 레이어라 귀 아이콘을 가리지 않는다. */}
+      {isListening && <FloatingSoundIcons orbitSoundList={orbitSoundList} />}
 
       {/* 공용 LiveSoundIcon은 style을 받지 않으므로, 반응형 크기는 래퍼 span이 갖고
           아이콘은 부모를 가득 채우게 한다. */}

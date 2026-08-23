@@ -1,3 +1,5 @@
+import type { SoundRateTypes } from '../types/soundRateTypes';
+
 import LiveSoundAnimation from './LiveSoundAnimation';
 import LiveSoundButton from './LiveSoundButton';
 
@@ -5,6 +7,7 @@ interface LiveSoundAnimationAreaPropTypes {
   isListening: boolean;
   isConnecting: boolean;
   statusLabel: string;
+  soundRateList: SoundRateTypes[];
   onListeningToggleClick: () => void;
 }
 
@@ -13,11 +16,15 @@ const LiveSoundAnimationArea = ({
   isListening,
   isConnecting,
   statusLabel,
+  soundRateList,
   onListeningToggleClick,
 }: LiveSoundAnimationAreaPropTypes) => {
   return (
     <div className="flex flex-col items-center">
-      <LiveSoundAnimation isListening={isListening} />
+      <LiveSoundAnimation
+        isListening={isListening}
+        soundRateList={soundRateList}
+      />
       <h2 className="heading-xl-bold mt-sm text-center text-secondary">
         {statusLabel}
       </h2>
