@@ -8,6 +8,7 @@ interface LiveSoundAnimationAreaPropTypes {
   isConnecting: boolean;
   statusLabel: string;
   soundRateList: SoundRateTypes[];
+  getAmplitude: (() => number) | null;
   onListeningToggleClick: () => void;
 }
 
@@ -17,6 +18,7 @@ const LiveSoundAnimationArea = ({
   isConnecting,
   statusLabel,
   soundRateList,
+  getAmplitude,
   onListeningToggleClick,
 }: LiveSoundAnimationAreaPropTypes) => {
   return (
@@ -24,6 +26,7 @@ const LiveSoundAnimationArea = ({
       <LiveSoundAnimation
         isListening={isListening}
         soundRateList={soundRateList}
+        getAmplitude={getAmplitude}
       />
       <h2 className="heading-xl-bold mt-sm text-center text-secondary">
         {statusLabel}

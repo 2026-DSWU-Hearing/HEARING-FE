@@ -14,6 +14,8 @@ interface UseLiveSoundStatusReturnTypes {
   statusLabel: string;
   soundRateList: SoundRateTypes[];
   alertMessage: string;
+  // 감지 중일 때만 함수, 아니면 null. 화면은 이 유무로 애니메이션 루프를 켜고 끈다.
+  getAmplitude: (() => number) | null;
   handleListeningToggleClick: () => void;
   handleAlertClose: () => void;
 }
@@ -34,11 +36,17 @@ export const useLiveSoundStatus = (): UseLiveSoundStatusReturnTypes => {
   // 첫 메시지가 도착하기 전(connecting 구간) 지난 세션 결과가 남아 보이는 것을 막는다.
   const handleSessionStart = useCallback(() => setSoundRateList([]), []);
 
-  const { status, alertMessage, startSession, stopSession, clearAlertMessage } =
-    useLiveSoundSocket({
-      onClassification: handleClassification,
-      onSessionStart: handleSessionStart,
-    });
+  const {
+    status,
+    alertMessage,
+    getAmplitude,
+    startSession,
+    stopSession,
+    clearAlertMessage,
+  } = useLiveSoundSocket({
+    onClassification: handleClassification,
+    onSessionStart: handleSessionStart,
+  });
 
   const isListening = status === 'listening';
 
@@ -58,6 +66,8 @@ export const useLiveSoundStatus = (): UseLiveSoundStatusReturnTypes => {
     statusLabel: LIVE_SOUND_STATUS_LABEL[status],
     soundRateList,
     alertMessage,
+    // 감지 중이 아닐 때 null을 주면 화면이 rAF 루프를 아예 돌리지 않는다.
+    getAmplitude: isListening ? getAmplitude : null,
     handleListeningToggleClick,
     handleAlertClose: clearAlertMessage,
   };
