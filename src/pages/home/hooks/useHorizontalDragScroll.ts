@@ -45,6 +45,8 @@ export const useHorizontalDragScroll = () => {
 
       clearClickSuppressionTimeout();
       shouldPreventClickRef.current = false;
+      // 누르는 즉시 캡처해, 커서가 요소를 벗어난 뒤 떼도 pointerup이 반드시 전달되게 한다.
+      event.currentTarget.setPointerCapture(event.pointerId);
       dragStateRef.current = {
         pointerId: event.pointerId,
         startClientX: event.clientX,
@@ -68,9 +70,9 @@ export const useHorizontalDragScroll = () => {
         return;
       }
 
+      // 임계값은 클릭과 드래그를 가르는 용도로만 쓴다(캡처 시점과 무관).
       if (!dragState.hasDragged) {
         dragState.hasDragged = true;
-        event.currentTarget.setPointerCapture(event.pointerId);
         setIsDragging(true);
       }
 
