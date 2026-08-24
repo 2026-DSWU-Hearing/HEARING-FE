@@ -6,7 +6,7 @@ export interface DetectionTypes {
   sound_name: string;
   sound_category: string;
   source: string;
-  confidence: number;
+  confidence: number | null;
   location: string | null;
   detected_at: string;
 }

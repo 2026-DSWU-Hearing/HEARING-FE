@@ -10,7 +10,7 @@ const isDetection = (value: unknown): value is DetectionTypes => {
   if (!value || typeof value !== 'object') return false;
 
   const detection = value as Record<string, unknown>;
-  const { location } = detection;
+  const { location, confidence } = detection;
 
   return (
     typeof detection.id === 'number' &&
@@ -18,8 +18,8 @@ const isDetection = (value: unknown): value is DetectionTypes => {
     typeof detection.sound_name === 'string' &&
     typeof detection.sound_category === 'string' &&
     typeof detection.source === 'string' &&
-    typeof detection.confidence === 'number' &&
-    Number.isFinite(detection.confidence) &&
+    (confidence === null ||
+      (typeof confidence === 'number' && Number.isFinite(confidence))) &&
     (location === null || typeof location === 'string') &&
     typeof detection.detected_at === 'string'
   );
