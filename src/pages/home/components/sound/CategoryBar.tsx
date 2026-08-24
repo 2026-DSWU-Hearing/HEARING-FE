@@ -1,5 +1,6 @@
 import CategoryBlock from '@/pages/home/components/sound/CategoryBlock';
 import { useCategoryBar } from '@/pages/home/hooks/useCategoryBar';
+import { useHorizontalDragScroll } from '@/pages/home/hooks/useHorizontalDragScroll';
 
 interface CategoryBarPropTypes {
   selectedCategory: string | null;
@@ -17,9 +18,26 @@ const CategoryBar = ({
     handleAllCategoryClick,
     handleCategoryChange,
   } = useCategoryBar({ onCategoryChange });
+  const {
+    isDragging,
+    handlePointerDown,
+    handlePointerMove,
+    handlePointerUp,
+    handlePointerCancel,
+    handleClickCapture,
+  } = useHorizontalDragScroll();
 
   return (
-    <div className="flex gap-xs overflow-x-auto py-1 touch-pan-x [&>*]:shrink-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+    <div
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerCancel}
+      onClickCapture={handleClickCapture}
+      className={`flex cursor-grab gap-xs overflow-x-auto py-1 select-none touch-pan-x [&>*]:shrink-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden ${
+        isDragging ? 'cursor-grabbing' : ''
+      }`}
+    >
       <CategoryBlock
         categoryName="전체"
         variant="filter"
