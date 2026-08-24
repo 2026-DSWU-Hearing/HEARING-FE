@@ -480,7 +480,7 @@ WS `detection` 메시지의 `data`와 필드·타입이 완전히 동일하다.
 | `sound_name`     | string            | required. 한글. 예: `"화재 경보"`                                         |
 | `sound_category` | string            | required. 한글. 아래 8종 중 하나                                          |
 | `source`         | string            | required. 감지 출처. **알림에서는 화면 미표시**                           |
-| `confidence`     | number            | required. `0.0`~`1.0`. **알림에서는 화면 미표시**                         |
+| `confidence`     | number \| null    | required(널 허용). `0.0`~`1.0`. **알림에서는 화면 미표시**                |
 | `location`       | string \| null    | required(널 허용). 사람이 읽는 문자열. **알림에서는 화면 미표시**         |
 | `detected_at`    | string (datetime) | required. **ISO 8601 + 타임존 오프셋**. 예: `"2026-04-09T13:01:22+09:00"` |
 
