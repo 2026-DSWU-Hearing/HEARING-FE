@@ -16,6 +16,11 @@ interface LiveSoundAnimationPropTypes {
   getAmplitude: (() => number) | null;
 }
 
+// 감지 영역 컨테이너의 최대 폭. 넓은 화면에서는 이 값으로 고정되고,
+// 화면이 좁아지면 100%(부모 폭)가 선택돼 함께 줄어든다.
+// 아래 아이콘 크기 계산이 이 값을 기준으로 삼으므로 한 곳에서만 정의한다.
+const ANIMATION_CONTAINER_MAX_REM = 21.75;
+
 // 원 크기는 min(maxRem, ratio)로 반응형 처리한다.
 // 넓은 화면에선 maxRem(고정 크기), 컨테이너가 좁아지면 ratio(컨테이너 너비 비율)가 선택돼 함께 줄어든다.
 // ratio는 가장 바깥 링을 컨테이너 너비의 96%로 두고, 원들의 상대 비율(maxRem 기준)을 유지하도록 환산했다.
@@ -35,18 +40,66 @@ const OUTLINE_RING_LIST = [
 // 가장 안쪽 배경 원과 아이콘도 같은 기준으로 반응형 크기를 갖는다.
 const BACKGROUND_CIRCLE_SIZE = getResponsiveSize(10.75, '48%');
 
-// 중앙 아이콘. %의 기준은 "부모"라, 이 값을 쓰는 요소는 반드시 감지 영역 컨테이너의
-// 직속 자식이어야 한다. 중간에 크기를 가진 래퍼를 끼우면 24.6%가 그 래퍼 기준으로
-// 다시 계산돼 아이콘이 소리 없이 작아진다.
+// 중앙 아이콘의 기준 크기(대기 상태의 귀 아이콘). %의 기준은 "부모"라, 이 값을 쓰는
+// 요소는 반드시 감지 영역 컨테이너의 직속 자식이어야 한다. 중간에 크기를 가진 래퍼를
+// 끼우면 24.6%가 그 래퍼 기준으로 다시 계산돼 아이콘이 소리 없이 작아진다.
 const ICON_SIZE = getResponsiveSize(5.5, '24.6%');
 
-// FontAwesome 아이콘은 height:1em이 강제돼 width/height가 아니라 font-size로만 커진다.
-// 그런데 font-size의 %는 컨테이너 너비가 아니라 "부모의 글자 크기" 기준이라,
-// ICON_SIZE를 그대로 주면 24.6%가 4px 남짓으로 계산돼 아이콘이 점처럼 작아진다.
-// 그래서 글자 크기는 %를 못 쓰고, 화면 폭(vw)으로 같은 반응형 곡선을 흉내 낸다.
-// 컨테이너는 페이지 좌우 여백(각 1rem)을 뺀 폭이라 24.6%를 vw로 환산하면 약 24.6vw다.
-// (직접 그린 SVG는 w/h를 따르므로 이 값과 무관하다.)
-const ICON_FONT_SIZE = getResponsiveSize(5.5, '24.6vw');
+// 소리 아이콘 두 부류가 "서로 같은 크기로 보이게" 맞추는 보정.
+// (귀 아이콘 대비 최종 크기는 아래 SOUND_ICON_AREA_PERCENT가 정한다.)
+//
+// 같은 박스를 줘도 눈에 보이는 크기는 다르다. 박스를 그림이 얼마나 채우는지가
+// 아이콘 세트마다 다르기 때문이다(실측한 세로 충전율):
+//   - 귀(LiveSoundIcon):  0.653  ← viewBox 36×36에 그림은 y=6.6~30.1만 차지
+//   - 직접 그린 소리 SVG: 0.98~1.00 (viewBox가 그림에 딱 맞게 잘려 있음)
+//   - FontAwesome 폴백:   0.875
+// 즉 귀만 여백을 내장하고 있어, 보정 없이는 소리 아이콘이 1.5배쯤 커 보인다.
+//
+// 두 소리 아이콘 부류를 따로 맞출 수 있는 이유: 조절 수단이 서로 겹치지 않는다.
+// 직접 그린 SVG는 width/height만 따르고, FontAwesome은 height:1em이 강제돼
+// font-size만 따른다. 그래서 한쪽을 바꿔도 다른 쪽은 영향받지 않는다.
+const HAND_DRAWN_ICON_SCALE = 0.653 / 0.98;
+const FONT_AWESOME_ICON_SCALE = 0.653 / 0.875;
+
+// 소리 아이콘이 차지하는 영역(컨테이너 폭 대비 %).
+// 대기 상태 귀 아이콘(ICON_SIZE, 24.6%)보다 한 단계 작게 둔다. 감지 중에는 아이콘
+// 아래에 소리 이름표가 함께 붙어 대기 화면보다 빽빽해, 배경 원 안에 여백을 남긴다.
+// 24.6 × 0.85. 아래 두 부류가 공통으로 참조하므로 이 값만 바꾸면 함께 움직인다.
+const SOUND_ICON_AREA_PERCENT = 20.9;
+
+// 크기 상한도 같은 비율로 줄여, 넓은 화면과 좁은 화면의 곡선이 어긋나지 않게 한다.
+const SOUND_ICON_MAX_REM = 5.5 * (SOUND_ICON_AREA_PERCENT / 24.6);
+
+// 직접 그린 SVG용 박스 크기(width/height).
+// width는 %를 쓸 수 있어 귀 아이콘과 완전히 같은 기준(컨테이너 폭)으로 잡힌다.
+const SOUND_ICON_SIZE = getResponsiveSize(
+  SOUND_ICON_MAX_REM * HAND_DRAWN_ICON_SCALE,
+  `${(SOUND_ICON_AREA_PERCENT * HAND_DRAWN_ICON_SCALE).toFixed(1)}%`,
+);
+
+// FontAwesome 폴백용 글자 크기(font-size).
+// font-size의 %는 컨테이너 너비가 아니라 "부모의 글자 크기" 기준이라 %를 쓸 수 없다.
+// (그대로 주면 24.6%가 4px 남짓으로 계산돼 아이콘이 점처럼 작아진다.)
+//
+// 그래서 컨테이너 폭을 화면 폭으로부터 직접 환산한다. 이 페이지의 레이아웃은
+//   .app(max-width: PAGE_MAX_WIDTH_REM) > main(좌우 PAGE_HORIZONTAL_PADDING_REM 패딩)
+// 이라, 컨테이너 폭은 min(고정 폭, 100vw - 좌우 패딩)이 된다.
+// 넓은 화면에서는 앞의 고정 rem이, 좁은 화면에서는 뒤의 calc가 선택된다.
+// (24.6vw처럼 패딩을 무시하고 근사하면 좁은 화면에서 아이콘이 커진다.)
+const PAGE_MAX_WIDTH_REM = 26.875;
+const PAGE_HORIZONTAL_PADDING_REM = 1;
+const CONTAINER_WIDTH_REM = Math.min(
+  ANIMATION_CONTAINER_MAX_REM,
+  PAGE_MAX_WIDTH_REM - PAGE_HORIZONTAL_PADDING_REM * 2,
+);
+const SOUND_ICON_AREA_RATIO = SOUND_ICON_AREA_PERCENT / 100;
+
+const SOUND_ICON_FONT_SIZE = getResponsiveSize(
+  CONTAINER_WIDTH_REM * SOUND_ICON_AREA_RATIO * FONT_AWESOME_ICON_SCALE,
+  `calc((100vw - ${PAGE_HORIZONTAL_PADDING_REM * 2}rem) * ${(
+    SOUND_ICON_AREA_RATIO * FONT_AWESOME_ICON_SCALE
+  ).toFixed(4)})`,
+);
 
 // 소리 이름표는 아이콘 아래에 절대 배치한다. 이름 길이가 아이콘 크기에 영향을 주지 않게
 // 하려는 것이고, 덕분에 아이콘이 컨테이너 직속 자식 자리를 지킬 수 있다.
@@ -98,8 +151,8 @@ const LiveSoundAnimation = ({
       // 부모(LiveSoundAnimationArea)가 items-center라 폭이 stretch되지도 않아,
       // 기준 폭을 직접 정해주지 않으면 컨테이너가 0에 가깝게 줄어든다.
       style={{
-        width: '21.75rem',
-        maxHeight: '21.75rem',
+        width: `${ANIMATION_CONTAINER_MAX_REM}rem`,
+        maxHeight: `${ANIMATION_CONTAINER_MAX_REM}rem`,
         maxWidth: '100%',
       }}
     >
@@ -180,7 +233,10 @@ const LiveSoundAnimation = ({
             크기에 width/height와 font-size를 함께 주는 이유:
             직접 그린 SVG는 viewBox뿐이라 width/height로 조절되고,
             FontAwesome 폴백은 height:1em이 강제돼 font-size로만 조절된다.
-            소리명에 따라 어느 쪽이 렌더될지 달라져 셋을 함께 건다. */}
+            소리명에 따라 어느 쪽이 렌더될지 달라져 셋을 함께 건다.
+
+            박스 크기를 아이콘 종류에 따라 나누는 이유는 SOUND_ICON_SCALE 주석 참고.
+            같은 박스를 주면 여백이 없는 소리 아이콘이 귀보다 커 보인다. */}
         <motion.div
           key={primarySound?.id ?? 'idle'}
           className={`absolute z-10 flex items-center justify-center leading-none transition-colors duration-500 ${
@@ -190,9 +246,9 @@ const LiveSoundAnimation = ({
           }`}
           style={
             {
-              width: ICON_SIZE,
-              height: ICON_SIZE,
-              fontSize: ICON_FONT_SIZE,
+              width: primarySound ? SOUND_ICON_SIZE : ICON_SIZE,
+              height: primarySound ? SOUND_ICON_SIZE : ICON_SIZE,
+              fontSize: SOUND_ICON_FONT_SIZE,
             } as CSSProperties
           }
           initial={{ opacity: 0, scale: 0.85 }}
