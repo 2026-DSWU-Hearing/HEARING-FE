@@ -1,13 +1,9 @@
 import SoundIconView from '@/shared/components/icons/sounds/SoundIconView';
 
-import { SOUND_RATE_DISPLAY_THRESHOLD } from '../constants/liveSoundDisplayConfig';
 import type { SoundRateTypes } from '../types/soundRateTypes';
 
 // 감지 중인데 아직 잡힌 소리가 없을 때 카드에 표시할 안내 문구.
 const EMPTY_DETECTION_MESSAGE = '주변에서 아무 소리도 감지되지 않았어요';
-
-// rate는 0~100인데 임계값 상수는 0~1(confidence) 기준이라 맞춰준다.
-const DISPLAY_THRESHOLD_RATE = SOUND_RATE_DISPLAY_THRESHOLD * 100;
 
 interface SoundRateBlockPropTypes {
   isListening: boolean;
@@ -26,14 +22,10 @@ const SoundRateBlock = ({
     return null;
   }
 
-  // 확신이 낮은 소리는 아예 빼서 목록을 신뢰할 수 있게 만든다.
-  // 항목이 3개가 안 되더라도 억지로 채우지 않는다.
-  const visibleSoundList = soundRateList.filter(
-    ({ rate }) => rate >= DISPLAY_THRESHOLD_RATE,
-  );
-
-  // 감지 중이지만 보여줄 소리가 없으면, 빈 화면 대신 안내 문구를 보여준다.
-  if (visibleSoundList.length === 0) {
+  // 감지 중이지만 아직 잡힌 소리가 없으면, 빈 화면 대신 안내 문구를 보여준다.
+  // 서버가 준 결과는 거르지 않고 그대로 보여준다. confidence가 낮다고 프론트가
+  // 빼면 실제로 난 소리를 놓치게 되고, 그건 이 서비스에서 가장 위험한 실패다.
+  if (soundRateList.length === 0) {
     return (
       <div className={CARD_CLASS_NAME}>
         <p className="body-base-medium text-center text-secondary">
@@ -44,7 +36,7 @@ const SoundRateBlock = ({
   }
 
   // 막대 길이를 비교하려면 순서가 고정돼야 한다. 서버 응답 순서에 기대지 않는다.
-  const sortedSoundList = [...visibleSoundList].sort(
+  const sortedSoundList = [...soundRateList].sort(
     (first, second) => second.rate - first.rate,
   );
 
