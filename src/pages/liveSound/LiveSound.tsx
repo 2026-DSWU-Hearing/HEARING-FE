@@ -12,6 +12,7 @@ const LiveSound = () => {
     statusLabel,
     soundRateList,
     alertMessage,
+    getAmplitude,
     handleListeningToggleClick,
     handleAlertClose,
   } = useLiveSoundStatus();
@@ -24,6 +25,8 @@ const LiveSound = () => {
           isListening={isListening}
           isConnecting={status === 'connecting'}
           statusLabel={statusLabel}
+          soundRateList={soundRateList}
+          getAmplitude={getAmplitude}
           onListeningToggleClick={handleListeningToggleClick}
         />
         <SoundRateBlock

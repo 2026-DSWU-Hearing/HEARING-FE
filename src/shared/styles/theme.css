@@ -152,6 +152,14 @@
     var(--color-neutral-700);
 }
 
+/* 실시간 소리 감지 링이 마이크 음량(--amp)에 반응하는 폭.
+   1이 기본이고, prefers-reduced-motion에서 이 값만 낮춰 반응을 줄인다.
+   @theme이 아니라 :root에 두는 이유: 유틸리티 클래스를 만들 값이 아니라
+   런타임에 읽히는 조절 값이고, @theme 토큰은 미디어쿼리로 덮어쓸 수 없다. */
+:root {
+  --amp-reactivity: 1;
+}
+
 /* layout */
 @utility page-layout {
   padding-inline: var(--layout-mobile-margin);
@@ -415,4 +423,21 @@
 
 @utility animate-bubble-rise {
   animation: bubble-rise 0.35s ease-out;
+}
+
+/* 접근성: 전정기관 자극에 민감한 사용자를 위해 움직임만 줄인다.
+   요소를 숨기거나 반응을 0으로 죽이지는 않는다 - 무엇이 감지됐는지,
+   지금 소리가 나고 있는지의 정보가 유실되면 안 되기 때문이다.
+   링의 음량 반응은 --amp-reactivity로 폭만 줄여 남기고,
+   쉬지 않고 도는 opacity 펄스(sound-wave)만 멈춘다.
+   @utility와 명시도가 같아 선언 순서에 의존하지 않도록 !important를 붙였다. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-sound-wave {
+    animation: none !important;
+    opacity: 0.7 !important;
+  }
+
+  :root {
+    --amp-reactivity: 0.35;
+  }
 }

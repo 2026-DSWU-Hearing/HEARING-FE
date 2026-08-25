@@ -39,6 +39,10 @@ interface UseLiveSoundSocketParamsTypes {
 interface UseLiveSoundSocketReturnTypes {
   status: LiveSoundStatusTypes;
   alertMessage: string;
+  // 현재 마이크 음량(0~1)을 읽는 함수. 캡처가 없으면 0을 반환한다.
+  // 값이 아니라 함수를 넘기는 것이 핵심이다. 음량을 state로 들고 있으면
+  // 초당 60번 리렌더되므로, 필요한 쪽(rAF 루프)이 그때그때 당겨 쓰게 한다.
+  getAmplitude: () => number;
   startSession: () => void;
   stopSession: () => void;
   clearAlertMessage: () => void;
@@ -316,6 +320,13 @@ export const useLiveSoundSocket = ({
 
   const clearAlertMessage = useCallback(() => setAlertMessage(''), []);
 
+  // 캡처 객체를 ref에서 그때그때 읽는다. identity가 고정돼 있어 이 함수를 의존성으로
+  // 받는 쪽(useSoundAmplitude)이 세션 교체마다 루프를 다시 만들지 않는다.
+  const getAmplitude = useCallback(
+    () => audioCaptureRef.current?.getAmplitude() ?? 0,
+    [],
+  );
+
   // 언마운트/라우트 이동 시 마이크와 소켓을 정리한다.
   useEffect(() => {
     return () => {
@@ -323,5 +334,12 @@ export const useLiveSoundSocket = ({
     };
   }, []);
 
-  return { status, alertMessage, startSession, stopSession, clearAlertMessage };
+  return {
+    status,
+    alertMessage,
+    getAmplitude,
+    startSession,
+    stopSession,
+    clearAlertMessage,
+  };
 };
