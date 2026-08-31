@@ -126,7 +126,7 @@ const NotificationSettingPage = () => {
             />
           )}
           <NotificationToggleBar
-            title="긴급 카테고리는 즉시 진동 울리기"
+            title="긴급 소리 알림 받기"
             isOn={isEmergencyStrongVibrationOn}
             onToggle={handleEmergencyVibrationToggle}
           />
