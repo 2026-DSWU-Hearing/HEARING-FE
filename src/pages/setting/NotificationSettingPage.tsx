@@ -24,7 +24,9 @@ const NotificationSettingPage = () => {
   // 사용자가 토글을 건드리기 전까지는 null이며, 이때 표시값은 서버 값을 그대로 따른다.
   // 서버 값을 로컬 state로 복사하면 조회 전 기본값(꺼짐)이 잠깐 노출되고,
   // 이후 서버 값이 갱신돼도 화면이 옛 값에 고정되므로 파생값으로 계산한다.
-  const [pendingAppPushOn, setPendingAppPushOn] = useState<boolean | null>(null);
+  const [pendingAppPushOn, setPendingAppPushOn] = useState<boolean | null>(
+    null,
+  );
   // 긴급 알림 강한 진동은 API 미정이라 로컬 상태로만 관리한다.
   const [isEmergencyStrongVibrationOn, setIsEmergencyStrongVibrationOn] =
     useState(false);
@@ -35,7 +37,8 @@ const NotificationSettingPage = () => {
   // 온보딩을 건너뛰어 권한을 물어본 적이 없어, 이 계산이 없으면 켜진 것처럼 보인다.)
   const hasNotificationPermission = permission === 'granted';
   const isAppPushOn =
-    pendingAppPushOn ?? ((user?.push_enabled && hasNotificationPermission) || false);
+    pendingAppPushOn ??
+    ((user?.push_enabled && hasNotificationPermission) || false);
 
   const handleAppPushToggle = () => {
     setPendingAppPushOn(!isAppPushOn);
@@ -123,7 +126,7 @@ const NotificationSettingPage = () => {
             />
           )}
           <NotificationToggleBar
-            title="긴급 알림만 세게 진동 울리기"
+            title="긴급 카테고리는 즉시 진동 울리기"
             isOn={isEmergencyStrongVibrationOn}
             onToggle={handleEmergencyVibrationToggle}
           />
