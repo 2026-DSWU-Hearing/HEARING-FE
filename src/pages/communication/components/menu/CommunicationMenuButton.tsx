@@ -5,7 +5,6 @@ interface CommunicationMenuButtonPropTypes {
   onClick: () => void;
 }
 
-
 const CommunicationMenuButton = ({
   isOpen,
   onClick,

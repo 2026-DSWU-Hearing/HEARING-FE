@@ -43,5 +43,5 @@ export interface FavoriteAnswerTypes {
 export interface GetCommunicationMockResponseTypes {
   conversation: ConversationTypes;
   favoriteAnswers: FavoriteAnswerTypes[];
-  conversationHistories: ConversationHistoryTypes[];
+  conversationHistories: ConversationHistoryDetailTypes[];
 }

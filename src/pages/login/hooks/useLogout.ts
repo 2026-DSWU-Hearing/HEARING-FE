@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { postLogout } from '@/pages/login/apis/authApi';
 import { removeAuthTokens } from '@/pages/login/utils/tokenStorage';
+import { resetAllStores } from '@/shared/stores/resetAllStores';
 
 export const useLogout = () => {
   const navigate = useNavigate();
@@ -20,6 +21,9 @@ export const useLogout = () => {
       // 이전 사용자의 프로필·기기 정보가 다음 로그인 화면에 잠깐 비치지 않도록
       // localStorage와 별개인 쿼리 캐시도 비운다.
       queryClient.clear();
+      // 쿼리 캐시와 달리 zustand 스토어는 모듈 스코프에 남아 있어서 따로 비워야 한다.
+      // 비우지 않으면 다음 로그인 사용자에게 이전 사용자의 자주 쓰는 답변·대화 기록이 그대로 보인다.
+      resetAllStores();
       navigate('/login', { replace: true });
     },
   });
