@@ -4,10 +4,15 @@ import path from 'path';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
+import { rtzrMockBackend } from './vite/rtzrMockBackend.ts';
+
 export default defineConfig({
   plugins: [
     tailwindcss(),
     react(),
+    // RTZR 실시간 STT용 목 백엔드(dev 서버 전용).
+    // 토큰 발급 + WebSocket 중계를 담당한다. 실제 백엔드가 준비되면 제거한다.
+    rtzrMockBackend(),
     VitePWA({
       registerType: 'autoUpdate',
       // dev 환경에서도 PWA SW를 활성화해 FCM SW와의 2-SW 공존을 검증할 수 있게 한다.
