@@ -7,17 +7,15 @@ import FavoriteAnswerAddInput from '@/pages/communication/components/favoriteAns
 import FavoriteAnswerEditItem from '@/pages/communication/components/favoriteAnswer/FavoriteAnswerEditItem';
 import { FAVORITE_ANSWER_MESSAGE } from '@/pages/communication/constants/favoriteAnswerMessages';
 import { useFavoriteAnswerModal } from '@/pages/communication/hooks/useFavoriteAnswerModal';
-import type { FavoriteAnswerTypes } from '@/pages/communication/types/communication-Types';
 import { useEscapeKey } from '@/shared/hooks/useEscapeKey';
 
 interface FavoriteAnswerModalPropTypes {
-  answers: FavoriteAnswerTypes[];
   onClose: () => void;
   onSelect: (content: string) => void;
 }
 
+// 답변 목록은 훅이 스토어에서 직접 구독하므로 prop으로 내려받지 않는다.
 const FavoriteAnswerModal = ({
-  answers,
   onClose,
   onSelect,
 }: FavoriteAnswerModalPropTypes) => {
@@ -37,7 +35,7 @@ const FavoriteAnswerModal = ({
     handleComplete,
     handleAnswerChange,
     handleDeleteAnswer,
-  } = useFavoriteAnswerModal(answers);
+  } = useFavoriteAnswerModal();
 
   const handleEscape = () => {
     if (isAdding) {

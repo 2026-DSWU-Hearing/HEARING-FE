@@ -7,6 +7,7 @@ interface FavoriteAnswerState {
   isInitialized: boolean;
   initialize: (answers: FavoriteAnswerTypes[]) => void;
   setAnswers: (answers: FavoriteAnswerTypes[]) => void;
+  reset: () => void;
 }
 
 export const getNextAnswerId = (answers: FavoriteAnswerTypes[]) =>
@@ -22,4 +23,8 @@ export const useFavoriteAnswerStore = create<FavoriteAnswerState>((set) => ({
     ),
 
   setAnswers: (answers) => set({ answers }),
+
+  // 로그아웃 시 호출한다. isInitialized까지 되돌려야 다음 사용자가 로그인했을 때
+  // initialize가 다시 동작한다(true로 남아 있으면 이전 사용자 답변이 그대로 보인다).
+  reset: () => set({ answers: [], isInitialized: false }),
 }));

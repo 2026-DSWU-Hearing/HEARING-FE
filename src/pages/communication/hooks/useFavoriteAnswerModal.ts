@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
   getNextAnswerId,
@@ -6,14 +6,26 @@ import {
 } from '@/pages/communication/stores/useFavoriteAnswerStore';
 import type { FavoriteAnswerTypes } from '@/pages/communication/types/communication-Types';
 
-export const useFavoriteAnswerModal = (answers: FavoriteAnswerTypes[]) => {
+// 자주 쓰는 답변 모달의 상태/핸들러.
+// 답변 목록은 prop으로 받지 않고 스토어를 직접 구독한다.
+// prop + useState 초깃값으로 받으면 첫 렌더 시점의 값에 고정되어, 목록이 나중에
+// 채워지는 경우(목데이터/API 로딩이 끝나기 전에 모달을 연 경우) 계속 빈 목록으로 남는다.
+export const useFavoriteAnswerModal = () => {
+  const answers = useFavoriteAnswerStore((state) => state.answers);
   const setAnswers = useFavoriteAnswerStore((state) => state.setAnswers);
 
-  const [draftAnswers, setDraftAnswers] =
-    useState<FavoriteAnswerTypes[]>(answers);
+  const [draftAnswers, setDraftAnswers] = useState<FavoriteAnswerTypes[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [draft, setDraft] = useState('');
+
+  // 스토어가 갱신되면 편집본에 반영한다.
+  // 편집 중에는 덮어쓰지 않는다 - 사용자가 고치던 내용이 날아간다.
+  useEffect(() => {
+    if (isEditing) return;
+
+    setDraftAnswers(answers);
+  }, [answers, isEditing]);
 
   const isDirty =
     draftAnswers.length !== answers.length ||

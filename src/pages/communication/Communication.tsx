@@ -13,10 +13,10 @@ const Communication = () => {
     conversation,
     bubbles,
     isListening,
+    sttErrorMessage,
     draftReply,
     draftListening,
     isSavedNoticeOpen,
-    favoriteAnswers,
     isFavoriteAnswerOpen,
     handleOpenHistory,
     handleOpenFavoriteAnswer,
@@ -61,10 +61,20 @@ const Communication = () => {
           위로 스크롤해도 항상 화면 하단에 그대로 보이게 한다. */}
       <section
         ref={historyScrollRef}
-        className="hide-scrollbar flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto"
+        className="hide-scrollbar flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto pb-xs"
       >
         <ChatHistoryList bubbles={bubbles} />
       </section>
+
+      {/* 대화기록이 하단 고정 영역 경계에서 딱 잘려 보이지 않도록 위를 덮는 페이드 층.
+          음수 margin으로 레이아웃 높이는 0이라 아래 요소들의 위치는 그대로 두고,
+          스크롤 영역의 마지막 구간 위에만 겹쳐 그린다.
+          위 section의 pb와 이 층의 높이는 항상 같은 값이어야 한다 - 페이드가 더 크면
+          맨 아래 최신 버블이 이 층에 물려 흐려진다. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none -mt-xs h-xs shrink-0 bg-gradient-to-b from-transparent to-neutral-950"
+      />
 
       <ChatContainer
         isListening={isListening}
@@ -76,17 +86,18 @@ const Communication = () => {
         onSubmitListening={handleSubmitListening}
       />
 
-      <div className="flex shrink-0 items-center justify-center px-base pb-[6.1875rem] pt-base">
+      {/* pt-xs: 입력 버블 쌍과의 간격. 버블 사이 간격과 같은 값으로 맞춘다. */}
+      <div className="flex shrink-0 items-center justify-center px-base pb-[6.1875rem] pt-xs">
         <RecordingButton
           isRecording={isListening}
           onToggle={handleToggleRecording}
           onEndConversation={handleEndConversation}
+          errorMessage={sttErrorMessage}
         />
       </div>
 
       {isFavoriteAnswerOpen && (
         <FavoriteAnswerModal
-          answers={favoriteAnswers}
           onClose={handleCloseFavoriteAnswer}
           onSelect={handleSelectFavoriteAnswer}
         />
