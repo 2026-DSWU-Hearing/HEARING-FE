@@ -5,7 +5,6 @@ import {
   STT_FINAL_WAIT_MS,
   STT_MAX_BUFFERED_AMOUNT,
   STT_MESSAGE,
-  STT_TOKEN_URL,
   buildSttStreamUrl,
 } from '@/pages/communication/constants/sttConfig';
 import type {
@@ -15,6 +14,9 @@ import type {
 import { createAudioCapture } from '@/pages/liveSound/utils/createAudioCapture';
 import type { AudioCaptureTypes } from '@/pages/liveSound/utils/createAudioCapture';
 import { getMicrophoneErrorMessage } from '@/pages/liveSound/utils/getMicrophoneErrorMessage';
+import { getAccessToken } from '@/pages/login/utils/tokenStorage';
+import { refreshAccessToken } from '@/shared/apis/axios';
+import { isTokenExpired } from '@/shared/utils/jwt';
 
 interface UseSttSocketParamsTypes {
   // 인식 중인 중간 결과. 말하는 동안 계속 갱신된다.
@@ -23,10 +25,21 @@ interface UseSttSocketParamsTypes {
   onFinalText: (text: string) => void;
 }
 
-// RTZR(VITO) 실시간 STT 소켓 훅.
-// 마이크를 열어 16kHz PCM int16 청크를 소켓으로 흘려보내고, 내려오는 인식 결과를
+// 소켓 주소에 토큰을 실어 보내야 해서, 만료된 토큰은 미리 갱신한다.
+// (감지 소켓 useDetectionSocket과 같은 방식)
+const getValidAccessToken = async (): Promise<string | null> => {
+  const storedToken = getAccessToken();
+  if (!storedToken) return null;
+  if (!isTokenExpired(storedToken)) return storedToken;
+
+  return refreshAccessToken();
+};
+
+// 실시간 STT 소켓 훅.
+// 마이크를 열어 16kHz PCM int16 청크를 서버로 흘려보내고, 내려오는 인식 결과를
 // 중간(partial) / 확정(final)으로 나눠 콜백으로 넘긴다.
 //
+// RTZR 인증/중계는 백엔드가 담당한다. 프론트는 대화 id로 소켓만 붙이면 된다.
 // 마이크 캡처는 실시간 소리 화면과 규격이 같아서 createAudioCapture를 그대로 재사용한다.
 export const useSttSocket = ({
   onPartialText,
@@ -58,28 +71,27 @@ export const useSttSocket = ({
     captureRef.current = null;
   };
 
-  const start = useCallback(async () => {
+  // 대화 id가 있어야 소켓 주소가 만들어지므로, 반드시 대화 생성 후에 호출한다.
+  const start = useCallback(async (conversationId: number) => {
     // 이미 열려 있으면 중복 연결하지 않는다(StrictMode 이중 실행 포함).
     if (socketRef.current) return;
 
     setStatus('connecting');
     setErrorMessage('');
 
-    // 소켓 업그레이드에는 Authorization 헤더가 필요한데 브라우저가 붙일 수 없어서,
-    // 서버가 미리 토큰을 준비하도록 먼저 호출한다(토큰 값 자체는 받지 않는다).
-    try {
-      const response = await fetch(STT_TOKEN_URL);
-      if (!response.ok) {
-        throw new Error(`토큰 준비 실패: ${response.status}`);
-      }
-    } catch (error) {
-      console.error('[STT] 토큰 준비 실패:', error);
+    const accessToken = await getValidAccessToken();
+    if (!accessToken) {
+      console.error(
+        '[STT] 유효한 토큰이 없어 연결을 중단합니다. (재로그인 필요)',
+      );
       setErrorMessage(STT_MESSAGE.TOKEN_FAILED);
       setStatus('error');
       return;
     }
 
-    const socket = new WebSocket(buildSttStreamUrl());
+    const socket = new WebSocket(
+      buildSttStreamUrl(conversationId, accessToken),
+    );
     socket.binaryType = 'arraybuffer';
     socketRef.current = socket;
 
@@ -128,11 +140,10 @@ export const useSttSocket = ({
         return;
       }
 
-      // alternatives[0]이 가장 확률 높은 후보다.
-      const text = message.alternatives?.[0]?.text?.trim() ?? '';
+      const text = message.content?.trim() ?? '';
       if (!text) return;
 
-      if (message.final) {
+      if (message.isFinal) {
         handlersRef.current.onFinalText(text);
         return;
       }

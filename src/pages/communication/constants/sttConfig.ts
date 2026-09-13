@@ -1,30 +1,9 @@
-import { TARGET_SAMPLE_RATE } from '@/pages/liveSound/constants/audioConfig';
+import { getWebSocketBaseUrl } from '@/shared/utils/getWebSocketBaseUrl';
 
-// RTZR(VITO) 실시간 STT 연결 설정.
-// 마이크 캡처 규격(16kHz mono PCM int16)은 실시간 소리 화면과 동일해서
-// liveSound/constants/audioConfig의 값을 그대로 재사용한다.
-
-// 토큰 준비 요청 엔드포인트. dev 서버의 목 백엔드(vite/rtzrMockBackend.ts)가 응답한다.
-export const STT_TOKEN_URL = '/api/mock/stt/token';
-
-// VITO 스트리밍 경로. 목 백엔드가 같은 경로로 중계하므로 프론트/서버가 같은 값을 쓴다.
-export const STT_STREAM_PATH = '/v1/transcribe:streaming';
-
-// 지금은 dev 서버(같은 오리진)가 중계한다. 실제 백엔드가 생기면 이 값만 바꾸면 된다.
-// 예: `wss://api.hearing.example.com`
-export const STT_STREAM_ORIGIN = '';
-
-// VITO 스트리밍 쿼리 파라미터.
-// - encoding LINEAR16: PCM int16 리틀엔디안. convertFloat32ToInt16의 출력과 같다.
-// - use_itn: 숫자/단위를 표기법에 맞게 변환("삼천원" -> "3,000원")
-// - use_disfluency_filter: "어", "음" 같은 간투어를 걸러 화면에 덜 지저분하게 남긴다.
-export const STT_STREAM_PARAMS = {
-  sample_rate: String(TARGET_SAMPLE_RATE),
-  encoding: 'LINEAR16',
-  model_name: 'sommers_ko',
-  use_itn: 'true',
-  use_disfluency_filter: 'true',
-} as const;
+// 백엔드 STT 중계 소켓 설정.
+// RTZR 토큰 발급과 중계는 서버가 전담하므로 프론트는 대화 id와 액세스 토큰만 있으면 된다.
+// 마이크 캡처 규격(16kHz mono PCM int16, 100ms 청크)은 실시간 소리 화면과 동일해서
+// liveSound의 createAudioCapture를 그대로 재사용한다.
 
 // 오디오 전송이 끝났음을 알리는 텍스트 프레임. 이걸 보내야 마지막 문장의 final이 내려온다.
 export const STT_EOS_MESSAGE = 'EOS';
@@ -43,13 +22,13 @@ export const STT_MESSAGE = {
 } as const;
 
 // 브라우저가 붙을 STT 소켓 주소를 만든다.
-// STT_STREAM_ORIGIN이 비어 있으면 현재 페이지와 같은 오리진(dev 프록시)으로 붙는다.
-export const buildSttStreamUrl = (): string => {
-  const origin =
-    STT_STREAM_ORIGIN ||
-    `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}`;
+// 인증 방식은 기존 감지 소켓(/ws/users/me/detections)과 동일하게 쿼리 토큰을 쓴다.
+export const buildSttStreamUrl = (
+  conversationId: number,
+  accessToken: string,
+): string => {
+  // 토큰에 쿼리스트링 예약 문자(+, /, = 등)가 있어도 깨지지 않도록 인코딩한다.
+  const encodedToken = encodeURIComponent(accessToken);
 
-  const params = new URLSearchParams(STT_STREAM_PARAMS);
-
-  return `${origin}${STT_STREAM_PATH}?${params.toString()}`;
+  return `${getWebSocketBaseUrl()}/ws/conversations/${conversationId}/stt?token=${encodedToken}`;
 };
