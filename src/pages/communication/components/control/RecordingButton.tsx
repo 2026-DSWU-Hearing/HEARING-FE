@@ -5,6 +5,8 @@ interface RecordingButtonPropTypes {
   isRecording: boolean;
   onToggle: () => void;
   onEndConversation: () => void;
+  // 마이크 권한 거부, STT 연결 실패 등의 안내 문구. 있으면 라벨 자리에 대신 보여준다.
+  errorMessage?: string;
 }
 
 // 녹음 버튼과, 녹음 중일 때만 옆에 나타나는 대화 종료 버튼을 한 컴포넌트에서 함께 그린다.
@@ -16,7 +18,12 @@ const RecordingButton = ({
   isRecording,
   onToggle,
   onEndConversation,
+  errorMessage = '',
 }: RecordingButtonPropTypes) => {
+  // 에러가 있으면 라벨 자리를 에러 안내로 쓴다. 라벨 높이는 그대로라 레이아웃이 흔들리지 않는다.
+  const label = errorMessage || '말해주세요!';
+  const isLabelVisible = Boolean(errorMessage) || isRecording;
+
   return (
     <div className="flex items-center justify-center gap-xl">
       <div className="flex flex-col items-center gap-xs">
@@ -35,12 +42,13 @@ const RecordingButton = ({
         </button>
 
         <span
-          aria-hidden={!isRecording}
+          aria-hidden={!isLabelVisible}
+          role={errorMessage ? 'alert' : undefined}
           className={`body-base-medium text-center text-primary-500 ${
-            isRecording ? '' : 'invisible'
+            isLabelVisible ? '' : 'invisible'
           }`}
         >
-          말해주세요!
+          {label}
         </span>
       </div>
 

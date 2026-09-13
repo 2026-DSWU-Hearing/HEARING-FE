@@ -14,8 +14,10 @@ interface ChatContainerPropTypes {
 }
 
 // 기본 입력 한 쌍(왼쪽/오른쪽) 컨테이너에 공통으로 쓰는 스타일.
+// 세로 간격은 gap 한 곳에서만 만들고 상하 패딩은 두지 않는다.
+// 패딩을 두면 위(대화기록)/아래(녹음 버튼)와의 간격이 여기서 한 번 더 더해져 어긋난다.
 const BUBBLE_CONTAINER_CLASSNAME =
-  'flex flex-col items-start justify-center gap-[0.625rem] self-stretch p-base';
+  'flex flex-col items-start justify-center gap-xs self-stretch px-base';
 
 // 기본 텍스트 입력 버블 쌍(대화기록과 별도, 스크롤 영역 밖에 고정 배치).
 // 위로 스크롤해서 지난 대화기록을 보더라도 이 영역은 항상 화면 하단에 그대로 보인다.
@@ -88,7 +90,7 @@ const ChatContainer = ({
   );
 
   return (
-    <div className="shrink-0 px-xs py-base">
+    <div className="shrink-0 px-xs">
       <div className={BUBBLE_CONTAINER_CLASSNAME}>
         {listeningBubble}
         {inputBubble}
