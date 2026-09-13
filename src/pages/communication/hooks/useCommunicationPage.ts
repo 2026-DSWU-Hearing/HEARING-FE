@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { useGetCommunicationMock } from '@/pages/communication/hooks/useGetCommunicationMock';
 import { useSttSocket } from '@/pages/communication/hooks/useSttSocket';
+import { useActiveConversationStore } from '@/pages/communication/stores/useActiveConversationStore';
 import {
   createConversationHistoryId,
   useConversationHistoryStore,
@@ -31,6 +32,13 @@ export const useCommunicationPage = () => {
   );
   const addHistory = useConversationHistoryStore((state) => state.addHistory);
   const favoriteAnswerModal = useModal();
+
+  // STT 소켓 주소에 대화 id가 필요해서, 마이크를 켜기 전에 대화부터 만든다.
+  const ensureConversation = useActiveConversationStore(
+    (state) => state.ensureConversation,
+  );
+  const endConversation = useActiveConversationStore((state) => state.end);
+  const conversationError = useActiveConversationStore((state) => state.error);
 
   const [bubbles, setBubbles] = useState<ChatBubbleTypes[]>([]);
   const [draftReply, setDraftReply] = useState('');
@@ -127,13 +135,19 @@ export const useCommunicationPage = () => {
     navigate('/communication/histories');
   };
 
-  const handleToggleRecording = () => {
+  const handleToggleRecording = async () => {
     if (isListening) {
       stopStt();
       return;
     }
 
-    void startStt();
+    try {
+      const conversation = await ensureConversation();
+      await startStt(conversation.conversation_id);
+    } catch (error) {
+      // 사용자에게 보여줄 문구는 스토어(conversationError)가 이미 채운다.
+      console.error('[STT] 대화 생성 실패:', error);
+    }
   };
 
   const handleDraftReplyChange = (value: string) => {
@@ -162,10 +176,21 @@ export const useCommunicationPage = () => {
     stopStt();
     setDraftListening('');
 
+    // 대화 전체를 여기서 한 번에 서버로 올린다.
+    // 버블이 없으면(마이크만 켰다 끈 경우) 스토어가 만들어둔 빈 대화를 지운다.
+    // 로컬 기록이 먼저이므로 응답을 기다리지 않는다 - 실패해도 화면에는 남는다.
+    void endConversation(
+      bubbles.map(({ direction, inputType, content }) => ({
+        direction,
+        inputType,
+        content,
+      })),
+    );
+
     if (bubbles.length === 0) return;
 
-    // 백엔드가 없어서 종료한 대화를 스토어(localStorage)에 그대로 쌓는다.
-    // 목록에는 첫 마디가 제목으로 보인다.
+    // 기록은 localStorage에 쌓는다. 오프라인에서도 확실히 남고, 서버 저장이
+    // 실패해도 사용자가 잃는 게 없다. 목록에는 첫 마디가 제목으로 보인다.
     addHistory({
       id: createConversationHistoryId(),
       title: bubbles[0].content,
@@ -187,15 +212,14 @@ export const useCommunicationPage = () => {
     savedNoticeTimerRef.current = setTimeout(() => {
       setIsSavedNoticeOpen(false);
     }, SAVED_NOTICE_DURATION);
-
-    // TODO: 저장 API가 생기면 여기서 함께 호출한다(현재는 로컬 저장만).
   };
 
   return {
     conversation,
     bubbles,
     isListening,
-    sttErrorMessage,
+    // 대화 생성 실패도 같은 자리에 보여준다(마이크를 못 켠 이유는 사용자 입장에선 하나다).
+    sttErrorMessage: sttErrorMessage || conversationError,
     draftReply,
     draftListening,
     isSavedNoticeOpen,

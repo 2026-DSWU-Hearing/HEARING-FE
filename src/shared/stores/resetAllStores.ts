@@ -1,3 +1,4 @@
+import { useActiveConversationStore } from '@/pages/communication/stores/useActiveConversationStore';
 import { useConversationHistoryStore } from '@/pages/communication/stores/useConversationHistoryStore';
 import { useFavoriteAnswerStore } from '@/pages/communication/stores/useFavoriteAnswerStore';
 
@@ -11,4 +12,6 @@ import { useFavoriteAnswerStore } from '@/pages/communication/stores/useFavorite
 export const resetAllStores = () => {
   useFavoriteAnswerStore.getState().reset();
   useConversationHistoryStore.getState().reset();
+  // 진행 중이던 대화 id가 남으면 다음 사용자의 발화가 이전 사용자의 대화에 붙는다.
+  useActiveConversationStore.getState().reset();
 };

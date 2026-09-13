@@ -1,7 +1,6 @@
 import http from '@/shared/apis/axios';
 import type {
   ConversationBubbleRequestTypes,
-  ConversationBubbleResponseTypes,
   ConversationCreatedTypes,
   ConversationDetailTypes,
   ConversationEndTypes,
@@ -27,26 +26,24 @@ export const getConversation = async (conversationId: number) =>
       getConversationUrl(`/${conversationId}`),
     )
   ).data;
+// STT 소켓 주소에 대화 id가 필요해서, 마이크를 켜기 전에 대화부터 만든다.
 export const postConversation = async (location: ConversationLocationTypes) =>
   (await http.post<ConversationCreatedTypes>(getConversationUrl(), location))
     .data;
-export const postConversationBubble = async (
+// 대화 전체를 한 번에 올린다. 서버는 이 시점에 제목/요약을 생성한다.
+// 빈 내용은 서버가 거부하므로 보내기 전에 걸러낸다.
+export const postConversationEnd = async (
   conversationId: number,
-  bubble: ConversationBubbleRequestTypes,
-) => {
-  const content = bubble.content.trim();
-  if (!content) throw new Error('빈 메시지는 저장할 수 없습니다.');
-  return (
-    await http.post<ConversationBubbleResponseTypes>(
-      getConversationUrl(`/${conversationId}/bubbles`),
-      { ...bubble, content },
-    )
-  ).data;
-};
-export const postConversationEnd = async (conversationId: number) =>
+  bubbles: ConversationBubbleRequestTypes[],
+) =>
   (
     await http.post<ConversationEndTypes>(
       getConversationUrl(`/${conversationId}/end`),
+      {
+        bubbles: bubbles
+          .map((bubble) => ({ ...bubble, content: bubble.content.trim() }))
+          .filter((bubble) => bubble.content),
+      },
     )
   ).data;
 export const deleteConversation = async (
