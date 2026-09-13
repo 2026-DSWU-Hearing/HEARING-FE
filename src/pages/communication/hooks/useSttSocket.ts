@@ -85,7 +85,7 @@ export const useSttSocket = ({
 
     socket.onopen = async () => {
       try {
-        captureRef.current = await createAudioCapture({
+        const capture = await createAudioCapture({
           onChunk: (chunk) => {
             if (socket.readyState !== WebSocket.OPEN) return;
             // 전송이 밀리면 최신 오디오를 우선하고 밀린 청크는 버린다.
@@ -97,6 +97,18 @@ export const useSttSocket = ({
           },
         });
 
+        // 권한 팝업 때문에 여기서 한참 멈출 수 있다. 그 사이에 stop()이나 언마운트가
+        // 일어났다면 captureRef는 아직 비어 있어서 아무도 이 마이크를 꺼주지 못한다.
+        // 돌아온 시점에 이 소켓이 여전히 현재 세션인지 확인하고, 아니면 직접 끈다.
+        if (
+          socketRef.current !== socket ||
+          socket.readyState !== WebSocket.OPEN
+        ) {
+          await capture.stop();
+          return;
+        }
+
+        captureRef.current = capture;
         setStatus('listening');
       } catch (error) {
         console.error('[STT] 마이크 시작 실패:', error);
@@ -135,11 +147,14 @@ export const useSttSocket = ({
 
     socket.onclose = () => {
       clearCloseTimer();
-      stopCapture();
 
-      if (socketRef.current === socket) {
-        socketRef.current = null;
-      }
+      // EOS 후 늦게 닫히는 동안 사용자가 다시 시작했을 수 있다. 그때 이 핸들러가
+      // stopCapture()를 부르면 새 세션의 마이크가 꺼지고, setStatus는 'listening'을
+      // 'idle'로 덮어쓴다. 현재 세션의 소켓일 때만 정리한다.
+      if (socketRef.current !== socket) return;
+
+      socketRef.current = null;
+      stopCapture();
 
       // 에러로 닫힌 경우에는 사용자에게 보여줄 문구를 지우지 않는다.
       setStatus((prevStatus) => (prevStatus === 'error' ? 'error' : 'idle'));
