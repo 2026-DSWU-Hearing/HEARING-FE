@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useGetUsers } from '@/shared/hooks/useGetUsers';
 import { ProfileSkeleton } from '@/pages/setting/components/SettingSkeleton';
 import { getDisabilityLabel } from '@/pages/setting/constants/disabilityType';
+import profileImage from '@/shared/assets/images/profile_image.svg';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -29,10 +30,11 @@ const Profile = () => {
 
   return (
     <div className="flex items-center gap-base rounded-xl bg-neutral-900 px-base py-base">
-      {/* 프로필 이미지 영역. TODO(api/asset): 캐릭터 이미지 에셋 확정 시 교체한다. */}
-      <div
-        className="h-[3.75rem] w-[3.75rem] shrink-0 rounded-full bg-neutral-300"
+      <img
+        src={profileImage}
+        alt="프로필 이미지"
         aria-hidden="true"
+        className="h-[3.75rem] w-[3.75rem] shrink-0"
       />
 
       <div className="flex min-w-0 gap-[0.44rem] flex-1 flex-col">
