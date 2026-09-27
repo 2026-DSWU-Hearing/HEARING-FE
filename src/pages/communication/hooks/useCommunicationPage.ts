@@ -1,20 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
+
+import { CONVERSATION_LIST_QUERY_KEY } from '@/pages/communication/constants/conversationQueryKeys';
 
 import { useGetCommunicationMock } from '@/pages/communication/hooks/useGetCommunicationMock';
 import { useGetCurrentLocationName } from '@/pages/communication/hooks/useGetCurrentLocationName';
 import { useSttSocket } from '@/pages/communication/hooks/useSttSocket';
 import { useActiveConversationStore } from '@/pages/communication/stores/useActiveConversationStore';
-import {
-  createConversationHistoryId,
-  useConversationHistoryStore,
-} from '@/pages/communication/stores/useConversationHistoryStore';
 import { useFavoriteAnswerStore } from '@/pages/communication/stores/useFavoriteAnswerStore';
 import type {
   BubbleInputTypes,
   ChatBubbleTypes,
 } from '@/pages/communication/types/communication-Types';
-import { formatConversationTimestamp } from '@/pages/communication/utils/formatConversationTimestamp';
 import { useModal } from '@/shared/hooks/useModal';
 
 // '대화가 저장되었습니다' 안내가 화면에 떠 있는 시간(ms)
@@ -23,6 +21,7 @@ const SAVED_NOTICE_DURATION = 2000;
 // 양방향 소통(Communication) 페이지의 상태/핸들러를 모아둔 훅.
 export const useCommunicationPage = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { data } = useGetCommunicationMock();
   const conversation = data?.conversation ?? null;
   const locationName = useGetCurrentLocationName();
@@ -32,7 +31,6 @@ export const useCommunicationPage = () => {
   const initializeFavoriteAnswers = useFavoriteAnswerStore(
     (state) => state.initialize,
   );
-  const addHistory = useConversationHistoryStore((state) => state.addHistory);
   const favoriteAnswerModal = useModal();
 
   // STT 소켓 주소에 대화 id가 필요해서, 마이크를 켜기 전에 대화부터 만든다.
@@ -41,6 +39,9 @@ export const useCommunicationPage = () => {
   );
   const endConversation = useActiveConversationStore((state) => state.end);
   const conversationError = useActiveConversationStore((state) => state.error);
+  const isSavingConversation = useActiveConversationStore(
+    (state) => state.isSaving,
+  );
   const resetConversation = useActiveConversationStore((state) => state.reset);
 
   const [bubbles, setBubbles] = useState<ChatBubbleTypes[]>([]);
@@ -52,8 +53,6 @@ export const useCommunicationPage = () => {
 
   // 새로 추가되는 버블에 부여할 다음 id. 목데이터의 마지막 id 다음부터 이어간다.
   const nextBubbleIdRef = useRef(0);
-  // 첫 버블이 생긴 시각. 대화를 종료할 때 기록의 startedAt으로 쓴다.
-  const startedAtRef = useRef<string | null>(null);
   const savedNoticeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
@@ -66,11 +65,6 @@ export const useCommunicationPage = () => {
   ) => {
     const trimmedContent = content.trim();
     if (!trimmedContent) return;
-
-    // 첫 발화 시점을 대화 시작 시각으로 본다(마이크만 켜고 아무 말 없이 끄는 경우 제외).
-    if (!startedAtRef.current) {
-      startedAtRef.current = formatConversationTimestamp();
-    }
 
     const id = nextBubbleIdRef.current;
     nextBubbleIdRef.current += 1;
@@ -176,37 +170,31 @@ export const useCommunicationPage = () => {
     submitBubble('right', content, 'favorite_answer');
   };
 
-  const handleEndConversation = () => {
+  const handleEndConversation = async () => {
+    if (isSavingConversation) return;
+
     stopStt();
     setDraftListening('');
 
     // 대화 전체를 여기서 한 번에 서버로 올린다.
     // 버블이 없으면(마이크만 켰다 끈 경우) 스토어가 만들어둔 빈 대화를 지운다.
-    // 로컬 기록이 먼저이므로 응답을 기다리지 않는다 - 실패해도 화면에는 남는다.
-    void endConversation(
-      bubbles.map(({ direction, inputType, content }) => ({
+    const savedBubbles = bubbles;
+    const result = await endConversation(
+      savedBubbles.map(({ direction, inputType, content }) => ({
         direction,
         inputType,
         content,
       })),
     );
 
-    if (bubbles.length === 0) return;
+    if (!result) return;
 
-    // 기록은 localStorage에 쌓는다. 오프라인에서도 확실히 남고, 서버 저장이
-    // 실패해도 사용자가 잃는 게 없다. 목록에는 첫 마디가 제목으로 보인다.
-    addHistory({
-      id: createConversationHistoryId(),
-      title: bubbles[0].content,
-      locationName: conversation?.locationName ?? '',
-      startedAt: startedAtRef.current ?? formatConversationTimestamp(),
-      endedAt: formatConversationTimestamp(),
-      bubbles,
+    void queryClient.invalidateQueries({
+      queryKey: CONVERSATION_LIST_QUERY_KEY,
     });
 
     // 화면을 비워 다음 대화를 새로 시작한다.
-    setBubbles([]);
-    startedAtRef.current = null;
+    setBubbles((prev) => prev.slice(savedBubbles.length));
 
     if (savedNoticeTimerRef.current) {
       clearTimeout(savedNoticeTimerRef.current);

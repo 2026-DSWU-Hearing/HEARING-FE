@@ -14,14 +14,9 @@ import type {
 
 // 진행 중인 대화의 서버 세션만 들고 있는 스토어.
 //
-// 화면에 쌓이는 버블은 useCommunicationPage가 들고 있고, 기록 보관은
-// useConversationHistoryStore(localStorage)가 한다. 여기는 서버와의 연결만 맡는다.
+// 화면에 쌓이는 버블은 useCommunicationPage가 들고 있고, 여기는 서버와의 연결만 맡는다.
 //   - 마이크를 켜기 전에 대화를 만든다(STT 소켓 주소에 대화 id가 필요해서).
 //   - 대화를 끝낼 때 버블 전체를 한 번에 올린다.
-//
-// 버블을 하나씩 올리지 않는 이유: 중간 저장은 네트워크가 끊기면 어차피 유실되는데,
-// 기록은 localStorage가 오프라인에서도 확실히 들고 있다. 대신 대화 도중의 순서 보장
-// (전송 큐, 직렬화, 늦게 온 응답 무시)이 전부 필요 없어져 흐름이 단순해진다.
 interface ActiveConversationStateTypes {
   conversation: ConversationCreatedTypes | null;
   isCreating: boolean;
@@ -87,13 +82,16 @@ export const useActiveConversationStore = create<ActiveConversationStateTypes>(
       },
 
       end: async (bubbles) => {
-        const conversation = get().conversation;
-        if (!conversation) return null;
+        if (get().isSaving) return null;
+        if (!get().conversation && bubbles.length === 0) return null;
 
         const currentGeneration = generation;
         set({ isSaving: true, error: '' });
 
         try {
+          const conversation =
+            get().conversation ?? (await get().ensureConversation());
+
           // 마이크만 켰다 끈 경우. 올릴 내용이 없으니 만들어둔 대화를 지운다.
           if (bubbles.length === 0) {
             await deleteConversation(conversation.conversation_id);
@@ -109,8 +107,7 @@ export const useActiveConversationStore = create<ActiveConversationStateTypes>(
           console.error('[대화] 종료 처리 실패:', error);
           if (generation === currentGeneration) {
             set({
-              error:
-                '대화를 서버에 저장하지 못했습니다. 기록은 이 기기에 남아 있어요.',
+              error: '대화를 저장하지 못했습니다. 다시 시도해 주세요.',
             });
           }
 
