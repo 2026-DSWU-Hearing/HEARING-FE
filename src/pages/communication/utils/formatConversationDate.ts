@@ -1,6 +1,5 @@
-export const formatConversationDate = (startedAt: string) => {
-  const [date] = startedAt.split(' ');
-  const [, month, day] = date.split('-');
+export const formatConversationDate = (dateTime: string) => {
+  const date = new Date(dateTime);
 
-  return `${Number(month)}월 ${Number(day)}일`;
+  return `${date.getMonth() + 1}월 ${date.getDate()}일`;
 };
