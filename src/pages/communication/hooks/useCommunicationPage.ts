@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useGetCommunicationMock } from '@/pages/communication/hooks/useGetCommunicationMock';
+import { useGetCurrentLocationName } from '@/pages/communication/hooks/useGetCurrentLocationName';
 import { useSttSocket } from '@/pages/communication/hooks/useSttSocket';
 import { useActiveConversationStore } from '@/pages/communication/stores/useActiveConversationStore';
 import {
@@ -24,6 +25,7 @@ export const useCommunicationPage = () => {
   const navigate = useNavigate();
   const { data } = useGetCommunicationMock();
   const conversation = data?.conversation ?? null;
+  const locationName = useGetCurrentLocationName();
 
   // 답변 목록 자체는 모달(useFavoriteAnswerModal)이 스토어에서 직접 구독한다.
   // 여기서는 목데이터를 스토어에 채우는 역할만 한다.
@@ -218,6 +220,7 @@ export const useCommunicationPage = () => {
 
   return {
     conversation,
+    locationName,
     bubbles,
     isListening,
     // 대화 생성 실패도 같은 자리에 보여준다(마이크를 못 켠 이유는 사용자 입장에선 하나다).
