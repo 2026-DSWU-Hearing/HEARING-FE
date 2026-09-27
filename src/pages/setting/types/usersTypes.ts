@@ -14,6 +14,11 @@ export interface UpdatePushEnabledRequestTypes {
   push_enabled: boolean;
 }
 
+/** PATCH /users/me/emergency-alert 요청 바디 (긴급 소리 알림 on/off) */
+export interface UpdateEmergencyAlertRequestTypes {
+  emergency_alert_enabled: boolean;
+}
+
 /** PATCH /users/me/agreement 요청 바디 (약관 동의 수정) */
 export interface UpdateAgreementRequestTypes {
   terms_agreed: boolean;

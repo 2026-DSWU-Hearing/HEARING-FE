@@ -10,6 +10,7 @@ import { isNotificationSupported } from '@/shared/firebase/settingFCM';
 import { useFcmToken } from '@/shared/hooks/useFcmToken';
 import { useGetUsers } from '@/shared/hooks/useGetUsers';
 import { usePatchPushEnabled } from '@/pages/setting/hooks/usePatchPushEnabled';
+import { usePatchEmergencyAlert } from '@/pages/setting/hooks/usePatchEmergencyAlert';
 
 const NotificationSettingPage = () => {
   const navigate = useNavigate();
@@ -17,6 +18,10 @@ const NotificationSettingPage = () => {
   const { data: user, isLoading: isUserLoading } = useGetUsers();
   const { mutateAsync: updatePushEnabled, isPending: isUpdatingPushEnabled } =
     usePatchPushEnabled();
+  const {
+    mutateAsync: updateEmergencyAlert,
+    isPending: isUpdatingEmergencyAlert,
+  } = usePatchEmergencyAlert();
   const { permission, handleRequestPermission } = useFcmToken();
 
   const [alertMessage, setAlertMessage] = useState('');
@@ -27,9 +32,12 @@ const NotificationSettingPage = () => {
   const [pendingAppPushOn, setPendingAppPushOn] = useState<boolean | null>(
     null,
   );
-  // 긴급 알림 강한 진동은 API 미정이라 로컬 상태로만 관리한다.
-  const [isEmergencyStrongVibrationOn, setIsEmergencyStrongVibrationOn] =
-    useState(false);
+  // 긴급 소리 알림도 같은 방식으로, 완료 버튼을 누르기 전까지는 대기 값으로만 둔다.
+  const [pendingEmergencyAlertOn, setPendingEmergencyAlertOn] = useState<
+    boolean | null
+  >(null);
+
+  const isSaving = isUpdatingPushEnabled || isUpdatingEmergencyAlert;
 
   // 브라우저 알림 권한이 없으면 서버 값과 무관하게 실제로는 푸시가 오지 않는다.
   // 서버의 push_enabled는 "받고 싶다는 의사"일 뿐이므로, 수신 가능 여부까지 함께 봐야
@@ -40,22 +48,25 @@ const NotificationSettingPage = () => {
     pendingAppPushOn ??
     ((user?.push_enabled && hasNotificationPermission) || false);
 
+  // 서버 기본값이 true(펌웨어 기본값과 동일)이므로, 응답에 값이 없을 때도 켜짐으로 본다.
+  const isEmergencyAlertOn =
+    pendingEmergencyAlertOn ?? user?.emergency_alert_enabled ?? true;
+
   const handleAppPushToggle = () => {
     setPendingAppPushOn(!isAppPushOn);
   };
 
-  const handleEmergencyVibrationToggle = () => {
-    setIsEmergencyStrongVibrationOn((prev) => !prev);
-    // TODO(api): 긴급 알림 강한 진동 on/off API 연동
+  const handleEmergencyAlertToggle = () => {
+    setPendingEmergencyAlertOn(!isEmergencyAlertOn);
   };
 
   const handleDoneClick = async () => {
-    if (isUpdatingPushEnabled || !user) {
+    if (isSaving || !user) {
       return;
     }
 
-    // 사용자가 토글을 건드리지 않았다면 저장할 것이 없다.
-    if (pendingAppPushOn === null) {
+    // 사용자가 어떤 토글도 건드리지 않았다면 저장할 것이 없다.
+    if (pendingAppPushOn === null && pendingEmergencyAlertOn === null) {
       navigate(-1);
       return;
     }
@@ -69,8 +80,31 @@ const NotificationSettingPage = () => {
     // 서버 값과 같아도 저장을 건너뛰지 않는다. 권한이 없어 꺼져 보이던 상태에서
     // 사용자가 켠 경우, 서버 값은 이미 true라 비교만으로는 변경을 감지할 수 없다.
     // (이때 필요한 것은 저장이 아니라 위의 권한 요청이며, PATCH는 멱등이라 무해하다.)
-    if (pendingAppPushOn !== user.push_enabled) {
-      await updatePushEnabled({ push_enabled: pendingAppPushOn });
+    // 두 설정은 서로 독립이므로 값이 바뀐 항목만 골라 함께 저장한다.
+    const updateRequests: Promise<unknown>[] = [];
+    if (pendingAppPushOn !== null && pendingAppPushOn !== user.push_enabled) {
+      updateRequests.push(
+        updatePushEnabled({ push_enabled: pendingAppPushOn }),
+      );
+    }
+    if (
+      pendingEmergencyAlertOn !== null &&
+      pendingEmergencyAlertOn !== user.emergency_alert_enabled
+    ) {
+      updateRequests.push(
+        updateEmergencyAlert({
+          emergency_alert_enabled: pendingEmergencyAlertOn,
+        }),
+      );
+    }
+
+    // 저장에 실패하면 페이지에 머물러 다시 시도할 수 있게 한다.
+    // 성공한 항목은 캐시가 갱신되므로, 재시도 시 위 비교에서 자동으로 제외된다.
+    try {
+      await Promise.all(updateRequests);
+    } catch {
+      setAlertMessage(NOTIFICATION_MESSAGE.SAVE_FAIL);
+      return;
     }
     navigate(-1);
   };
@@ -105,31 +139,36 @@ const NotificationSettingPage = () => {
           rightText="완료"
           onRightClick={handleDoneClick}
           rightVariant="default"
-          isRightDisabled={isUpdatingPushEnabled || isUserLoading}
+          isRightDisabled={isSaving || isUserLoading}
         />
 
         <section className="flex flex-col gap-xs px-[1.34rem]">
           <h2 className="heading-base-semibold text-secondary">알림 종류</h2>
 
           {isUserLoading ? (
-            <NotificationToggleBarSkeleton />
+            <>
+              <NotificationToggleBarSkeleton />
+              <NotificationToggleBarSkeleton />
+            </>
           ) : (
-            <NotificationToggleBar
-              title="앱 푸시"
-              isOn={isAppPushOn}
-              onToggle={handleAppPushToggle}
-              description={
-                permission === 'denied'
-                  ? NOTIFICATION_MESSAGE.PERMISSION_DENIED_HINT
-                  : undefined
-              }
-            />
+            <>
+              <NotificationToggleBar
+                title="앱 푸시"
+                isOn={isAppPushOn}
+                onToggle={handleAppPushToggle}
+                description={
+                  permission === 'denied'
+                    ? NOTIFICATION_MESSAGE.PERMISSION_DENIED_HINT
+                    : undefined
+                }
+              />
+              <NotificationToggleBar
+                title="긴급 소리 알림 받기"
+                isOn={isEmergencyAlertOn}
+                onToggle={handleEmergencyAlertToggle}
+              />
+            </>
           )}
-          <NotificationToggleBar
-            title="긴급 소리 알림 받기"
-            isOn={isEmergencyStrongVibrationOn}
-            onToggle={handleEmergencyVibrationToggle}
-          />
         </section>
       </div>
       <AlertModal

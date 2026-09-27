@@ -31,16 +31,17 @@
 
 #### UserResponse
 
-| 필드              | 타입           | 비고     |
-| ----------------- | -------------- | -------- |
-| `id`              | integer        | required |
-| `email`           | string         | required |
-| `nickname`        | string         | required |
-| `disability_type` | string \| null | required |
-| `haptic_strength` | integer        | required |
-| `do_not_disturb`  | boolean        | required |
-| `push_enabled`    | boolean        | required |
-| `terms_agreed`    | boolean        | required |
+| 필드                      | 타입           | 비고                                           |
+| ------------------------- | -------------- | ---------------------------------------------- |
+| `id`                      | integer        | required                                       |
+| `email`                   | string         | required                                       |
+| `nickname`                | string         | required                                       |
+| `disability_type`         | string \| null | required                                       |
+| `haptic_strength`         | integer        | required                                       |
+| `do_not_disturb`          | boolean        | required                                       |
+| `push_enabled`            | boolean        | required                                       |
+| `emergency_alert_enabled` | boolean        | required. 기본값 `true` (펌웨어 기본값과 동일) |
+| `terms_agreed`            | boolean        | required                                       |
 
 ---
 
@@ -127,15 +128,16 @@
 
 > 모든 엔드포인트 인증 필요 (`Authorization` 헤더). 응답은 별도 명시 없으면 `UserResponse`.
 
-| 메서드 | 경로                       | 설명             |
-| ------ | -------------------------- | ---------------- |
-| GET    | `/users/me`                | 내 정보 조회     |
-| PATCH  | `/users/me`                | 내 정보 수정     |
-| PATCH  | `/users/me/haptic`         | 진동 세기 수정   |
-| PATCH  | `/users/me/do-not-disturb` | 방해금지모드     |
-| PATCH  | `/users/me/push-enabled`   | 푸시 알림 on/off |
-| POST   | `/users/me/fcm-token`      | FCM 토큰 등록    |
-| PATCH  | `/users/me/agreement`      | 약관 동의 수정   |
+| 메서드 | 경로                        | 설명                  |
+| ------ | --------------------------- | --------------------- |
+| GET    | `/users/me`                 | 내 정보 조회          |
+| PATCH  | `/users/me`                 | 내 정보 수정          |
+| PATCH  | `/users/me/haptic`          | 진동 세기 수정        |
+| PATCH  | `/users/me/do-not-disturb`  | 방해금지모드          |
+| PATCH  | `/users/me/push-enabled`    | 푸시 알림 on/off      |
+| PATCH  | `/users/me/emergency-alert` | 긴급 소리 알림 on/off |
+| POST   | `/users/me/fcm-token`       | FCM 토큰 등록         |
+| PATCH  | `/users/me/agreement`       | 약관 동의 수정        |
 
 ### GET `/users/me`
 
@@ -179,6 +181,18 @@
   | 필드           | 타입    | 필수 |
   | -------------- | ------- | ---- |
   | `push_enabled` | boolean | ✅   |
+
+- **Response** `200` → `UserResponse`
+
+### PATCH `/users/me/emergency-alert`
+
+> 설정 > 알림 설정의 "긴급 소리 알림 받기" 토글. 완료 버튼을 누를 때 값이 바뀐 경우에만 호출한다.
+
+- **Request Body** (`EmergencyAlertUpdate`)
+
+  | 필드                      | 타입    | 필수 |
+  | ------------------------- | ------- | ---- |
+  | `emergency_alert_enabled` | boolean | ✅   |
 
 - **Response** `200` → `UserResponse`
 
