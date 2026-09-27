@@ -10,4 +10,6 @@ export const NOTIFICATION_MESSAGE = {
   // 사용자가 이유를 모른 채 켜져 있다고 믿는 상황을 막는다.
   PERMISSION_DENIED_HINT:
     '핸드폰 설정 혹은 브라우저 설정에서 알림 권한을 허용해주세요',
+  // 완료 버튼에서 설정 저장(PATCH)에 실패한 경우: 저장되지 않았음을 알리고 재시도를 안내한다.
+  SAVE_FAIL: '설정을 저장하지 못했습니다.\n잠시 후 다시 시도해주세요.',
 } as const;
