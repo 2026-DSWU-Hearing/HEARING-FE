@@ -20,6 +20,7 @@ export const STT_MESSAGE = {
   TOKEN_FAILED: '음성 인식 서버에 연결하지 못했습니다.',
   SOCKET_FAILED: '음성 인식 연결이 끊어졌습니다.',
   SERVER_CLOSED: '음성 인식이 중단되었습니다. 다시 시도해 주세요.',
+  NO_SPEECH: '음성을 인식하지 못했습니다.',
 } as const;
 
 export const STT_SERVER_CLOSE_CODE_MIN = 4000;

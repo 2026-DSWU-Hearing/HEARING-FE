@@ -108,6 +108,16 @@ export const useSttSocket = ({
     socket.binaryType = 'arraybuffer';
     socketRef.current = socket;
 
+    let hasStartedListening = false;
+    let hasReceivedText = false;
+    let hasFailed = false;
+
+    const notifyIfNoSpeech = () => {
+      if (!hasStartedListening || hasReceivedText || hasFailed) return;
+
+      setErrorMessage(STT_MESSAGE.NO_SPEECH);
+    };
+
     socket.onopen = async () => {
       try {
         const capture = await createAudioCapture({
@@ -134,9 +144,11 @@ export const useSttSocket = ({
         }
 
         captureRef.current = capture;
+        hasStartedListening = true;
         setStatus('listening');
       } catch (error) {
         console.error('[STT] 마이크 시작 실패:', error);
+        hasFailed = true;
         setErrorMessage(getMicrophoneErrorMessage(error));
         setStatus('error');
         socket.close();
@@ -156,6 +168,8 @@ export const useSttSocket = ({
       const text = message.content?.trim() ?? '';
       if (!text) return;
 
+      hasReceivedText = true;
+
       if (message.isFinal) {
         handlersRef.current.onFinalText(text);
         return;
@@ -165,6 +179,7 @@ export const useSttSocket = ({
     };
 
     socket.onerror = () => {
+      hasFailed = true;
       setErrorMessage(STT_MESSAGE.SOCKET_FAILED);
       setStatus('error');
     };
@@ -175,12 +190,16 @@ export const useSttSocket = ({
       // EOS 후 늦게 닫히는 동안 사용자가 다시 시작했을 수 있다. 그때 이 핸들러가
       // stopCapture()를 부르면 새 세션의 마이크가 꺼지고, setStatus는 'listening'을
       // 'idle'로 덮어쓴다. 현재 세션의 소켓일 때만 정리한다.
-      if (socketRef.current !== socket) return;
+      if (socketRef.current !== socket) {
+        if (!socketRef.current) notifyIfNoSpeech();
+        return;
+      }
 
       socketRef.current = null;
       stopCapture();
 
       if (event.code >= STT_SERVER_CLOSE_CODE_MIN) {
+        hasFailed = true;
         console.error(
           '[STT] 서버가 연결을 종료했습니다:',
           event.code,
@@ -199,6 +218,7 @@ export const useSttSocket = ({
 
       // 에러로 닫힌 경우에는 사용자에게 보여줄 문구를 지우지 않는다.
       setStatus((prevStatus) => (prevStatus === 'error' ? 'error' : 'idle'));
+      notifyIfNoSpeech();
     };
   }, []);
 
