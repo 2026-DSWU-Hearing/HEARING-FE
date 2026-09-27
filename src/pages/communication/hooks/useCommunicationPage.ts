@@ -8,7 +8,6 @@ import { useGetCommunicationMock } from '@/pages/communication/hooks/useGetCommu
 import { useGetCurrentLocationName } from '@/pages/communication/hooks/useGetCurrentLocationName';
 import { useSttSocket } from '@/pages/communication/hooks/useSttSocket';
 import { useActiveConversationStore } from '@/pages/communication/stores/useActiveConversationStore';
-import { useFavoriteAnswerStore } from '@/pages/communication/stores/useFavoriteAnswerStore';
 import type {
   BubbleInputTypes,
   ChatBubbleTypes,
@@ -26,11 +25,6 @@ export const useCommunicationPage = () => {
   const conversation = data?.conversation ?? null;
   const locationName = useGetCurrentLocationName();
 
-  // 답변 목록 자체는 모달(useFavoriteAnswerModal)이 스토어에서 직접 구독한다.
-  // 여기서는 목데이터를 스토어에 채우는 역할만 한다.
-  const initializeFavoriteAnswers = useFavoriteAnswerStore(
-    (state) => state.initialize,
-  );
   const favoriteAnswerModal = useModal();
 
   // STT 소켓 주소에 대화 id가 필요해서, 마이크를 켜기 전에 대화부터 만든다.
@@ -113,12 +107,6 @@ export const useCommunicationPage = () => {
         0,
       ) + 1;
   }, [conversation]);
-
-  useEffect(() => {
-    if (!data) return;
-
-    initializeFavoriteAnswers(data.favoriteAnswers);
-  }, [data, initializeFavoriteAnswers]);
 
   // 언마운트 시 남아있는 안내 타이머를 정리한다.
   useEffect(() => {

@@ -7,6 +7,7 @@ import FavoriteAnswerAddInput from '@/pages/communication/components/favoriteAns
 import FavoriteAnswerEditItem from '@/pages/communication/components/favoriteAnswer/FavoriteAnswerEditItem';
 import { FAVORITE_ANSWER_MESSAGE } from '@/pages/communication/constants/favoriteAnswerMessages';
 import { useFavoriteAnswerModal } from '@/pages/communication/hooks/useFavoriteAnswerModal';
+import AlertModal from '@/shared/components/AlertModal';
 import { useEscapeKey } from '@/shared/hooks/useEscapeKey';
 
 interface FavoriteAnswerModalPropTypes {
@@ -14,7 +15,6 @@ interface FavoriteAnswerModalPropTypes {
   onSelect: (content: string) => void;
 }
 
-// 답변 목록은 훅이 스토어에서 직접 구독하므로 prop으로 내려받지 않는다.
 const FavoriteAnswerModal = ({
   onClose,
   onSelect,
@@ -26,6 +26,9 @@ const FavoriteAnswerModal = ({
     isDraftTyping,
     isEditing,
     isDirty,
+    isSaving,
+    isLoadError,
+    errorMessage,
     handleDraftChange,
     handleStartAdding,
     handleCancelAdding,
@@ -35,6 +38,7 @@ const FavoriteAnswerModal = ({
     handleComplete,
     handleAnswerChange,
     handleDeleteAnswer,
+    handleCloseError,
   } = useFavoriteAnswerModal();
 
   const handleEscape = () => {
@@ -93,7 +97,8 @@ const FavoriteAnswerModal = ({
               type="button"
               onMouseDown={handleActionMouseDown}
               onClick={handleComplete}
-              className="body-base-regular justify-self-end text-primary-400"
+              disabled={isSaving}
+              className="body-base-regular justify-self-end text-primary-400 disabled:text-neutral-500"
             >
               {FAVORITE_ANSWER_MESSAGE.DONE}
             </button>
@@ -123,7 +128,9 @@ const FavoriteAnswerModal = ({
             ))
           ) : draftAnswers.length === 0 && !isAdding ? (
             <p className="body-sm-regular mt-lg text-center text-neutral-500">
-              {FAVORITE_ANSWER_MESSAGE.EMPTY}
+              {isLoadError
+                ? FAVORITE_ANSWER_MESSAGE.LOAD_FAILED
+                : FAVORITE_ANSWER_MESSAGE.EMPTY}
             </p>
           ) : (
             draftAnswers.map((answer) => (
@@ -149,6 +156,12 @@ const FavoriteAnswerModal = ({
           )}
         </div>
       </motion.div>
+
+      <AlertModal
+        isOpen={Boolean(errorMessage)}
+        message={errorMessage}
+        onClose={handleCloseError}
+      />
     </>
   );
 };
