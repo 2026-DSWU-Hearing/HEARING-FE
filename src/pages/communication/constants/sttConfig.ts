@@ -19,7 +19,32 @@ export const STT_MAX_BUFFERED_AMOUNT = 32000;
 export const STT_MESSAGE = {
   TOKEN_FAILED: '음성 인식 서버에 연결하지 못했습니다.',
   SOCKET_FAILED: '음성 인식 연결이 끊어졌습니다.',
+  SERVER_CLOSED: '음성 인식이 중단되었습니다. 다시 시도해 주세요.',
 } as const;
+
+export const STT_SERVER_CLOSE_CODE_MIN = 4000;
+
+export const STT_CLOSE_CODE = {
+  UNAUTHORIZED: 4401,
+  NOT_FOUND: 4404,
+  ALREADY_ENDED: 4409,
+  UNAVAILABLE: 4503,
+} as const;
+
+export const STT_CLOSE_MESSAGE: Record<number, string> = {
+  [STT_CLOSE_CODE.UNAUTHORIZED]:
+    '로그인이 만료되었습니다. 다시 로그인해 주세요.',
+  [STT_CLOSE_CODE.NOT_FOUND]: '대화를 찾을 수 없습니다. 다시 시도해 주세요.',
+  [STT_CLOSE_CODE.ALREADY_ENDED]:
+    '이미 종료된 대화입니다. 다시 시도하면 새 대화로 시작합니다.',
+  [STT_CLOSE_CODE.UNAVAILABLE]:
+    '음성 인식 서버에 연결할 수 없습니다. 잠시 후 다시 시도해 주세요.',
+};
+
+export const STT_CONVERSATION_UNAVAILABLE_CLOSE_CODES: readonly number[] = [
+  STT_CLOSE_CODE.NOT_FOUND,
+  STT_CLOSE_CODE.ALREADY_ENDED,
+];
 
 // 브라우저가 붙을 STT 소켓 주소를 만든다.
 // 인증 방식은 기존 감지 소켓(/ws/users/me/detections)과 동일하게 쿼리 토큰을 쓴다.

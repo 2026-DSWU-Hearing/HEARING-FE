@@ -39,6 +39,7 @@ export const useCommunicationPage = () => {
   );
   const endConversation = useActiveConversationStore((state) => state.end);
   const conversationError = useActiveConversationStore((state) => state.error);
+  const resetConversation = useActiveConversationStore((state) => state.reset);
 
   const [bubbles, setBubbles] = useState<ChatBubbleTypes[]>([]);
   const [draftReply, setDraftReply] = useState('');
@@ -97,6 +98,7 @@ export const useCommunicationPage = () => {
       submitBubble('left', text, 'stt');
       setDraftListening('');
     },
+    onConversationUnavailable: resetConversation,
   });
 
   // 연결 중에도 버튼은 '녹음 중'으로 보여줘야 두 번 눌리지 않는다.
