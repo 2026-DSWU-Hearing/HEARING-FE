@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
+  STT_CLOSE_MESSAGE,
+  STT_CONVERSATION_UNAVAILABLE_CLOSE_CODES,
   STT_EOS_MESSAGE,
   STT_FINAL_WAIT_MS,
   STT_MAX_BUFFERED_AMOUNT,
   STT_MESSAGE,
+  STT_SERVER_CLOSE_CODE_MIN,
   buildSttStreamUrl,
 } from '@/pages/communication/constants/sttConfig';
 import type {
@@ -23,6 +26,7 @@ interface UseSttSocketParamsTypes {
   onPartialText: (text: string) => void;
   // 한 문장이 확정된 결과. 화면에는 이 시점에 버블로 쌓는다.
   onFinalText: (text: string) => void;
+  onConversationUnavailable?: () => void;
 }
 
 // 소켓 주소에 토큰을 실어 보내야 해서, 만료된 토큰은 미리 갱신한다.
@@ -44,6 +48,7 @@ const getValidAccessToken = async (): Promise<string | null> => {
 export const useSttSocket = ({
   onPartialText,
   onFinalText,
+  onConversationUnavailable,
 }: UseSttSocketParamsTypes) => {
   const [status, setStatus] = useState<SttStatusTypes>('idle');
   const [errorMessage, setErrorMessage] = useState('');
@@ -53,9 +58,17 @@ export const useSttSocket = ({
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // 콜백이 매 렌더 새로 만들어져도 start/stop이 다시 만들어지지 않도록 ref로 들고 있는다.
-  const handlersRef = useRef({ onPartialText, onFinalText });
+  const handlersRef = useRef({
+    onPartialText,
+    onFinalText,
+    onConversationUnavailable,
+  });
   useEffect(() => {
-    handlersRef.current = { onPartialText, onFinalText };
+    handlersRef.current = {
+      onPartialText,
+      onFinalText,
+      onConversationUnavailable,
+    };
   });
 
   const clearCloseTimer = () => {
@@ -95,6 +108,16 @@ export const useSttSocket = ({
     socket.binaryType = 'arraybuffer';
     socketRef.current = socket;
 
+    let hasStartedListening = false;
+    let hasReceivedText = false;
+    let hasFailed = false;
+
+    const notifyIfNoSpeech = () => {
+      if (!hasStartedListening || hasReceivedText || hasFailed) return;
+
+      setErrorMessage(STT_MESSAGE.NO_SPEECH);
+    };
+
     socket.onopen = async () => {
       try {
         const capture = await createAudioCapture({
@@ -121,9 +144,11 @@ export const useSttSocket = ({
         }
 
         captureRef.current = capture;
+        hasStartedListening = true;
         setStatus('listening');
       } catch (error) {
         console.error('[STT] 마이크 시작 실패:', error);
+        hasFailed = true;
         setErrorMessage(getMicrophoneErrorMessage(error));
         setStatus('error');
         socket.close();
@@ -143,6 +168,8 @@ export const useSttSocket = ({
       const text = message.content?.trim() ?? '';
       if (!text) return;
 
+      hasReceivedText = true;
+
       if (message.isFinal) {
         handlersRef.current.onFinalText(text);
         return;
@@ -152,23 +179,46 @@ export const useSttSocket = ({
     };
 
     socket.onerror = () => {
+      hasFailed = true;
       setErrorMessage(STT_MESSAGE.SOCKET_FAILED);
       setStatus('error');
     };
 
-    socket.onclose = () => {
+    socket.onclose = (event) => {
       clearCloseTimer();
 
       // EOS 후 늦게 닫히는 동안 사용자가 다시 시작했을 수 있다. 그때 이 핸들러가
       // stopCapture()를 부르면 새 세션의 마이크가 꺼지고, setStatus는 'listening'을
       // 'idle'로 덮어쓴다. 현재 세션의 소켓일 때만 정리한다.
-      if (socketRef.current !== socket) return;
+      if (socketRef.current !== socket) {
+        if (!socketRef.current) notifyIfNoSpeech();
+        return;
+      }
 
       socketRef.current = null;
       stopCapture();
 
+      if (event.code >= STT_SERVER_CLOSE_CODE_MIN) {
+        hasFailed = true;
+        console.error(
+          '[STT] 서버가 연결을 종료했습니다:',
+          event.code,
+          event.reason,
+        );
+        setErrorMessage(
+          STT_CLOSE_MESSAGE[event.code] ?? STT_MESSAGE.SERVER_CLOSED,
+        );
+        setStatus('error');
+
+        if (STT_CONVERSATION_UNAVAILABLE_CLOSE_CODES.includes(event.code)) {
+          handlersRef.current.onConversationUnavailable?.();
+        }
+        return;
+      }
+
       // 에러로 닫힌 경우에는 사용자에게 보여줄 문구를 지우지 않는다.
       setStatus((prevStatus) => (prevStatus === 'error' ? 'error' : 'idle'));
+      notifyIfNoSpeech();
     };
   }, []);
 

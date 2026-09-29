@@ -22,6 +22,11 @@ const RecordingButton = ({
 }: RecordingButtonPropTypes) => {
   // 에러가 있으면 라벨 자리를 에러 안내로 쓴다. 라벨 높이는 그대로라 레이아웃이 흔들리지 않는다.
   const label = errorMessage || '말해주세요!';
+  const labelLines = label
+    .replace(/\.\s+/g, '.\n')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean);
   const isLabelVisible = Boolean(errorMessage) || isRecording;
 
   return (
@@ -44,11 +49,15 @@ const RecordingButton = ({
         <span
           aria-hidden={!isLabelVisible}
           role={errorMessage ? 'alert' : undefined}
-          className={`body-base-medium text-center text-primary-500 ${
+          className={`body-base-medium flex flex-col items-center text-center text-primary-500 ${
             isLabelVisible ? '' : 'invisible'
           }`}
         >
-          {label}
+          {labelLines.map((line) => (
+            <span key={line} className="whitespace-nowrap">
+              {line}
+            </span>
+          ))}
         </span>
       </div>
 

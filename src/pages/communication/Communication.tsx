@@ -11,6 +11,7 @@ import { useCommunicationPage } from '@/pages/communication/hooks/useCommunicati
 const Communication = () => {
   const {
     conversation,
+    locationName,
     bubbles,
     isListening,
     sttErrorMessage,
@@ -52,7 +53,7 @@ const Communication = () => {
   return (
     <main className="flex h-dvh flex-col overflow-hidden bg-neutral-950">
       <CommunicationHeader
-        locationName={conversation.locationName}
+        locationName={locationName}
         onOpenHistory={handleOpenHistory}
         onOpenFavoriteAnswer={handleOpenFavoriteAnswer}
       />

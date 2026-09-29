@@ -1,6 +1,4 @@
 import { useActiveConversationStore } from '@/pages/communication/stores/useActiveConversationStore';
-import { useConversationHistoryStore } from '@/pages/communication/stores/useConversationHistoryStore';
-import { useFavoriteAnswerStore } from '@/pages/communication/stores/useFavoriteAnswerStore';
 
 // 로그아웃 시 사용자에 종속된 전역 스토어를 한 번에 비운다.
 //
@@ -10,8 +8,6 @@ import { useFavoriteAnswerStore } from '@/pages/communication/stores/useFavorite
 //
 // 사용자별 스토어를 새로 만들면 여기에 추가한다. 호출부(useLogout)는 손대지 않아도 된다.
 export const resetAllStores = () => {
-  useFavoriteAnswerStore.getState().reset();
-  useConversationHistoryStore.getState().reset();
   // 진행 중이던 대화 id가 남으면 다음 사용자의 발화가 이전 사용자의 대화에 붙는다.
   useActiveConversationStore.getState().reset();
 };

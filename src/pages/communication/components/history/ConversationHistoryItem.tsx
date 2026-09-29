@@ -1,10 +1,10 @@
 import { CONVERSATION_HISTORY_MESSAGE } from '@/pages/communication/constants/conversationHistoryMessages';
-import type { ConversationHistoryDetailTypes } from '@/pages/communication/types/communication-Types';
+import type { ConversationListItemTypes } from '@/pages/communication/types/conversationApiTypes';
 import { formatConversationDate } from '@/pages/communication/utils/formatConversationDate';
 import CloseIcon from '@/shared/components/icons/CloseIcon';
 
 interface ConversationHistoryItemPropTypes {
-  history: ConversationHistoryDetailTypes;
+  history: ConversationListItemTypes;
   isDeleteMode: boolean;
   onClick: () => void;
   onDelete: () => void;
@@ -22,11 +22,13 @@ const ConversationHistoryItem = ({
   onClick,
   onDelete,
 }: ConversationHistoryItemPropTypes) => {
+  const title = history.title || CONVERSATION_HISTORY_MESSAGE.UNTITLED;
+
   if (isDeleteMode) {
     return (
       <div className={CARD_CLASSNAME}>
         <div className={ROW_CLASSNAME}>
-          <span className={TITLE_CLASSNAME}>{history.title}</span>
+          <span className={TITLE_CLASSNAME}>{title}</span>
 
           <button
             type="button"
@@ -48,10 +50,10 @@ const ConversationHistoryItem = ({
       className={`${CARD_CLASSNAME} transition-colors active:bg-neutral-800`}
     >
       <div className={ROW_CLASSNAME}>
-        <span className={TITLE_CLASSNAME}>{history.title}</span>
+        <span className={TITLE_CLASSNAME}>{title}</span>
 
         <span className="body-sm-regular shrink-0 text-right text-tertiary">
-          {formatConversationDate(history.startedAt)}
+          {formatConversationDate(history.created_at)}
         </span>
       </div>
     </button>

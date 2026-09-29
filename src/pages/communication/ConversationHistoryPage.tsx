@@ -1,36 +1,64 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import ConversationHistoryList from '@/pages/communication/components/history/ConversationHistoryList';
 import { CONVERSATION_HISTORY_MESSAGE } from '@/pages/communication/constants/conversationHistoryMessages';
-import { useGetCommunicationMock } from '@/pages/communication/hooks/useGetCommunicationMock';
-import { useConversationHistoryStore } from '@/pages/communication/stores/useConversationHistoryStore';
+import { useDeleteConversation } from '@/pages/communication/hooks/useDeleteConversation';
+import { useGetConversations } from '@/pages/communication/hooks/useGetConversations';
 import TopNavigation from '@/layout/TopNavigation';
+import AlertModal from '@/shared/components/AlertModal';
 import ConfirmModal from '@/shared/components/ConfirmModal';
+
+const MESSAGE_CLASSNAME = 'body-sm-regular mt-lg text-center text-neutral-500';
 
 const ConversationHistoryPage = () => {
   const navigate = useNavigate();
-  const { data } = useGetCommunicationMock();
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  const histories = useConversationHistoryStore((state) => state.histories);
-  const isInitialized = useConversationHistoryStore(
-    (state) => state.isInitialized,
-  );
-  const initializeHistories = useConversationHistoryStore(
-    (state) => state.initialize,
-  );
-  const deleteHistory = useConversationHistoryStore(
-    (state) => state.deleteHistory,
-  );
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isError,
+    isFetchNextPageError,
+    isFetchingNextPage,
+    isPending,
+    refetch,
+  } = useGetConversations();
+  const { mutate: deleteConversation, isPending: isDeleting } =
+    useDeleteConversation();
 
   const [isDeleteMode, setIsDeleteMode] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
+  const [isDeleteFailed, setIsDeleteFailed] = useState(false);
+
+  const histories =
+    data?.pages
+      .flatMap(({ conversations }) => conversations)
+      .filter(({ ended_at: endedAt }) => endedAt !== null) ?? [];
 
   useEffect(() => {
-    if (!data) return;
+    const loadMoreElement = loadMoreRef.current;
+    if (!loadMoreElement) return;
 
-    initializeHistories(data.conversationHistories);
-  }, [data, initializeHistories]);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (
+          entry.isIntersecting &&
+          hasNextPage &&
+          !isFetchingNextPage &&
+          !isFetchNextPageError
+        ) {
+          void fetchNextPage();
+        }
+      },
+      { rootMargin: '200px 0px' },
+    );
+
+    observer.observe(loadMoreElement);
+
+    return () => observer.disconnect();
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage, isFetchNextPageError]);
 
   const handleToggleDeleteMode = () => {
     setIsDeleteMode((prev) => !prev);
@@ -45,10 +73,61 @@ const ConversationHistoryPage = () => {
   };
 
   const handleConfirmDelete = () => {
-    if (deleteTargetId === null) return;
+    if (deleteTargetId === null || isDeleting) return;
 
-    deleteHistory(deleteTargetId);
-    setIsDeleteMode(false);
+    deleteConversation(deleteTargetId, {
+      onSuccess: () => setIsDeleteMode(false),
+      onError: () => setIsDeleteFailed(true),
+    });
+  };
+
+  const handleRetryClick = () => {
+    void refetch();
+  };
+
+  const handleLoadMoreRetryClick = () => {
+    void fetchNextPage();
+  };
+
+  const renderContent = () => {
+    if (isPending) {
+      return (
+        <p role="status" className={MESSAGE_CLASSNAME}>
+          {CONVERSATION_HISTORY_MESSAGE.LOADING}
+        </p>
+      );
+    }
+
+    if (isError && !isFetchNextPageError) {
+      return (
+        <div role="alert" className="mt-lg flex flex-col items-center gap-sm">
+          <p className="body-sm-regular text-neutral-500">
+            {CONVERSATION_HISTORY_MESSAGE.LOAD_FAILED}
+          </p>
+          <button
+            type="button"
+            onClick={handleRetryClick}
+            className="body-sm-medium rounded-lg border border-neutral-600 px-base py-xs text-primary"
+          >
+            {CONVERSATION_HISTORY_MESSAGE.RETRY}
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <ConversationHistoryList
+        histories={histories}
+        isDeleteMode={isDeleteMode}
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
+        isFetchNextPageError={isFetchNextPageError}
+        loadMoreRef={loadMoreRef}
+        onSelect={handleSelectHistory}
+        onDelete={handleDeleteClick}
+        onLoadMoreRetry={handleLoadMoreRetryClick}
+      />
+    );
   };
 
   return (
@@ -64,14 +143,7 @@ const ConversationHistoryPage = () => {
         onRightClick={handleToggleDeleteMode}
       />
 
-      {isInitialized && (
-        <ConversationHistoryList
-          histories={histories}
-          isDeleteMode={isDeleteMode}
-          onSelect={handleSelectHistory}
-          onDelete={handleDeleteClick}
-        />
-      )}
+      {renderContent()}
 
       <ConfirmModal
         isOpen={deleteTargetId !== null}
@@ -79,6 +151,12 @@ const ConversationHistoryPage = () => {
         onConfirm={handleConfirmDelete}
         onCancel={() => {}}
         onClose={() => setDeleteTargetId(null)}
+      />
+
+      <AlertModal
+        isOpen={isDeleteFailed}
+        message={CONVERSATION_HISTORY_MESSAGE.DELETE_FAILED}
+        onClose={() => setIsDeleteFailed(false)}
       />
     </div>
   );

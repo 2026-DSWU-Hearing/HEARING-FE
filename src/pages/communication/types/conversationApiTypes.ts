@@ -17,9 +17,11 @@ export interface ConversationCreatedTypes {
   created_at: string;
 }
 // 제목/요약은 대화 종료 시 서버가 AI로 생성한다. 종료 전에는 아직 없다.
-export interface ConversationListItemTypes extends ConversationCreatedTypes {
+export interface ConversationListItemTypes
+  extends ConversationCreatedTypes, ConversationLocationTypes {
   title?: string | null;
   summary?: string | null;
+  ended_at: string | null;
 }
 export interface ConversationDetailTypes extends ConversationListItemTypes {
   bubbles: ConversationBubbleResponseTypes[];
