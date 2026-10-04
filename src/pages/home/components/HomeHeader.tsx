@@ -29,8 +29,9 @@ const HomeHeader = () => {
       </div>
 
       {/* 하단 행: 인사 문구 + 방해금지 모드 버튼 */}
-      <div className="flex items-end justify-between">
-        <p className="heading-base-semibold text-secondary">
+      {/* 좁은 화면(320px)에서 문구가 버튼에 붙거나 글자 중간에서 끊기지 않도록, 간격을 두고 단어 단위로만 줄바꿈한다. */}
+      <div className="flex items-end justify-between gap-base">
+        <p className="heading-base-semibold text-secondary min-w-0 break-keep">
           {user?.nickname ? `${user.nickname}님 ` : ''}반가워요
           <br />
           환경에 맞는 모드를 선택하세요
