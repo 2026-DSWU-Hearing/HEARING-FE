@@ -28,7 +28,10 @@ const DeviceSection = () => {
     isError,
     isMutating,
     isConnecting,
-    hasConnectError,
+    isUpdating,
+    connectErrorMessage,
+    nameEditErrorMessage,
+    deleteErrorMessage,
     nameModal,
     deleteModal,
     handleEditClick,
@@ -76,9 +79,9 @@ const DeviceSection = () => {
             onClick={handleConnectClick}
             disabled={isMutating}
           />
-          {hasConnectError && (
+          {connectErrorMessage && (
             <p className="whitespace-pre-line text-center px-base body-sm-regular text-tertiary">
-              {DEVICE_MESSAGE.CONNECT_FAILED}
+              {connectErrorMessage}
             </p>
           )}
         </div>
@@ -94,9 +97,9 @@ const DeviceSection = () => {
             onClick={handleConnectClick}
             disabled={isMutating}
           />
-          {hasConnectError && (
+          {connectErrorMessage && (
             <p className="whitespace-pre-line rounded-xl bg-neutral-900 px-base py-base body-base-regular text-secondary">
-              {DEVICE_MESSAGE.CONNECT_FAILED}
+              {connectErrorMessage}
             </p>
           )}
         </div>
@@ -116,6 +119,14 @@ const DeviceSection = () => {
             />
           </SettingCard>
           <DeleteDeviceButton onClick={handleDeleteClick} />
+          {deleteErrorMessage && (
+            <p
+              role="alert"
+              className="whitespace-pre-line text-center px-base caption-xs-regular text-state-alert"
+            >
+              {deleteErrorMessage}
+            </p>
+          )}
         </div>
       )}
 
@@ -124,6 +135,8 @@ const DeviceSection = () => {
           currentName={name}
           onClose={nameModal.close}
           onSubmit={handleNameSubmit}
+          submitErrorMessage={nameEditErrorMessage}
+          isSubmitting={isUpdating}
         />
       )}
 

@@ -26,6 +26,8 @@ export const useProfileEditPage = () => {
   // (기본값을 넣으면 닉네임만 고쳐도 disability_type이 의도치 않게 저장됨)
   const [disabilityType, setDisabilityType] =
     useState<DisabilityTypeTypes | null>(null);
+  // 저장 요청 실패 안내. 비어 있으면 안내 모달을 띄우지 않는다.
+  const [saveErrorMessage, setSaveErrorMessage] = useState('');
 
   // 조회한 사용자 정보로 폼 초기값을 한 번만 채운다.
   // (입력 중 재조회로 값이 덮어써지지 않도록 isInitialized 가드를 둔다.)
@@ -64,6 +66,8 @@ export const useProfileEditPage = () => {
     setDisabilityType(value);
   };
 
+  const clearSaveErrorMessage = () => setSaveErrorMessage('');
+
   const handleDoneClick = async () => {
     if (isDoneDisabled) {
       return;
@@ -75,18 +79,25 @@ export const useProfileEditPage = () => {
       payload.disability_type = disabilityType;
     }
 
-    await updateUsers(payload);
-    navigate(-1);
+    // 실패하면 입력값을 유지한 채 안내만 띄운다(페이지를 떠나지 않아 바로 재시도 가능).
+    try {
+      await updateUsers(payload);
+      navigate(-1);
+    } catch {
+      setSaveErrorMessage(PROFILE_MESSAGE.SAVE_FAILED);
+    }
   };
 
   return {
     nickname,
     disabilityType,
     nicknameErrorMessage,
+    saveErrorMessage,
     isDoneDisabled,
     isLoading,
     handleNicknameChange,
     handleDisabilityTypeSelect,
     handleDoneClick,
+    clearSaveErrorMessage,
   };
 };
