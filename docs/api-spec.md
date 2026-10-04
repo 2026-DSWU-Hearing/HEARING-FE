@@ -253,7 +253,9 @@
   | - `ModeSoundInput`: `{ sound_id: integer (required), name?: string\|null }` |
 
 - **Response** `200` → `ModeWriteResponse`
-  - `{ mode_id, name, icon, sounds: ModeSoundItem[] }`, `ModeSoundItem`: `{ sound_id, name }`
+  - `{ mode_id, name, icon, sounds: ModeSoundItem[] }`, `ModeSoundItem`: `{ sound_id, name, category, is_active }`
+  - `ModeSoundItem`은 `GET /modes/{mode_id}` 상세 응답의 소리 항목과 **완전히 동일한 형태**다.
+    생성 시 모든 소리는 `is_active: true`로 내려온다.
 
 ### GET `/modes/icons`
 
@@ -315,6 +317,9 @@
   | `sounds` | array&lt;ModeSoundInput&gt; | ✅   |
 
 - **Response** `200` → `ModeSoundsResponse` — `{ mode_id, sounds: ModeSoundItem[] }`
+
+  > 서버는 요청에서 빠진 소리만 제거하고 새 소리만 추가한다. **유지되는 소리의 `is_active`는
+  > 그대로 보존**되어 응답에 담긴다. 요청 `sounds`에 같은 `sound_id`가 중복돼도 서버가 dedupe한다.
 
 ### PATCH `/modes/{mode_id}/sounds/{sound_id}`
 

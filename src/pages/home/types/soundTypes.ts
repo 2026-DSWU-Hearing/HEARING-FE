@@ -1,3 +1,8 @@
+import type {
+  ModeDetailSoundTypes,
+  ModeSoundTypes,
+} from '@/pages/home/types/modeTypes';
+
 export interface SoundTypes {
   sound_id: number;
   name: string;
@@ -7,11 +12,6 @@ export interface SoundTypes {
 
 export interface CategoryTypes {
   category_id: number;
-  name: string;
-}
-
-export interface ModeSoundTypes {
-  sound_id: number;
   name: string;
 }
 
@@ -29,5 +29,5 @@ export interface UpdateModeSoundsRequestTypes {
 
 export interface UpdateModeSoundsResponseTypes {
   mode_id: number;
-  sounds: ModeSoundTypes[];
+  sounds: ModeDetailSoundTypes[];
 }
