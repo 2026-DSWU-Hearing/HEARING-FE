@@ -50,12 +50,15 @@ const NotificationBar = ({
   // 아이콘 + 소리명 + 카테고리 + 시간. wrapper(button/div)와 무관하게 동일하다.
   const cardContent = (
     <>
-      {/* 좌측 소리 아이콘 */}
-      <SoundIconView
-        soundName={soundName}
-        categoryName={category}
-        className="h-[2.5rem] w-[2.5rem] shrink-0 text-[2rem] leading-none text-primary"
-      />
+      {/* 좌측 소리 아이콘: 슬롯은 40px, 아이콘은 32px.
+          직접 그린 SVG는 w/h를, FontAwesome 폴백은 font-size를 따르므로 둘을 같은 값으로 준다. */}
+      <span className="flex h-[2.5rem] w-[2.5rem] shrink-0 items-center justify-center text-primary">
+        <SoundIconView
+          soundName={soundName}
+          categoryName={category}
+          className="h-icon-xl w-icon-xl text-[2rem] leading-none"
+        />
+      </span>
 
       {/* 가운데: 소리명 + 카테고리 배지 */}
       <div className="flex min-w-0 flex-1 flex-col gap-xxs">
