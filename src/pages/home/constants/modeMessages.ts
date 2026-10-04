@@ -33,3 +33,11 @@ export const MODE_EDIT_ERROR_MESSAGE = {
   CONFLICT: '이미 사용 중인 모드 이름입니다',
   DEFAULT: '모드 설정을 처리하지 못했습니다',
 } as const;
+
+// 홈 화면에서 모드 활성화·소리 조작 요청이 실패했을 때 띄우는 안내 메시지
+export const HOME_ERROR_MESSAGE = {
+  ACTIVATE_MODE: '모드를 변경하지 못했습니다.\n잠시 후 다시 시도해주세요',
+  TOGGLE_SOUND: '소리 설정을 변경하지 못했습니다.\n잠시 후 다시 시도해주세요',
+  ADD_SOUND: '소리를 추가하지 못했습니다.\n잠시 후 다시 시도해주세요',
+  REMOVE_SOUND: '소리를 삭제하지 못했습니다.\n잠시 후 다시 시도해주세요',
+} as const;

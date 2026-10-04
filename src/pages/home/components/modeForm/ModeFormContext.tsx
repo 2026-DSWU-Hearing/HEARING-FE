@@ -117,8 +117,10 @@ export const ModeFormProvider = ({
     !isModeNameDuplicated &&
     (isEditPage || selectedSoundIds.length >= 1);
 
+  // 이름을 고치면 제출 가드를 풀어, 저장 실패 뒤에도 중복·길이 안내가 다시 표시되게 한다.
   const handleModeNameChange = useCallback((name: string) => {
     setModeName(name);
+    setHasSubmitted(false);
   }, []);
 
   const handleIconSelect = useCallback((icon: string) => {
