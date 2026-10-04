@@ -156,6 +156,8 @@
 
 ### PATCH `/users/me/haptic`
 
+> 설정 > 진동 강도 설정 슬라이더. 진동은 넥밴드에 적용되는 값이라, 내 계정이 활성 사용자로 연결된 기기가 있을 때(`is_connected && is_active_user`)만 화면에 표시한다.
+
 - **Request Body** (`HapticUpdate`)
 
   | 필드              | 타입    | 필수 |

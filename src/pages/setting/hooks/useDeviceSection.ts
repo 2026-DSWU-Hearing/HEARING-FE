@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { useGetDevices } from '@/pages/setting/hooks/useGetDevices';
+import { useDeviceConnection } from '@/pages/setting/hooks/useDeviceConnection';
 import { usePatchDevice } from '@/pages/setting/hooks/usePatchDevice';
 import { useDeleteDevice } from '@/pages/setting/hooks/useDeleteDevice';
 import { useDevicesConnect } from '@/shared/hooks/useDevicesConnect';
@@ -14,17 +14,14 @@ import { CONNECTION_STATUS } from '@/pages/setting/constants/connectionStatus';
  */
 export const useDeviceSection = () => {
   const [hasConnectError, setHasConnectError] = useState(false);
-  const { data: devices, isLoading, isError } = useGetDevices();
+  const { device, isConnected, isActiveUser, isLoading, isError } =
+    useDeviceConnection();
   const { mutate: updateDevice, isPending: isUpdating } = usePatchDevice();
   const { mutateAsync: connectDevice, isPending: isConnecting } =
     useDevicesConnect();
   const { mutate: removeDevice, isPending: isDeleting } = useDeleteDevice();
 
   const isMutating = isUpdating || isConnecting || isDeleting;
-
-  const device = devices?.[0];
-  const isConnected = device?.is_connected ?? false;
-  const isActiveUser = device?.is_active_user ?? false;
 
   const nameModal = useModal();
   const deleteModal = useModal();
