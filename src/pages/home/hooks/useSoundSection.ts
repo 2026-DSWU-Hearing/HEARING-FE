@@ -160,30 +160,45 @@ export const useSoundSection = () => {
         return;
       }
 
+      // 아무것도 고르지 않고 완료하면 바꿀 것이 없으므로 요청 없이 닫는다.
+      if (selectedSounds.length === 0) {
+        closeAddSoundModal();
+        return;
+      }
+
       const currentSounds = data.sounds.map((sound) => ({
         sound_id: sound.sound_id,
         name: sound.name,
       }));
-      const newSounds = selectedSounds.map((sound) => ({
-        sound_id: sound.sound_id,
-        name: sound.name,
-      }));
-      // 이미 담긴 소리와 새로 선택한 소리가 겹치면 한 번만 전송한다.
-      const nextSounds = [...currentSounds, ...newSounds].filter(
-        (sound, index, sounds) =>
-          sounds.findIndex((item) => item.sound_id === sound.sound_id) ===
-          index,
+      const currentSoundIds = new Set(
+        currentSounds.map((sound) => sound.sound_id),
       );
+      // 이미 담긴 소리는 제외한다. 전부 겹치면 요청 없이 안내만 띄우고 모달은 유지한다.
+      const newSounds = selectedSounds
+        .filter((sound) => !currentSoundIds.has(sound.sound_id))
+        .map((sound) => ({ sound_id: sound.sound_id, name: sound.name }));
+      const hasDuplicatedSound = newSounds.length < selectedSounds.length;
+
+      if (newSounds.length === 0) {
+        setAlertMessage(MODE_MESSAGE.ALREADY_ADDED_SOUND);
+        return;
+      }
 
       putModeSounds(
         {
           modeId: selectedModeId,
           soundsData: {
-            sounds: nextSounds,
+            sounds: [...currentSounds, ...newSounds],
           },
         },
         {
-          onSuccess: closeAddSoundModal,
+          onSuccess: () => {
+            closeAddSoundModal();
+            // 일부만 겹친 경우: 나머지는 추가됐고 겹친 소리는 빠졌음을 알린다.
+            if (hasDuplicatedSound) {
+              setAlertMessage(MODE_MESSAGE.PARTIALLY_ALREADY_ADDED_SOUND);
+            }
+          },
           onError: () => setAlertMessage(HOME_ERROR_MESSAGE.ADD_SOUND),
         },
       );
