@@ -6,12 +6,15 @@ import CommunicationHeader from '@/pages/communication/components/CommunicationH
 import ConversationSavedNotice from '@/pages/communication/components/ConversationSavedNotice';
 import RecordingButton from '@/pages/communication/components/control/RecordingButton';
 import FavoriteAnswerModal from '@/pages/communication/components/favoriteAnswer/FavoriteAnswerModal';
+import { LOCATION_MESSAGE } from '@/pages/communication/constants/locationMessages';
 import { useCommunicationPage } from '@/pages/communication/hooks/useCommunicationPage';
+import ConfirmModal from '@/shared/components/ConfirmModal';
 
 const Communication = () => {
   const {
     conversation,
     locationName,
+    isLocationConsentOpen,
     bubbles,
     isListening,
     sttErrorMessage,
@@ -24,6 +27,8 @@ const Communication = () => {
     handleCloseFavoriteAnswer,
     handleSelectFavoriteAnswer,
     handleToggleRecording,
+    handleLocationConsentConfirm,
+    handleLocationConsentCancel,
     handleDraftReplyChange,
     handleDraftListeningChange,
     handleSubmitReply,
@@ -105,6 +110,16 @@ const Communication = () => {
       )}
 
       <ConversationSavedNotice isOpen={isSavedNoticeOpen} />
+
+      <ConfirmModal
+        isOpen={isLocationConsentOpen}
+        message={LOCATION_MESSAGE.CONSENT_CONFIRM}
+        confirmText={LOCATION_MESSAGE.CONSENT_AGREE}
+        cancelText={LOCATION_MESSAGE.CONSENT_DECLINE}
+        onConfirm={handleLocationConsentConfirm}
+        onCancel={handleLocationConsentCancel}
+        onClose={() => {}}
+      />
     </main>
   );
 };

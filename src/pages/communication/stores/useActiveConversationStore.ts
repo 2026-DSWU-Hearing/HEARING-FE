@@ -6,6 +6,7 @@ import {
   postConversationEnd,
 } from '@/pages/communication/apis/conversationApi';
 import { getConversationLocation } from '@/pages/communication/utils/getConversationLocation';
+import { useLocationConsentStore } from '@/shared/stores/useLocationConsentStore';
 import type {
   ConversationBubbleRequestTypes,
   ConversationCreatedTypes,
@@ -51,7 +52,12 @@ export const useActiveConversationStore = create<ActiveConversationStateTypes>(
         const currentGeneration = generation;
         set({ isCreating: true, error: '' });
 
-        const request = getConversationLocation()
+        const { isLocationAgreed } = useLocationConsentStore.getState();
+        const locationRequest = isLocationAgreed
+          ? getConversationLocation()
+          : Promise.resolve({ latitude: null, longitude: null });
+
+        const request = locationRequest
           .then((location) => {
             if (generation !== currentGeneration) {
               throw new Error('세션이 종료되었습니다.');

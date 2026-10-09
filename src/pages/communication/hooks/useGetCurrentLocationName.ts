@@ -7,11 +7,12 @@ import { getConversationLocation } from '@/pages/communication/utils/getConversa
 
 const CURRENT_LOCATION_STALE_TIME = 60_000;
 
-export const useGetCurrentLocationName = () => {
+export const useGetCurrentLocationName = (isEnabled: boolean) => {
   const { data: location, isSuccess: isLocationLoaded } = useQuery({
     queryKey: CURRENT_LOCATION_QUERY_KEY,
     queryFn: getConversationLocation,
     staleTime: CURRENT_LOCATION_STALE_TIME,
+    enabled: isEnabled,
   });
 
   const latitude = location?.latitude ?? null;

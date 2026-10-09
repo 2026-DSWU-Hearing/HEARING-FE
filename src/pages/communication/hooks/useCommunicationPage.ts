@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { CONVERSATION_LIST_QUERY_KEY } from '@/pages/communication/constants/conversationQueryKeys';
+import { LOCATION_MESSAGE } from '@/pages/communication/constants/locationMessages';
 
 import { useGetCommunicationMock } from '@/pages/communication/hooks/useGetCommunicationMock';
 import { useGetCurrentLocationName } from '@/pages/communication/hooks/useGetCurrentLocationName';
@@ -13,6 +14,7 @@ import type {
   ChatBubbleTypes,
 } from '@/pages/communication/types/communication-Types';
 import { useModal } from '@/shared/hooks/useModal';
+import { useLocationConsentStore } from '@/shared/stores/useLocationConsentStore';
 
 // '대화가 저장되었습니다' 안내가 화면에 떠 있는 시간(ms)
 const SAVED_NOTICE_DURATION = 2000;
@@ -23,7 +25,24 @@ export const useCommunicationPage = () => {
   const queryClient = useQueryClient();
   const { data } = useGetCommunicationMock();
   const conversation = data?.conversation ?? null;
-  const locationName = useGetCurrentLocationName();
+  const isLocationAgreed = useLocationConsentStore(
+    (state) => state.isLocationAgreed,
+  );
+  const isLocationPromptDeclined = useLocationConsentStore(
+    (state) => state.isPromptDeclined,
+  );
+  const setLocationAgreed = useLocationConsentStore(
+    (state) => state.setLocationAgreed,
+  );
+  const declineLocationPrompt = useLocationConsentStore(
+    (state) => state.declinePrompt,
+  );
+  const currentLocationName = useGetCurrentLocationName(isLocationAgreed);
+  const locationName =
+    !isLocationAgreed && isLocationPromptDeclined
+      ? LOCATION_MESSAGE.UNKNOWN
+      : currentLocationName;
+  const isLocationConsentOpen = !isLocationAgreed && !isLocationPromptDeclined;
 
   const favoriteAnswerModal = useModal();
 
@@ -136,6 +155,14 @@ export const useCommunicationPage = () => {
     }
   };
 
+  const handleLocationConsentConfirm = () => {
+    setLocationAgreed(true);
+  };
+
+  const handleLocationConsentCancel = () => {
+    declineLocationPrompt();
+  };
+
   const handleDraftReplyChange = (value: string) => {
     setDraftReply(value);
   };
@@ -197,6 +224,7 @@ export const useCommunicationPage = () => {
   return {
     conversation,
     locationName,
+    isLocationConsentOpen,
     bubbles,
     isListening,
     // 대화 생성 실패도 같은 자리에 보여준다(마이크를 못 켠 이유는 사용자 입장에선 하나다).
@@ -210,6 +238,8 @@ export const useCommunicationPage = () => {
     handleCloseFavoriteAnswer: favoriteAnswerModal.close,
     handleSelectFavoriteAnswer,
     handleToggleRecording,
+    handleLocationConsentConfirm,
+    handleLocationConsentCancel,
     handleDraftReplyChange,
     handleDraftListeningChange,
     handleSubmitReply,
