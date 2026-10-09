@@ -6,6 +6,8 @@ import {
   postConversationEnd,
 } from '@/pages/communication/apis/conversationApi';
 import { getConversationLocation } from '@/pages/communication/utils/getConversationLocation';
+import { useLocationConsentStore } from '@/shared/stores/useLocationConsentStore';
+import type { ChatBubbleTypes } from '@/pages/communication/types/communication-Types';
 import type {
   ConversationBubbleRequestTypes,
   ConversationCreatedTypes,
@@ -22,6 +24,10 @@ interface ActiveConversationStateTypes {
   isCreating: boolean;
   isSaving: boolean;
   error: string;
+  bubbles: ChatBubbleTypes[];
+  addBubble: (bubble: Omit<ChatBubbleTypes, 'id'>) => void;
+  removeSavedBubbles: (savedCount: number) => void;
+  clearBubbles: () => void;
   ensureConversation: () => Promise<ConversationCreatedTypes>;
   // 버블이 비어 있으면 저장 대신 대화를 지운다. 저장할 게 없으면 서버에 빈 대화가 남으므로.
   end: (
@@ -36,12 +42,25 @@ export const useActiveConversationStore = create<ActiveConversationStateTypes>(
     let generation = 0;
     // 같은 대화를 두 번 만들지 않도록 진행 중인 생성 요청을 공유한다.
     let creation: Promise<ConversationCreatedTypes> | null = null;
+    let nextBubbleId = 1;
 
     return {
       conversation: null,
       isCreating: false,
       isSaving: false,
       error: '',
+      bubbles: [],
+
+      addBubble: (bubble) => {
+        const id = nextBubbleId;
+        nextBubbleId += 1;
+        set((state) => ({ bubbles: [...state.bubbles, { ...bubble, id }] }));
+      },
+
+      removeSavedBubbles: (savedCount) =>
+        set((state) => ({ bubbles: state.bubbles.slice(savedCount) })),
+
+      clearBubbles: () => set({ bubbles: [] }),
 
       ensureConversation: () => {
         const existing = get().conversation;
@@ -51,7 +70,12 @@ export const useActiveConversationStore = create<ActiveConversationStateTypes>(
         const currentGeneration = generation;
         set({ isCreating: true, error: '' });
 
-        const request = getConversationLocation()
+        const { isLocationAgreed } = useLocationConsentStore.getState();
+        const locationRequest = isLocationAgreed
+          ? getConversationLocation()
+          : Promise.resolve({ latitude: null, longitude: null });
+
+        const request = locationRequest
           .then((location) => {
             if (generation !== currentGeneration) {
               throw new Error('세션이 종료되었습니다.');

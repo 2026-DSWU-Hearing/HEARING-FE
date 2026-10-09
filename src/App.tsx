@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -14,6 +15,7 @@ import { useToast } from '@/shared/components/toast/ToastContext';
 import { useDetectionSocket } from '@/shared/hooks/useDetectionSocket';
 import { useFcmTokenSync } from '@/shared/hooks/useFcmTokenSync';
 import { useDetectionStore } from '@/shared/stores/useDetectionStore';
+import { useLocationConsentStore } from '@/shared/stores/useLocationConsentStore';
 import '@/App.css';
 
 import type { NotificationInfiniteDataTypes } from '@/pages/home/types/notificationTypes';
@@ -28,6 +30,13 @@ const App = () => {
   // (localStorage는 반응형이 아니라 라우트 변경을 신호로 삼는다.)
   const accessToken = getAccessToken();
   const pushDetection = useDetectionStore((state) => state.pushDetection);
+  const resetLocationPrompt = useLocationConsentStore(
+    (state) => state.resetPrompt,
+  );
+
+  useEffect(() => {
+    if (!pathname.startsWith('/communication')) resetLocationPrompt();
+  }, [pathname, resetLocationPrompt]);
 
   useFcmTokenSync();
   // 앱이 켜져 있을 때는 FCM 대신 WebSocket으로 감지 알림을 받는다(포그라운드 중복 방지).

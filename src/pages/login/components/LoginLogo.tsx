@@ -1,4 +1,4 @@
-import brandLogo from '@/shared/assets/brand/brand-logo.png';
+import brandLogo from '@/shared/assets/brand/brand-logo.svg';
 
 const LoginLogo = () => {
   return (

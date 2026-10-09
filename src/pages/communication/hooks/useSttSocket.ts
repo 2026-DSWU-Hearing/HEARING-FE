@@ -56,6 +56,8 @@ export const useSttSocket = ({
   const socketRef = useRef<WebSocket | null>(null);
   const captureRef = useRef<AudioCaptureTypes | null>(null);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isStartingRef = useRef(false);
+  const sessionIdRef = useRef(0);
 
   // 콜백이 매 렌더 새로 만들어져도 start/stop이 다시 만들어지지 않도록 ref로 들고 있는다.
   const handlersRef = useRef({
@@ -87,12 +89,19 @@ export const useSttSocket = ({
   // 대화 id가 있어야 소켓 주소가 만들어지므로, 반드시 대화 생성 후에 호출한다.
   const start = useCallback(async (conversationId: number) => {
     // 이미 열려 있으면 중복 연결하지 않는다(StrictMode 이중 실행 포함).
-    if (socketRef.current) return;
+    if (socketRef.current || isStartingRef.current) return;
+
+    isStartingRef.current = true;
+    sessionIdRef.current += 1;
+    const sessionId = sessionIdRef.current;
 
     setStatus('connecting');
     setErrorMessage('');
 
     const accessToken = await getValidAccessToken();
+    isStartingRef.current = false;
+    if (sessionIdRef.current !== sessionId) return;
+
     if (!accessToken) {
       console.error(
         '[STT] 유효한 토큰이 없어 연결을 중단합니다. (재로그인 필요)',
@@ -224,6 +233,8 @@ export const useSttSocket = ({
 
   const stop = useCallback(() => {
     const socket = socketRef.current;
+    sessionIdRef.current += 1;
+    isStartingRef.current = false;
 
     // 마이크는 기다리지 않고 바로 끈다(녹음 표시가 남지 않도록).
     stopCapture();
@@ -252,6 +263,8 @@ export const useSttSocket = ({
   // 페이지를 떠날 때 마이크와 소켓을 확실히 정리한다.
   useEffect(() => {
     return () => {
+      sessionIdRef.current += 1;
+      isStartingRef.current = false;
       clearCloseTimer();
       stopCapture();
       socketRef.current?.close();

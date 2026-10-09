@@ -23,6 +23,8 @@ import ProfileEditPage from '@/pages/setting/ProfileEditPage';
 import Setting from '@/pages/setting/Setting';
 
 import ProtectedRoute from '@/routes/ProtectedRoute';
+import PublicOnlyRoute from '@/routes/PublicOnlyRoute';
+import TermsAgreedRoute from '@/routes/TermsAgreedRoute';
 
 const NOT_FOUND_PATH = '*';
 
@@ -31,12 +33,12 @@ const NOT_FOUND_PATH = '*';
 // 404 경로는 임의 문자열이라 pathname 비교로는 잡을 수 없다.
 export const APP_ROUTES = createRoutesFromElements(
   <>
-    <Route path="/login" element={<Login />} />
+    <Route element={<PublicOnlyRoute />}>
+      <Route path="/login" element={<Login />} />
+    </Route>
 
     {/* 로그인(액세스 토큰) 없이는 아래 라우트에 접근할 수 없다. */}
     <Route element={<ProtectedRoute />}>
-      <Route path="/" element={<Home />} />
-
       <Route path="/onboarding/nickname" element={<NicknamePage />} />
       <Route path="/onboarding/disability" element={<DisabilityPage />} />
       <Route path="/onboarding/terms" element={<TermsPage />} />
@@ -50,25 +52,28 @@ export const APP_ROUTES = createRoutesFromElements(
         element={<HwCompletePage />}
       />
 
-      <Route path="/modes/new" element={<ModeCreatePage />} />
-      <Route path="/modes/:modeId/settings" element={<ModeEditPage />} />
-      <Route path="/notifications" element={<NotificationPage />} />
-      <Route path="/communication" element={<Communication />} />
-      <Route
-        path="/communication/histories"
-        element={<ConversationHistoryPage />}
-      />
-      <Route
-        path="/communication/histories/:historyId"
-        element={<ConversationHistoryDetailPage />}
-      />
-      <Route path="/live-sound" element={<LiveSound />} />
-      <Route path="/setting" element={<Setting />} />
-      <Route
-        path="/setting/notification"
-        element={<NotificationSettingPage />}
-      />
-      <Route path="/setting/profile/edit" element={<ProfileEditPage />} />
+      <Route element={<TermsAgreedRoute />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/modes/new" element={<ModeCreatePage />} />
+        <Route path="/modes/:modeId/settings" element={<ModeEditPage />} />
+        <Route path="/notifications" element={<NotificationPage />} />
+        <Route path="/communication" element={<Communication />} />
+        <Route
+          path="/communication/histories"
+          element={<ConversationHistoryPage />}
+        />
+        <Route
+          path="/communication/histories/:historyId"
+          element={<ConversationHistoryDetailPage />}
+        />
+        <Route path="/live-sound" element={<LiveSound />} />
+        <Route path="/setting" element={<Setting />} />
+        <Route
+          path="/setting/notification"
+          element={<NotificationSettingPage />}
+        />
+        <Route path="/setting/profile/edit" element={<ProfileEditPage />} />
+      </Route>
     </Route>
 
     {/* 위 어떤 라우트에도 걸리지 않는 주소. ProtectedRoute 바깥에 두어

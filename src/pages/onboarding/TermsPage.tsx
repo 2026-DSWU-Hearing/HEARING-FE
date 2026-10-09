@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 import LongConfirmButton from '@/pages/onboarding/components/LongConfirmButton';
 import OnboardingLayout from '@/pages/onboarding/components/OnboardingLayout';
@@ -14,8 +14,10 @@ import { usePatchPushEnabled } from '@/pages/setting/hooks/usePatchPushEnabled';
 import AlertModal from '@/shared/components/AlertModal';
 import { isNotificationSupported } from '@/shared/firebase/settingFCM';
 import { useFcmToken } from '@/shared/hooks/useFcmToken';
+import { useLocationConsentStore } from '@/shared/stores/useLocationConsentStore';
 
 const NEXT_ONBOARDING_PATH = '/onboarding/hardware';
+const FIRST_ONBOARDING_PATH = '/onboarding/nickname';
 
 const TermsPage = () => {
   const navigate = useNavigate();
@@ -25,6 +27,9 @@ const TermsPage = () => {
   const disabilityType = useOnboardingStore((state) => state.disabilityType);
   const agreements = useOnboardingStore((state) => state.agreements);
   const toggleAgreement = useOnboardingStore((state) => state.toggleAgreement);
+  const setLocationAgreed = useLocationConsentStore(
+    (state) => state.setLocationAgreed,
+  );
 
   const { mutateAsync: updateUsers } = usePatchUsers();
   const { mutateAsync: updateAgreement, isPending: isSubmitting } =
@@ -32,6 +37,7 @@ const TermsPage = () => {
   const { mutateAsync: updatePushEnabled } = usePatchPushEnabled();
   const { handleRequestPermission } = useFcmToken();
 
+  const isOnboardingInfoMissing = !nickname.trim() || !disabilityType;
   const isRequiredAgreementMissing = AGREEMENT_ITEMS.some(
     ({ id, isRequired }) => isRequired && !agreements[id],
   );
@@ -44,6 +50,7 @@ const TermsPage = () => {
       // 온보딩에서 모아둔 닉네임, 장애유형, 약관동의 정보를 이 시점에 한 번에 제출
       await updateUsers({ nickname, disability_type: disabilityType });
       await updateAgreement({ terms_agreed: true });
+      setLocationAgreed(agreements.location);
 
       // 동의한 경우에만, 사용자 클릭 제스처 안에서 브라우저 알림 권한을 요청한다.
       // 동의(의사)가 아니라 토큰 발급 성공(실제 수신 가능 여부)으로 push_enabled를 정한다.
@@ -82,6 +89,10 @@ const TermsPage = () => {
     setAlertMessage('');
     if (isPermissionAlert) navigate(NEXT_ONBOARDING_PATH);
   };
+
+  if (isOnboardingInfoMissing) {
+    return <Navigate to={FIRST_ONBOARDING_PATH} replace />;
+  }
 
   return (
     <>

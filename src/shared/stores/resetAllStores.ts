@@ -1,4 +1,6 @@
 import { useActiveConversationStore } from '@/pages/communication/stores/useActiveConversationStore';
+import { useOnboardingStore } from '@/pages/onboarding/stores/useOnboardingStore';
+import { useLocationConsentStore } from '@/shared/stores/useLocationConsentStore';
 
 // 로그아웃 시 사용자에 종속된 전역 스토어를 한 번에 비운다.
 //
@@ -10,4 +12,7 @@ import { useActiveConversationStore } from '@/pages/communication/stores/useActi
 export const resetAllStores = () => {
   // 진행 중이던 대화 id가 남으면 다음 사용자의 발화가 이전 사용자의 대화에 붙는다.
   useActiveConversationStore.getState().reset();
+  useActiveConversationStore.getState().clearBubbles();
+  useLocationConsentStore.getState().reset();
+  useOnboardingStore.getState().resetOnboarding();
 };
