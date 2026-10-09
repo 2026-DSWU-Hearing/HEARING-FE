@@ -150,6 +150,11 @@ const LiveSoundAnimation = ({
       // 링과 아이콘이 전부 absolute라 이 컨테이너의 폭을 밀어주는 자식이 없다.
       // 부모(LiveSoundAnimationArea)가 items-center라 폭이 stretch되지도 않아,
       // 기준 폭을 직접 정해주지 않으면 컨테이너가 0에 가깝게 줄어든다.
+      //
+      // maxWidth: '100%'는 부모 래퍼가 w-full로 확정된 폭을 가질 때만 작동한다.
+      // 래퍼가 fit-content면 이 %는 순환 참조(cyclic percentage)로 간주돼 none으로
+      // 취급되고, width 21.75rem이 그대로 살아 좁은 화면에서 링이 넘친다.
+      // → LiveSoundAnimationArea 래퍼의 w-full을 지우면 안 된다.
       style={{
         width: `${ANIMATION_CONTAINER_MAX_REM}rem`,
         maxHeight: `${ANIMATION_CONTAINER_MAX_REM}rem`,

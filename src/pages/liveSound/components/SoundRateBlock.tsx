@@ -10,8 +10,10 @@ interface SoundRateBlockPropTypes {
   soundRateList: SoundRateTypes[];
 }
 
+// 좌우 패딩을 px-base로 둔 이유: 한 줄에 아이콘·막대·퍼센트가 고정 폭으로 들어가
+// 320px 화면에서는 소리 이름에 남는 폭이 빠듯하다. 패딩과 항목 gap을 줄여 이름 칸을 확보한다.
 const CARD_CLASS_NAME =
-  'tag-glass-effect mt-[2rem] bg-[#21221E]/50 flex w-full flex-col gap-base rounded-2xl px-xl py-base';
+  'tag-glass-effect mt-[2rem] bg-[#21221E]/50 flex w-full flex-col gap-base rounded-2xl px-base py-base';
 
 const SoundRateBlock = ({
   isListening,
@@ -47,7 +49,7 @@ const SoundRateBlock = ({
         const isPrimary = index === 0;
 
         return (
-          <li key={id} className="flex items-center gap-base">
+          <li key={id} className="flex items-center gap-sm">
             <span
               className={`flex h-icon-md w-icon-md shrink-0 items-center justify-center text-[1.25rem] leading-none ${
                 isPrimary ? 'text-primary-300' : 'text-tertiary'
@@ -60,8 +62,11 @@ const SoundRateBlock = ({
               />
             </span>
 
+            {/* 소리 이름은 잘라내지 않는다. 무슨 소리인지가 이 화면의 핵심 정보라
+                말줄임(…)으로 가리면 안 된다. 칸보다 길면 단어(띄어쓰기) 단위로 줄바꿈한다.
+                320px 화면 기준 이름 칸은 약 98px로, 가장 긴 이름(7글자)도 한 줄에 들어간다. */}
             <span
-              className={`heading-base-semibold min-w-0 flex-1 truncate ${
+              className={`heading-base-semibold min-w-0 flex-1 break-keep ${
                 isPrimary ? 'text-primary-300' : 'text-secondary'
               }`}
             >
@@ -69,10 +74,15 @@ const SoundRateBlock = ({
             </span>
 
             {/* 서열 막대. 숫자가 바로 옆에 텍스트로 있으므로 보조기기에는 노출하지 않는다
-                (같은 값을 두 번 읽게 된다). 폭을 고정해 이름 길이와 무관하게 정렬된다. */}
+                (같은 값을 두 번 읽게 된다).
+                폭은 행(li) 너비의 22%다. 모든 행의 너비가 같으므로 비율로 줘도 막대 길이가
+                행마다 똑같아 이름 길이와 무관하게 정렬된다. 화면이 넓어지면 막대도 같이
+                길어지고(430px에서 약 80px), 320px에서는 하한 3.5rem(56px)이 걸려 이름 칸을
+                지킨다. flex-1(이름)이 아니라 막대에 비율을 주는 이유: 이름을 늘리면 막대가
+                행마다 달라지지만, 막대를 비율로 두면 남는 공간이 전부 이름으로 간다. */}
             <span
               aria-hidden="true"
-              className="h-[0.375rem] w-[4.5rem] shrink-0 overflow-hidden rounded-pill bg-neutral-700"
+              className="h-[0.375rem] w-[22%] min-w-[3.5rem] shrink-0 overflow-hidden rounded-pill bg-neutral-700"
             >
               <span
                 className={`block h-full rounded-pill transition-[width] duration-500 ${
@@ -83,7 +93,7 @@ const SoundRateBlock = ({
             </span>
 
             <span
-              className={`heading-base-semibold w-[3rem] shrink-0 text-right ${
+              className={`heading-base-semibold w-[2.5rem] shrink-0 text-right ${
                 isPrimary ? 'text-primary-300' : 'text-secondary'
               }`}
             >

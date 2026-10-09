@@ -22,7 +22,12 @@ const LiveSoundAnimationArea = ({
   onListeningToggleClick,
 }: LiveSoundAnimationAreaPropTypes) => {
   return (
-    <div className="flex flex-col items-center">
+    // w-full이 반드시 필요하다. 부모 section이 items-center라 이 래퍼는 기본적으로
+    // 자식 콘텐츠 폭(fit-content)으로 잡히는데, 그러면 LiveSoundAnimation의
+    // maxWidth: 100%가 "부모가 자식에 의존하는 순환 %"가 돼 무시되고(CSS Sizing의
+    // cyclic percentage 규칙), 고정 width 21.75rem이 그대로 살아 320px 화면에서
+    // 링이 좌우로 넘쳐 잘린다. 래퍼가 section 폭을 stretch로 받아야 100%가 풀린다.
+    <div className="flex w-full flex-col items-center">
       <LiveSoundAnimation
         isListening={isListening}
         soundRateList={soundRateList}
