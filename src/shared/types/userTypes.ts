@@ -1,0 +1,15 @@
+export interface UserTypes {
+  id: number;
+  email: string;
+  nickname: string;
+  disability_type: string | null;
+  haptic_strength: number;
+  do_not_disturb: boolean;
+  push_enabled: boolean;
+  emergency_alert_enabled: boolean;
+  terms_agreed: boolean;
+}
+
+export interface UpdateDoNotDisturbRequestTypes {
+  do_not_disturb: boolean;
+}

@@ -1,0 +1,449 @@
+@theme {
+  /* 폰트 */
+  --font-base:
+    'Pretendard Variable', 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+  --font-size-base: 1rem;
+
+  /* 색상 */
+  --color-white: #fcfcfc;
+  --color-black: #181818;
+  /* primary */
+  --color-primary-50: #fffdf0;
+  --color-primary-100: #fff9d4;
+  --color-primary-200: #fff0a1;
+  --color-primary-300: #ffe26e;
+  --color-primary-400: #ffd142;
+  --color-primary-500: #f2b204;
+  --color-primary-600: #cd9300;
+  --color-primary-700: #a27100;
+  --color-primary-800: #785100;
+  --color-primary-900: #4e3300;
+  --color-primary-950: #2d1d00;
+  /* secondary */
+  --color-secondary-50: #f0f4fc;
+  --color-secondary-100: #d9e4f8;
+  --color-secondary-200: #b3caf2;
+  --color-secondary-300: #80a5e9;
+  --color-secondary-400: #4d7fdf;
+  --color-secondary-500: #1e4fa3;
+  --color-secondary-600: #163d82;
+  --color-secondary-700: #0f2c61;
+  --color-secondary-800: #091b3f;
+  --color-secondary-900: #050f24;
+  --color-secondary-950: #020612;
+  /* neutral */
+  --color-neutral-50: #f8f8f7;
+  --color-neutral-100: #eff0ee;
+  --color-neutral-200: #e2e3e0;
+  --color-neutral-300: #c7c8c5;
+  --color-neutral-400: #a9aaa6;
+  --color-neutral-500: #8c8d89;
+  --color-neutral-600: #6f706c;
+  --color-neutral-700: #535450;
+  --color-neutral-800: #393a36;
+  --color-neutral-900: #21221e;
+  --color-neutral-950: #11120f;
+  /* text */
+  --color-primary: #f8f8f7;
+  --color-secondary: #e2e3e0;
+  --color-tertiary: #a9aaa6;
+  --color-disabled: #6f706c;
+  --color-inverse: #11120f;
+  /* state */
+  --color-state-disabled: #c7c8c5;
+  --color-state-active: #df9a00;
+  --color-state-hover: #ffd142;
+  --color-state-alert: #f0342f;
+  --color-state-success: #77c419;
+  /* background */
+  --color-background-neutral-base: #21221e;
+  --color-background-neutral-surface-1: #535450;
+  --color-background-neutral-surface-2: #8c8d89;
+  --color-background-neutral-surface-input: #a9aaa6;
+  --color-background-neutral-surface-alert: #a9aaa6;
+
+  /* Layout */
+  --layout-mobile-column-count: 3;
+  --layout-mobile-margin: 1rem; /* 16px */
+  --layout-mobile-gutter: 0.75rem; /* 12px */
+
+  --layout-mobile-top-height: 44px;
+  --layout-mobile-bottom-height: 34px;
+
+  /* radius */
+  --radius-pill: 999px;
+  --radius-2xl: 24px;
+  --radius-xl: 16px;
+  --radius-lg: 12px;
+  --radius-md: 8px;
+  --radius-sm: 4px;
+  --radius-xs: 2px;
+
+  /* Spacing */
+  --spacing-3xl: 3.5rem; /* 56px */
+  --spacing-2xl: 2.5rem; /* 40px */
+  --spacing-xl: 2rem; /* 32px */
+  --spacing-lg: 1.5rem; /* 24px */
+  --spacing-base: 1rem; /* 16px */
+  --spacing-sm: 0.75rem; /* 12px */
+  --spacing-xs: 0.5rem; /* 8px */
+  --spacing-xxs: 0.25rem; /* 4px */
+  --spacing-xxxs: 0.125rem; /* 2px */
+
+  /* Icon Size */
+  --icon-sm: 1rem; /* 16px */
+  --icon-md: 1.5rem; /* 24px */
+  --icon-lg: 1.75rem; /* 28px */
+  --icon-xl: 2rem; /* 32px */
+  --icon-2xl: 2.25rem; /* 36px */
+  --icon-3xl: 3rem; /* 48px */
+  --icon-4xl: 3.5rem; /* 56px */
+
+  /* Opacity */
+  --opacity-opaque: 1;
+  --opacity-overlay: 0.8;
+  --opacity-medium: 0.6;
+  --opacity-muted: 0.3;
+  --opacity-subtle: 0.16;
+  --opacity-semi-transparent: 0.08;
+  --opacity-invisible: 0;
+
+  /* Blur */
+  --blur-xl: 40px;
+  --blur-lg: 24px;
+  --blur-md: 12px;
+  --blur-sm: 6px;
+  --blur-xs: 4px;
+
+  /* Effect */
+  --shadow-light-20: 0 0 20px 0 rgb(255 249 212 / 50%);
+  --shadow-light-10: 0 0 10px 0 rgb(255 249 212 / 50%);
+  --shadow-chip: 0 0 4px 0 rgb(0 0 0 / 25%);
+
+  /* Glass */
+  --glass-tag-background: rgb(255 255 255 / 8%);
+  --glass-tag-border: rgb(255 255 255 / 16%);
+  --glass-tag-blur: 24px;
+  --glass-tag-shadow: inset 0 1px 0 rgb(255 255 255 / 20%);
+
+  /* Gradient */
+  --gradient-card-false: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--color-neutral-900) 30%, transparent) 0%,
+    color-mix(in srgb, var(--color-neutral-400) 30%, transparent) 100%
+  );
+  --gradient-card-true: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--color-primary-500) 30%, transparent) 0%,
+    color-mix(in srgb, var(--color-primary-400) 30%, transparent) 100%
+  );
+  --gradient-card-true-bottomsheet: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--color-primary-400) 40%, transparent) 0%,
+    color-mix(in srgb, var(--color-primary-100) 40%, transparent) 100%
+  );
+  --gradient-default: linear-gradient(to bottom, #fdd043 0%, #82a6e6 100%);
+  --gradient-listening-bubble:
+    linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.2) 0%,
+      rgba(255, 255, 255, 0.2) 100%
+    ),
+    var(--color-neutral-700);
+}
+
+/* 실시간 소리 감지 링이 마이크 음량(--amp)에 반응하는 폭.
+   1이 기본이고, prefers-reduced-motion에서 이 값만 낮춰 반응을 줄인다.
+   @theme이 아니라 :root에 두는 이유: 유틸리티 클래스를 만들 값이 아니라
+   런타임에 읽히는 조절 값이고, @theme 토큰은 미디어쿼리로 덮어쓸 수 없다. */
+:root {
+  --amp-reactivity: 1;
+}
+
+/* layout */
+@utility page-layout {
+  padding-inline: var(--layout-mobile-margin);
+}
+
+@utility mobile-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: var(--layout-mobile-gutter);
+}
+
+/* Text Styles*/
+@utility heading-5xl-bold {
+  font-size: 2rem;
+  line-height: 135%;
+  font-weight: 700;
+}
+
+@utility heading-5xl-semibold {
+  font-size: 2rem;
+  line-height: 135%;
+  font-weight: 600;
+}
+@utility heading-4xl-semibold {
+  font-size: 1.75rem;
+  line-height: 135%;
+  font-weight: 600;
+}
+@utility heading-3xl-semibold {
+  font-size: 1.5rem;
+  line-height: 135%;
+  font-weight: 600;
+}
+@utility heading-3xl-bold {
+  font-size: 1.5rem;
+  line-height: 135%;
+  font-weight: 700;
+}
+
+@utility heading-2xl-bold {
+  font-size: 1.25rem;
+  line-height: 140%;
+  font-weight: 700;
+}
+
+@utility heading-2xl-semibold {
+  font-size: 1.25rem;
+  line-height: 140%;
+  font-weight: 600;
+}
+
+@utility heading-xl-bold {
+  font-size: 1.125rem;
+  line-height: 140%;
+  font-weight: 700;
+}
+
+@utility heading-xl-semibold {
+  font-size: 1.125rem;
+  line-height: 140%;
+  font-weight: 600;
+}
+
+@utility heading-lg-bold {
+  font-size: 1rem;
+  line-height: 140%;
+  font-weight: 700;
+}
+
+@utility heading-lg-semibold {
+  font-size: 1rem;
+  line-height: 140%;
+  font-weight: 600;
+}
+
+@utility heading-base-semibold {
+  font-size: 0.875rem;
+  line-height: 150%;
+  font-weight: 600;
+}
+
+@utility body-2xl-regular {
+  font-size: 1.25rem;
+  line-height: 145%;
+  font-weight: 400;
+}
+
+@utility body-xl-regular {
+  font-size: 1.125rem;
+  line-height: 145%;
+  font-weight: 400;
+}
+
+@utility body-lg-medium {
+  font-size: 1rem;
+  line-height: 145%;
+  font-weight: 500;
+}
+
+@utility body-lg-regular {
+  font-size: 1rem;
+  line-height: 145%;
+  font-weight: 400;
+}
+
+@utility body-lg-light {
+  font-size: 1rem;
+  line-height: 145%;
+  font-weight: 300;
+}
+
+@utility body-base-medium {
+  font-size: 0.875rem;
+  line-height: 150%;
+  font-weight: 500;
+}
+
+@utility body-base-regular {
+  font-size: 0.875rem;
+  line-height: 150%;
+  font-weight: 400;
+}
+
+@utility body-sm-regular {
+  font-size: 0.8125rem;
+  line-height: 145%;
+  font-weight: 400;
+}
+
+@utility caption-xs-semibold {
+  font-size: 0.75rem;
+  line-height: 145%;
+  font-weight: 600;
+}
+
+@utility caption-xs-medium {
+  font-size: 0.75rem;
+  line-height: 145%;
+  font-weight: 500;
+}
+
+@utility caption-xs-regular {
+  font-size: 0.6875rem;
+  line-height: 145%;
+  font-weight: 400;
+}
+
+/* opacity */
+@utility opacity-opaque {
+  opacity: var(--opacity-opaque);
+}
+
+@utility opacity-overlay {
+  opacity: var(--opacity-overlay);
+}
+
+@utility opacity-medium {
+  opacity: var(--opacity-medium);
+}
+
+@utility opacity-muted {
+  opacity: var(--opacity-muted);
+}
+
+@utility opacity-subtle {
+  opacity: var(--opacity-subtle);
+}
+
+@utility opacity-semi-transparent {
+  opacity: var(--opacity-semi-transparent);
+}
+
+@utility opacity-invisible {
+  opacity: var(--opacity-invisible);
+}
+
+/* glass effect */
+@utility tag-glass-effect {
+  background-color: var(--glass-tag-background);
+  border: 1px solid var(--glass-tag-border);
+  backdrop-filter: blur(var(--glass-tag-blur));
+  -webkit-backdrop-filter: blur(var(--glass-tag-blur));
+  box-shadow: var(--glass-tag-shadow);
+}
+
+/* gradient */
+@utility card-false {
+  background-image: var(--gradient-card-false);
+}
+
+@utility card-true {
+  background-image: var(--gradient-card-true);
+}
+
+/* card-true 그라데이션을 테두리에 적용 (rounded 모서리 호환).
+   안쪽 채움색은 버튼 배경(--color-black)과 일치시켜야 안쪽에 색 띠가 생기지 않는다. */
+@utility border-card-true {
+  border: 0.5px solid transparent;
+  background:
+    linear-gradient(var(--color-black), var(--color-black)) padding-box,
+    var(--gradient-card-true) border-box;
+}
+
+@utility card-true-bottomsheet {
+  background-image: var(--gradient-card-true-bottomsheet);
+}
+
+@utility card-listening-bubble {
+  background: var(--gradient-listening-bubble);
+}
+
+@utility gradient-default {
+  background-image: var(--gradient-default);
+}
+
+/* icon size - --icon-* 토큰을 width, height 유틸리티로 노출한다 */
+@utility w-icon-* {
+  width: --value(--icon-*);
+}
+
+@utility h-icon-* {
+  height: --value(--icon-*);
+}
+
+/* shadow */
+@utility shadow-chip {
+  box-shadow: var(--shadow-chip);
+}
+
+@utility shadow-light-20 {
+  box-shadow: var(--shadow-light-20);
+}
+
+@utility shadow-light-10 {
+  box-shadow: var(--shadow-light-10);
+}
+
+/* 실시간 소리 감지 파동 - 고정된 동심원 링들이 안→밖으로 순차적으로 밝아졌다 어두워진다.
+   각 링에 animation-delay만 다르게 줘 빛이 바깥으로 흐르는 듯한 웨이브를 만든다. */
+@keyframes sound-wave {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@utility animate-sound-wave {
+  animation: sound-wave 2.8s ease-in-out infinite;
+}
+
+/* 양방향 소통 채팅 버블 - 한쪽에 입력이 시작되면 반대쪽 버블이 입력 중인 영역
+   "아래"에 새로 생겨난 자리에서 살짝 올라오며 나타나는 등장 애니메이션.
+   (실제로 그 자리에 새로 mount되는 요소라 살짝만 올라오면 충분하다.) */
+@keyframes bubble-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility animate-bubble-rise {
+  animation: bubble-rise 0.35s ease-out;
+}
+
+/* 접근성: 전정기관 자극에 민감한 사용자를 위해 움직임만 줄인다.
+   요소를 숨기거나 반응을 0으로 죽이지는 않는다 - 무엇이 감지됐는지,
+   지금 소리가 나고 있는지의 정보가 유실되면 안 되기 때문이다.
+   링의 음량 반응은 --amp-reactivity로 폭만 줄여 남기고,
+   쉬지 않고 도는 opacity 펄스(sound-wave)만 멈춘다.
+   @utility와 명시도가 같아 선언 순서에 의존하지 않도록 !important를 붙였다. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-sound-wave {
+    animation: none !important;
+    opacity: 0.7 !important;
+  }
+
+  :root {
+    --amp-reactivity: 0.35;
+  }
+}

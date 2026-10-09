@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(powershell -ExecutionPolicy Bypass -File \"C:\\\\Users\\\\siyeo\\\\.claude\\\\notify.ps1\" 2>&1; echo \"exit: $LASTEXITCODE\")",
+      "PowerShell(powershell -Command \"Get-Content 'C:\\\\Users\\\\siyeo\\\\.claude\\\\settings.json' | ConvertFrom-Json | Select-Object -ExpandProperty hooks\" 2>&1)",
+      "PowerShell(pnpm run *)",
+      "Bash(node -e \"console.log\\(Number.isInteger\\(Number\\('abc'\\)\\)\\); console.log\\(Number.isInteger\\(Number\\('0'\\)\\)\\); console.log\\(Number.isInteger\\(Number\\('1.5'\\)\\)\\); console.log\\(Number.isInteger\\(Number\\(''\\)\\)\\);\")",
+      "Bash(Sort-Object)",
+      "Bash(npx tsc *)"
+    ]
+  },
+  "outputStyle": "Explanatory"
+}
