@@ -8,6 +8,7 @@ import {
   mergeNotificationIntoCache,
 } from '@/pages/home/utils/notificationCache';
 import AppRouter from '@/routes/AppRouter';
+import { isNotFoundPath } from '@/routes/appRoutes';
 import { getAccessToken } from '@/pages/login/utils/tokenStorage';
 import { useToast } from '@/shared/components/toast/ToastContext';
 import { useDetectionSocket } from '@/shared/hooks/useDetectionSocket';
@@ -92,11 +93,13 @@ const App = () => {
   // ('/setting' 메인은 '/setting/'에 걸리지 않아 탭바가 유지된다)
   // 알림 페이지는 TopNavigation으로 진입/뒤로가기 하는 서브 페이지라 탭바를 숨긴다
   // (어떤 탭도 active가 되지 않는 어정쩡한 상태를 방지).
+  // 404 페이지도 같은 이유(active 탭 없음)로 숨기고, 자체 "홈으로" 버튼으로 복귀시킨다.
   const hideNavigation =
     pathname.startsWith('/modes/') ||
     pathname.startsWith('/setting/') ||
     pathname.startsWith('/onboarding') ||
-    pathname === '/notifications';
+    pathname === '/notifications' ||
+    isNotFoundPath(pathname);
 
   return (
     <div className="app">
