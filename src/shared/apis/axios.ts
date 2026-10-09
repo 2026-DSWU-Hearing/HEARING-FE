@@ -17,7 +17,7 @@ interface RetryableRequestConfigTypes extends InternalAxiosRequestConfig {
 const LOGIN_PATH = '/login';
 
 const http = axios.create({
-  baseURL: import.meta.env.VITE_APP_BASE_URL, //추후 env에 백 배포 url 추가
+  baseURL: import.meta.env.VITE_APP_BASE_URL,
   timeout: 5000,
   headers: {
     'Content-Type': 'application/json',
