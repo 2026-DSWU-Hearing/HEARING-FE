@@ -12,6 +12,7 @@ import { useLocationConsentStore } from '@/shared/stores/useLocationConsentStore
 export const resetAllStores = () => {
   // 진행 중이던 대화 id가 남으면 다음 사용자의 발화가 이전 사용자의 대화에 붙는다.
   useActiveConversationStore.getState().reset();
+  useActiveConversationStore.getState().clearBubbles();
   useLocationConsentStore.getState().reset();
   useOnboardingStore.getState().resetOnboarding();
 };

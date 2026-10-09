@@ -9,10 +9,7 @@ import { useGetCommunicationMock } from '@/pages/communication/hooks/useGetCommu
 import { useGetCurrentLocationName } from '@/pages/communication/hooks/useGetCurrentLocationName';
 import { useSttSocket } from '@/pages/communication/hooks/useSttSocket';
 import { useActiveConversationStore } from '@/pages/communication/stores/useActiveConversationStore';
-import type {
-  BubbleInputTypes,
-  ChatBubbleTypes,
-} from '@/pages/communication/types/communication-Types';
+import type { BubbleInputTypes } from '@/pages/communication/types/communication-Types';
 import { useModal } from '@/shared/hooks/useModal';
 import { useLocationConsentStore } from '@/shared/stores/useLocationConsentStore';
 
@@ -56,16 +53,22 @@ export const useCommunicationPage = () => {
     (state) => state.isSaving,
   );
   const resetConversation = useActiveConversationStore((state) => state.reset);
+  const isCreatingConversation = useActiveConversationStore(
+    (state) => state.isCreating,
+  );
+  const bubbles = useActiveConversationStore((state) => state.bubbles);
+  const addBubble = useActiveConversationStore((state) => state.addBubble);
+  const removeSavedBubbles = useActiveConversationStore(
+    (state) => state.removeSavedBubbles,
+  );
 
-  const [bubbles, setBubbles] = useState<ChatBubbleTypes[]>([]);
   const [draftReply, setDraftReply] = useState('');
   // 왼쪽(상대방) 버블. STT 중간 결과가 여기에 실시간으로 흐르고,
   // 마이크를 쓰지 않을 때는 직접 타이핑해서 확정할 수도 있다.
   const [draftListening, setDraftListening] = useState('');
   const [isSavedNoticeOpen, setIsSavedNoticeOpen] = useState(false);
 
-  // 새로 추가되는 버블에 부여할 다음 id. 목데이터의 마지막 id 다음부터 이어간다.
-  const nextBubbleIdRef = useRef(0);
+  const isStartingRecordingRef = useRef(false);
   const savedNoticeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
@@ -79,17 +82,7 @@ export const useCommunicationPage = () => {
     const trimmedContent = content.trim();
     if (!trimmedContent) return;
 
-    const id = nextBubbleIdRef.current;
-    nextBubbleIdRef.current += 1;
-
-    const newBubble: ChatBubbleTypes = {
-      id,
-      direction,
-      inputType,
-      content: trimmedContent,
-    };
-
-    setBubbles((prev) => [...prev, newBubble]);
+    addBubble({ direction, inputType, content: trimmedContent });
   };
 
   // RTZR 실시간 STT. 중간 결과는 왼쪽 입력 버블에 흘리고,
@@ -111,21 +104,10 @@ export const useCommunicationPage = () => {
   });
 
   // 연결 중에도 버튼은 '녹음 중'으로 보여줘야 두 번 눌리지 않는다.
-  const isListening = sttStatus === 'connecting' || sttStatus === 'listening';
-
-  // 목데이터의 기존 대화기록은 화면에 쌓아두지 않고, id 채번 기준으로만 사용한다.
-  // 실제 화면에는 Enter로 새로 보낸 메시지부터 쌓인다. 이미 한 번 채번했다면(포커스 복귀
-  // 등으로 재요청되어 conversation 참조가 바뀌어도) 다시 덮어쓰지 않는다 - 덮어쓰면
-  // 이미 로컬에 쌓인 버블 id와 겹칠 수 있다.
-  useEffect(() => {
-    if (!conversation || nextBubbleIdRef.current !== 0) return;
-
-    nextBubbleIdRef.current =
-      conversation.bubbles.reduce(
-        (maxId, bubble) => Math.max(maxId, bubble.id),
-        0,
-      ) + 1;
-  }, [conversation]);
+  const isListening =
+    isCreatingConversation ||
+    sttStatus === 'connecting' ||
+    sttStatus === 'listening';
 
   // 언마운트 시 남아있는 안내 타이머를 정리한다.
   useEffect(() => {
@@ -141,10 +123,14 @@ export const useCommunicationPage = () => {
   };
 
   const handleToggleRecording = async () => {
+    if (isStartingRecordingRef.current) return;
+
     if (isListening) {
       stopStt();
       return;
     }
+
+    isStartingRecordingRef.current = true;
 
     try {
       const conversation = await ensureConversation();
@@ -152,6 +138,8 @@ export const useCommunicationPage = () => {
     } catch (error) {
       // 사용자에게 보여줄 문구는 스토어(conversationError)가 이미 채운다.
       console.error('[STT] 대화 생성 실패:', error);
+    } finally {
+      isStartingRecordingRef.current = false;
     }
   };
 
@@ -209,7 +197,7 @@ export const useCommunicationPage = () => {
     });
 
     // 화면을 비워 다음 대화를 새로 시작한다.
-    setBubbles((prev) => prev.slice(savedBubbles.length));
+    removeSavedBubbles(savedBubbles.length);
 
     if (savedNoticeTimerRef.current) {
       clearTimeout(savedNoticeTimerRef.current);

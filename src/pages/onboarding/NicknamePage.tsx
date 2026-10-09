@@ -6,11 +6,13 @@ import OnboardingTopNavigation from '@/pages/onboarding/components/OnboardingTop
 import { MAX_NICKNAME_LENGTH } from '@/pages/onboarding/constants/onboardingConstants';
 import TextInput from '@/shared/components/TextInput';
 import { useOnboardingStore } from '@/pages/onboarding/stores/useOnboardingStore';
+import { useLogout } from '@/pages/login/hooks/useLogout';
 
 const NicknamePage = () => {
   const navigate = useNavigate();
   const nickname = useOnboardingStore((state) => state.nickname);
   const setNickname = useOnboardingStore((state) => state.setNickname);
+  const { handleLogout } = useLogout();
 
   const isNicknameEmpty = nickname.trim().length === 0;
   const isNicknameTooLong = nickname.length > MAX_NICKNAME_LENGTH;
@@ -29,9 +31,7 @@ const NicknamePage = () => {
   return (
     <OnboardingLayout
       title="닉네임을 입력해주세요."
-      topNavigation={
-        <OnboardingTopNavigation onBackClick={() => navigate('/login')} />
-      }
+      topNavigation={<OnboardingTopNavigation onBackClick={handleLogout} />}
     >
       <div className="mt-[206px]">
         <TextInput

@@ -7,7 +7,8 @@ export const usePatchAgreement = () => {
 
   return useMutation({
     mutationFn: patchAgreement,
-    onSuccess: () => {
+    onSuccess: (user) => {
+      queryClient.setQueryData(['users', 'me'], user);
       queryClient.invalidateQueries({ queryKey: ['users', 'me'] });
     },
   });
