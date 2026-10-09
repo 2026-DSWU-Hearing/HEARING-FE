@@ -26,11 +26,12 @@ const ToastViewport = ({ toasts, onClose }: ToastViewportPropTypes) => {
             transition={{ duration: 0.2 }}
             className="pointer-events-auto flex w-full items-center gap-3 rounded-xl bg-neutral-800 px-lg py-base text-left shadow-[0px_0px_4px_0px_rgba(0,0,0,0.25)]"
           >
-            {/* 소리 아이콘: 소리명으로 SVG/FontAwesome을 자동 매핑. currentColor라 흰색을 따른다. */}
+            {/* 소리 아이콘: 소리명으로 SVG/FontAwesome을 자동 매핑. currentColor라 흰색을 따른다.
+                직접 그린 SVG는 w/h를, FontAwesome은 font-size를 따르므로 둘을 같은 값(24px)으로 준다. */}
             <SoundIconView
               soundName={soundName}
               categoryName={categoryName}
-              className="h-6 w-6 shrink-0 text-white"
+              className="h-icon-md w-icon-md shrink-0 text-[1.5rem] leading-none text-white"
             />
             <span className="flex min-w-0 flex-col items-start gap-1">
               <span className="body-base-medium truncate text-white">

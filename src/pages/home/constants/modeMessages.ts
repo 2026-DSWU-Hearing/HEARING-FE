@@ -9,6 +9,11 @@ export const MODE_MESSAGE = {
   MAX_MODE_COUNT: '모드는 최대 6개까지 만들 수 있습니다',
   MIN_MODE_COUNT: '모드는 최소 1개 이상 유지해야 합니다',
   MIN_SOUND_COUNT: '소리는 최소 1개 이상 유지해야 합니다',
+  // 소리 추가 모달에서 고른 소리가 전부 이미 담긴 소리일 때
+  ALREADY_ADDED_SOUND: '이미 담은 소리입니다',
+  // 일부만 이미 담긴 소리일 때: 나머지는 추가됐음을 함께 알린다
+  PARTIALLY_ALREADY_ADDED_SOUND:
+    '이미 담은 소리는 제외하고\n나머지 소리를 추가했습니다',
   DELETE_CONFIRM: '정말 삭제하시겠습니까?',
   // 소리 추가 모달에서 선택한 채로 닫으려 할 때: 변경사항이 저장되지 않음을 안내
   CANCEL_CONFIRM: '정말 취소하시겠습니까?\n변경사항은 저장되지 않습니다',
@@ -32,4 +37,12 @@ export const MODE_EDIT_ERROR_MESSAGE = {
   NOT_FOUND: '존재하지 않는 모드입니다',
   CONFLICT: '이미 사용 중인 모드 이름입니다',
   DEFAULT: '모드 설정을 처리하지 못했습니다',
+} as const;
+
+// 홈 화면에서 모드 활성화·소리 조작 요청이 실패했을 때 띄우는 안내 메시지
+export const HOME_ERROR_MESSAGE = {
+  ACTIVATE_MODE: '모드를 변경하지 못했습니다.\n잠시 후 다시 시도해주세요',
+  TOGGLE_SOUND: '소리 설정을 변경하지 못했습니다.\n잠시 후 다시 시도해주세요',
+  ADD_SOUND: '소리를 추가하지 못했습니다.\n잠시 후 다시 시도해주세요',
+  REMOVE_SOUND: '소리를 삭제하지 못했습니다.\n잠시 후 다시 시도해주세요',
 } as const;

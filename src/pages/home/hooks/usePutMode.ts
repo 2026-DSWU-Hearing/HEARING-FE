@@ -41,21 +41,13 @@ export const usePutMode = () => {
         (old) => {
           if (!old) return old;
 
+          // 서버 응답의 sounds가 상세 조회와 같은 형태(category·is_active 포함)로 내려오므로
+          // 그대로 반영한다. 유지된 소리의 is_active는 서버가 보존해 돌려준다.
           return {
             ...old,
             name: data.name,
             icon: data.icon,
-            sounds: data.sounds.map((sound) => {
-              const oldSound = old.sounds.find(
-                (item) => item.sound_id === sound.sound_id,
-              );
-
-              return {
-                ...sound,
-                category: oldSound?.category ?? '',
-                is_active: oldSound?.is_active ?? true,
-              };
-            }),
+            sounds: data.sounds,
           };
         },
       );

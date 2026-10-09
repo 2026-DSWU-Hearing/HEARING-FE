@@ -1,6 +1,5 @@
 import type { KeyboardEvent, MouseEvent } from 'react';
 import { useHomeModeContext } from '@/pages/home/hooks/useHomeModeContext';
-import { usePatchActivateMode } from '@/pages/home/hooks/usePatchActivateMode';
 
 interface UseModeCardParamTypes {
   modeId: number;
@@ -12,19 +11,19 @@ export const useModeCard = ({
   modeId,
   isDoNotDisturb,
 }: UseModeCardParamTypes) => {
-  const { handleModeSelect } = useHomeModeContext();
-  const { mutate: activateMode } = usePatchActivateMode();
+  const { handleModeActivate } = useHomeModeContext();
 
-  // 카드 전체를 눌렀을 때, 해당 모드를 활성화하는 함수
+  // 카드 전체를 눌렀을 때, 해당 모드를 활성화하는 함수.
+  // 선택 전환·서버 요청·실패 롤백은 컨텍스트(handleModeActivate)가 한곳에서 처리한다.
   const handleActivateModeClick = () => {
     if (isDoNotDisturb) return;
 
-    // 화면 반응은 즉시 바꾸고, 서버의 활성 모드는 mutation으로 맞춘다.
-    handleModeSelect(modeId);
-    activateMode(modeId);
+    handleModeActivate(modeId);
   };
   // 키보드(Enter/Space)로도 카드를 활성화할 수 있게 하는 함수
   const handleActivateModeKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    // 설정 링크 같은 자식 요소에서 올라온 키 입력은 무시한다(링크의 Enter가 모드 활성화까지 일으키지 않게).
+    if (event.target !== event.currentTarget) return;
     if (isDoNotDisturb) return;
     if (event.key !== 'Enter' && event.key !== ' ') return;
 

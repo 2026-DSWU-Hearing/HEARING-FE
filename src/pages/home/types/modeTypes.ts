@@ -1,8 +1,10 @@
+// 모드에 담을 소리를 서버에 보낼 때 쓰는 입력 형태 (POST/PUT 요청 바디)
 export interface ModeSoundTypes {
   sound_id: number;
   name: string;
 }
 
+// 서버가 돌려주는 모드 소리 항목. 상세 조회·생성·수정·소리 교체 응답이 모두 이 형태를 공유한다.
 export interface ModeDetailSoundTypes extends ModeSoundTypes {
   category: string;
   is_active: boolean;
@@ -29,7 +31,7 @@ export interface CreateModeResponseTypes {
   mode_id: number;
   name: string;
   icon: string;
-  sounds: ModeSoundTypes[];
+  sounds: ModeDetailSoundTypes[];
 }
 
 export interface GetModeDetailResponseTypes {
@@ -50,7 +52,7 @@ export interface UpdateModeResponseTypes {
   mode_id: number;
   name: string;
   icon: string;
-  sounds: ModeSoundTypes[];
+  sounds: ModeDetailSoundTypes[];
 }
 
 export interface ActivateModeResponseTypes {

@@ -34,7 +34,8 @@ const ModeSoundSelectBlock = ({
         <SoundIconView
           soundName={sound.name}
           categoryName={sound.category_name}
-          className="w-icon-base h-icon-base leading-none"
+          // 직접 그린 SVG는 w/h를, FontAwesome 폴백은 font-size를 따르므로 둘을 같은 값(16px)으로 준다.
+          className="h-icon-sm w-icon-sm text-[1rem] leading-none"
         />
       </span>
 

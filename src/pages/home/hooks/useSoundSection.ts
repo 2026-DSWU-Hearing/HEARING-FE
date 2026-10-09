@@ -1,5 +1,8 @@
 import { useCallback, useState } from 'react';
-import { MODE_MESSAGE } from '@/pages/home/constants/modeMessages';
+import {
+  HOME_ERROR_MESSAGE,
+  MODE_MESSAGE,
+} from '@/pages/home/constants/modeMessages';
 import { useGetModeDetail } from '@/pages/home/hooks/useGetModeDetail';
 import { useHomeModeContext } from '@/pages/home/hooks/useHomeModeContext';
 import { useModeSoundState } from '@/pages/home/hooks/useModeSoundState';
@@ -14,12 +17,15 @@ export const useSoundSection = () => {
   const { data, isLoading, isError } = useGetModeDetail(selectedModeId);
   const { mutate: patchModeSoundActive, isPending: isPatchModeSoundActivePending } =
     usePatchModeSoundActive();
-  const { mutate: putModeSounds } = usePutModeSounds();
+  // 추가·삭제는 둘 다 "남길 소리 전체"를 PUT한다. 앞 요청이 끝나기 전에 다음 요청을 보내면
+  // 아직 반영 안 된 캐시로 목록을 만들어 앞선 변경을 덮어쓰므로, 진행 중에는 목록 조작을 막는다.
+  const { mutate: putModeSounds, isPending: isSoundListUpdating } =
+    usePutModeSounds();
   const {
     state,
     toggleEditMode,
     closeEditMode,
-    openAddSoundModal,
+    openAddSoundModal: openAddSoundModalState,
     closeAddSoundModal,
     toggleRemoveSound,
     resetRemoveSounds,
@@ -46,11 +52,16 @@ export const useSoundSection = () => {
       );
       if (!selectedSound) return;
 
-      patchModeSoundActive({
-        modeId: selectedModeId,
-        soundId,
-        isActive: !selectedSound.is_active,
-      });
+      patchModeSoundActive(
+        {
+          modeId: selectedModeId,
+          soundId,
+          isActive: !selectedSound.is_active,
+        },
+        {
+          onError: () => setAlertMessage(HOME_ERROR_MESSAGE.TOGGLE_SOUND),
+        },
+      );
     },
     [
       data?.sounds,
@@ -93,8 +104,9 @@ export const useSoundSection = () => {
   // 확인 모달에서 "확인"을 눌렀을 때 실제 삭제를 수행한다.
   // 삭제 = "빼기"가 아니라 삭제 대상을 제외한 "남길 소리"만 모아 한 번에 PUT하는 방식.
   // 추가(handleAddSoundsComplete)와 동일한 mutation/캐시 경로를 공유한다.
+  // 편집 모드·선택 목록은 성공했을 때만 닫는다. 실패하면 그대로 남아 바로 다시 시도할 수 있다.
   const handleRemoveSelectedSoundsConfirm = useCallback(() => {
-    if (selectedModeId === null || !data) return;
+    if (selectedModeId === null || !data || isSoundListUpdating) return;
 
     const nextSounds = data.sounds
       .filter(
@@ -102,18 +114,25 @@ export const useSoundSection = () => {
       )
       .map((sound) => ({ sound_id: sound.sound_id, name: sound.name }));
 
-    putModeSounds({
-      modeId: selectedModeId,
-      soundsData: {
-        sounds: nextSounds,
+    putModeSounds(
+      {
+        modeId: selectedModeId,
+        soundsData: {
+          sounds: nextSounds,
+        },
       },
-    });
-
-    resetRemoveSounds();
-    closeEditMode();
+      {
+        onSuccess: () => {
+          resetRemoveSounds();
+          closeEditMode();
+        },
+        onError: () => setAlertMessage(HOME_ERROR_MESSAGE.REMOVE_SOUND),
+      },
+    );
   }, [
     closeEditMode,
     data,
+    isSoundListUpdating,
     putModeSounds,
     resetRemoveSounds,
     selectedModeId,
@@ -122,35 +141,76 @@ export const useSoundSection = () => {
 
   const clearAlertMessage = useCallback(() => setAlertMessage(''), []);
 
-  // 소리 추가 완료 함수
+  // 소리 추가 모달 열기. 목록 갱신 중에는 열지 않는다(앞선 변경을 덮어쓰는 요청 방지).
+  const openAddSoundModal = useCallback(() => {
+    if (isSoundListUpdating) return;
+
+    openAddSoundModalState();
+  }, [isSoundListUpdating, openAddSoundModalState]);
+
+  // 소리 추가 완료 함수. 모달은 성공했을 때만 닫고, 실패하면 선택을 유지한 채 안내한다.
   const handleAddSoundsComplete = useCallback(
     (selectedSounds: SoundTypes[]) => {
-      if (selectedModeId === null || isDoNotDisturb || !data) return;
+      if (
+        selectedModeId === null ||
+        isDoNotDisturb ||
+        !data ||
+        isSoundListUpdating
+      ) {
+        return;
+      }
+
+      // 아무것도 고르지 않고 완료하면 바꿀 것이 없으므로 요청 없이 닫는다.
+      if (selectedSounds.length === 0) {
+        closeAddSoundModal();
+        return;
+      }
 
       const currentSounds = data.sounds.map((sound) => ({
         sound_id: sound.sound_id,
         name: sound.name,
       }));
-      const newSounds = selectedSounds.map((sound) => ({
-        sound_id: sound.sound_id,
-        name: sound.name,
-      }));
-      // 이미 담긴 소리와 새로 선택한 소리가 겹치면 한 번만 전송한다.
-      const nextSounds = [...currentSounds, ...newSounds].filter(
-        (sound, index, sounds) =>
-          sounds.findIndex((item) => item.sound_id === sound.sound_id) ===
-          index,
+      const currentSoundIds = new Set(
+        currentSounds.map((sound) => sound.sound_id),
       );
+      // 이미 담긴 소리는 제외한다. 전부 겹치면 요청 없이 안내만 띄우고 모달은 유지한다.
+      const newSounds = selectedSounds
+        .filter((sound) => !currentSoundIds.has(sound.sound_id))
+        .map((sound) => ({ sound_id: sound.sound_id, name: sound.name }));
+      const hasDuplicatedSound = newSounds.length < selectedSounds.length;
 
-      putModeSounds({
-        modeId: selectedModeId,
-        soundsData: {
-          sounds: nextSounds,
+      if (newSounds.length === 0) {
+        setAlertMessage(MODE_MESSAGE.ALREADY_ADDED_SOUND);
+        return;
+      }
+
+      putModeSounds(
+        {
+          modeId: selectedModeId,
+          soundsData: {
+            sounds: [...currentSounds, ...newSounds],
+          },
         },
-      });
-      closeAddSoundModal();
+        {
+          onSuccess: () => {
+            closeAddSoundModal();
+            // 일부만 겹친 경우: 나머지는 추가됐고 겹친 소리는 빠졌음을 알린다.
+            if (hasDuplicatedSound) {
+              setAlertMessage(MODE_MESSAGE.PARTIALLY_ALREADY_ADDED_SOUND);
+            }
+          },
+          onError: () => setAlertMessage(HOME_ERROR_MESSAGE.ADD_SOUND),
+        },
+      );
     },
-    [closeAddSoundModal, data, isDoNotDisturb, putModeSounds, selectedModeId],
+    [
+      closeAddSoundModal,
+      data,
+      isDoNotDisturb,
+      isSoundListUpdating,
+      putModeSounds,
+      selectedModeId,
+    ],
   );
 
   return {
@@ -159,6 +219,7 @@ export const useSoundSection = () => {
     sounds: data?.sounds ?? [],
     isLoading,
     isError,
+    isSoundListUpdating,
     isEditMode: state.isEditMode,
     isAddSoundModalOpen: state.isAddSoundModalOpen,
     selectedRemoveSoundIds: state.selectedRemoveSoundIds,

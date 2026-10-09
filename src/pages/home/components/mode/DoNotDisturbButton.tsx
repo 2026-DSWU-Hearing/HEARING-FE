@@ -42,7 +42,7 @@ const DoNotDisturbButton = ({
       aria-label="알림 받지 않기 모드"
       disabled={isDisabled}
       onClick={onToggle}
-      className={`relative inline-flex h-[2.75rem] w-fit min-w-[8rem] items-center rounded-pill bg-black disabled:cursor-not-allowed disabled:opacity-60 ${
+      className={`relative inline-flex h-[2.75rem] w-fit min-w-[8rem] shrink-0 items-center rounded-pill bg-black disabled:cursor-not-allowed disabled:opacity-60 ${
         isDoNotDisturb ? STYLES.button.on : STYLES.button.off
       }`}
     >
