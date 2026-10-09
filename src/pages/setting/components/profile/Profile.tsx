@@ -38,7 +38,9 @@ const Profile = () => {
       />
 
       <div className="flex min-w-0 gap-[0.44rem] flex-1 flex-col">
-        <span className="heading-lg-semibold truncate text-primary">
+        {/* 좁은 화면(320px)에서는 10글자가 한 줄에 안 들어가므로 두 줄까지 보여주고 그 이상만 말줄임한다.
+            break-words는 공백 없는 영문 닉네임도 줄바꿈되게 한다. */}
+        <span className="heading-lg-semibold break-words line-clamp-2 text-primary">
           {user.nickname}
         </span>
         <span className="heading-base-semibold text-secondary">

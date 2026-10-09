@@ -1,11 +1,13 @@
 import { useState } from 'react';
 
-import { useGetDevices } from '@/pages/setting/hooks/useGetDevices';
+import { useDeviceConnection } from '@/pages/setting/hooks/useDeviceConnection';
 import { usePatchDevice } from '@/pages/setting/hooks/usePatchDevice';
 import { useDeleteDevice } from '@/pages/setting/hooks/useDeleteDevice';
 import { useDevicesConnect } from '@/shared/hooks/useDevicesConnect';
 import { useModal } from '@/shared/hooks/useModal';
 import { CONNECTION_STATUS } from '@/pages/setting/constants/connectionStatus';
+import { DEVICE_MESSAGE } from '@/shared/constants/deviceMessages';
+import { getDeviceConnectErrorMessage } from '@/shared/utils/getDeviceConnectErrorMessage';
 
 /**
  * 나의 디바이스 섹션의 조회·연결·연결 해제·이름변경 로직을 모은 커스텀 훅.
@@ -13,48 +15,70 @@ import { CONNECTION_STATUS } from '@/pages/setting/constants/connectionStatus';
  * 프론트는 더 이상 연결 대기/타임아웃 상태를 갖지 않는다.
  */
 export const useDeviceSection = () => {
-  const [hasConnectError, setHasConnectError] = useState(false);
-  const { data: devices, isLoading, isError } = useGetDevices();
-  const { mutate: updateDevice, isPending: isUpdating } = usePatchDevice();
+  // 각 요청의 실패 안내. 비어 있으면 안내를 띄우지 않는다.
+  const [connectErrorMessage, setConnectErrorMessage] = useState('');
+  const [nameEditErrorMessage, setNameEditErrorMessage] = useState('');
+  const [deleteErrorMessage, setDeleteErrorMessage] = useState('');
+  const { device, isConnected, isActiveUser, isLoading, isError } =
+    useDeviceConnection();
+  const { mutateAsync: updateDevice, isPending: isUpdating } =
+    usePatchDevice();
   const { mutateAsync: connectDevice, isPending: isConnecting } =
     useDevicesConnect();
   const { mutate: removeDevice, isPending: isDeleting } = useDeleteDevice();
 
   const isMutating = isUpdating || isConnecting || isDeleting;
 
-  const device = devices?.[0];
-  const isConnected = device?.is_connected ?? false;
-  const isActiveUser = device?.is_active_user ?? false;
-
   const nameModal = useModal();
   const deleteModal = useModal();
 
-  const handleEditClick = () => nameModal.open();
+  const handleEditClick = () => {
+    setNameEditErrorMessage('');
+    nameModal.open();
+  };
 
-  const handleNameSubmit = (newName: string) => {
-    if (!device) return;
-    updateDevice({ deviceId: device.id, deviceData: { nickname: newName } });
+  // 저장이 성공했을 때만 모달을 닫는다. 실패하면 입력값을 유지한 채 모달 안에 안내한다.
+  const handleNameSubmit = async (newName: string) => {
+    if (!device || isUpdating) return;
+
+    setNameEditErrorMessage('');
+
+    try {
+      await updateDevice({
+        deviceId: device.id,
+        deviceData: { nickname: newName },
+      });
+      nameModal.close();
+    } catch {
+      setNameEditErrorMessage(DEVICE_MESSAGE.RENAME_FAILED);
+    }
   };
 
   const handleConnectClick = async () => {
     if (isMutating) return;
 
-    setHasConnectError(false);
+    setConnectErrorMessage('');
 
     try {
       await connectDevice();
-    } catch {
-      setHasConnectError(true);
+    } catch (error) {
+      // 409(기기 미접속)만 전원·Wi-Fi 안내, 그 외는 요청 실패로 구분해 안내한다.
+      setConnectErrorMessage(getDeviceConnectErrorMessage(error));
     }
   };
 
-  const handleDeleteClick = () => deleteModal.open();
+  const handleDeleteClick = () => {
+    setDeleteErrorMessage('');
+    deleteModal.open();
+  };
 
+  // 확인 모달은 확인 즉시 닫히므로, 실패 안내는 기기 카드 아래에 띄운다.
   const handleConfirmDelete = () => {
     if (!device || isMutating) return;
 
     removeDevice(device.id, {
-      onSuccess: () => setHasConnectError(false),
+      onSuccess: () => setConnectErrorMessage(''),
+      onError: () => setDeleteErrorMessage(DEVICE_MESSAGE.DISCONNECT_FAILED),
     });
   };
 
@@ -74,7 +98,10 @@ export const useDeviceSection = () => {
     isError,
     isMutating,
     isConnecting,
-    hasConnectError,
+    isUpdating,
+    connectErrorMessage,
+    nameEditErrorMessage,
+    deleteErrorMessage,
     nameModal,
     deleteModal,
     handleEditClick,
