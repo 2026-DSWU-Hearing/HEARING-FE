@@ -38,13 +38,15 @@ const BottomNavigation = () => {
       {NAVIGATION_ITEMS.map(({ to, end, label, Icon }) => (
         <NavLink key={to} to={to} end={end} aria-label={label}>
           {({ isActive }) => (
-            <Icon
-              className={`h-[2.234rem] w-[2.234rem] ${
-                isActive
-                  ? 'text-white drop-shadow-[0_0_10px_rgba(255,249,212,0.50)]'
-                  : 'text-neutral-500'
+            // 활성 글로우는 filter: drop-shadow 대신 원형 래퍼의 box-shadow로 그린다.
+            // iOS WebKit은 fixed 레이어 안 SVG에 filter를 걸면 사각 바운딩 박스가 비치는 버그가 있다.
+            <span
+              className={`flex h-[2.234rem] w-[2.234rem] items-center justify-center rounded-full ${
+                isActive ? 'text-white shadow-light-10' : 'text-neutral-500'
               }`}
-            />
+            >
+              <Icon className="h-full w-full" />
+            </span>
           )}
         </NavLink>
       ))}
