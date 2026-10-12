@@ -26,7 +26,7 @@ messaging.onBackgroundMessage((payload) => {
   const { title, body } = payload.data ?? {};
   self.registration.showNotification(title ?? '알림', {
     body,
-    icon: '/icons/android-chrome-192x192.png',
+    icon: '/icons/web-app-manifest-192x192.png',
   });
 });
 
