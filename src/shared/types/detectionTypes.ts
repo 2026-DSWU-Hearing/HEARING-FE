@@ -1,5 +1,6 @@
 // WebSocket(ws://.../ws/users/me/detections)으로 수신하는 실시간 소리 감지 알림 타입.
-// 앱이 켜져 있을 때는 FCM이 아니라 이 WS 메시지로 인앱 알림을 띄운다.
+// 실시간 감지 스토어·알림 목록 캐시 갱신의 데이터 소스다. 인앱 토스트는 푸시가 꺼져 있을 때만
+// 이 메시지로 띄우고, 푸시가 켜져 있으면 FCM 경로(배너/onMessage)가 표시를 맡는다(App.tsx 참고).
 
 // 소리가 감지된 방향. 넥밴드가 판별하지 못하면 UNKNOWN으로 온다(화면에는 표시하지 않는다).
 export type DetectionDirectionTypes =

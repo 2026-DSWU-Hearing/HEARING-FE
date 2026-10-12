@@ -12,13 +12,16 @@ import AppRouter from '@/routes/AppRouter';
 import { isNotFoundPath } from '@/routes/appRoutes';
 import { getAccessToken } from '@/pages/login/utils/tokenStorage';
 import { useToast } from '@/shared/components/toast/ToastContext';
+import { isNotificationSupported } from '@/shared/firebase/settingFCM';
 import { useDetectionSocket } from '@/shared/hooks/useDetectionSocket';
+import { useFcmForegroundMessage } from '@/shared/hooks/useFcmForegroundMessage';
 import { useFcmTokenSync } from '@/shared/hooks/useFcmTokenSync';
 import { useDetectionStore } from '@/shared/stores/useDetectionStore';
 import { useLocationConsentStore } from '@/shared/stores/useLocationConsentStore';
 import '@/App.css';
 
 import type { NotificationInfiniteDataTypes } from '@/pages/home/types/notificationTypes';
+import type { UserTypes } from '@/shared/types/userTypes';
 
 const App = () => {
   const { pathname } = useLocation();
@@ -38,17 +41,36 @@ const App = () => {
     if (!pathname.startsWith('/communication')) resetLocationPrompt();
   }, [pathname, resetLocationPrompt]);
 
-  useFcmTokenSync();
-  // 앱이 켜져 있을 때는 FCM 대신 WebSocket으로 감지 알림을 받는다(포그라운드 중복 방지).
-  // 하나의 감지 이벤트로 토스트를 띄우고(전역), 스토어에도 넣는다(실시간 감지 페이지 목록용).
+  const { isFcmTokenSynced } = useFcmTokenSync();
+  // 포그라운드 FCM(Android/PC에서 SDK가 배너 대신 페이지로 넘긴 푸시)은 토스트로 띄운다.
+  useFcmForegroundMessage();
+
+  // 감지 1건에 서버는 WS 메시지와 FCM 푸시를 둘 다 보낸다. 표시는 한 경로만 맡는다:
+  // - 푸시가 켜져 있으면 FCM 경로(백그라운드·iOS는 배너, Android/PC 포그라운드는 onMessage 토스트).
+  //   iOS 홈 화면 앱은 SW가 앱 창을 못 찾아 앱 이용 중에도 배너를 띄우므로, WS 토스트까지 띄우면 중복된다.
+  // - 푸시가 꺼져 있거나 권한이 없으면 FCM이 오지 않으므로 WS 토스트로 띄운다.
+  // WS는 표시와 무관하게 항상 스토어(실시간 감지 페이지)와 알림 목록 캐시를 갱신한다.
+  const isPushActive = () => {
+    const user = queryClient.getQueryData<UserTypes>(['users', 'me']);
+    // 캐시가 없으면(아직 내 정보를 안 불러옴) 푸시 여부를 모르므로 토스트를 띄우는 쪽을 택한다.
+    return (
+      isNotificationSupported() &&
+      Notification.permission === 'granted' &&
+      Boolean(user?.push_enabled) &&
+      isFcmTokenSynced
+    );
+  };
+
   useDetectionSocket({
     token: accessToken,
     onDetection: (detection) => {
-      showToast({
-        soundName: detection.sound_name,
-        categoryName: detection.sound_category,
-        direction: detection.direction,
-      });
+      if (!isPushActive()) {
+        showToast({
+          soundName: detection.sound_name,
+          categoryName: detection.sound_category,
+          direction: detection.direction,
+        });
+      }
       pushDetection(detection);
 
       // 알림 목록을 한 번이라도 조회한 경우에만 실시간 이벤트를 병합한다.
