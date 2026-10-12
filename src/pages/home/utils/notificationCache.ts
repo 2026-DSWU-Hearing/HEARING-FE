@@ -21,7 +21,11 @@ const isDetection = (value: unknown): value is DetectionTypes => {
     (confidence === null ||
       (typeof confidence === 'number' && Number.isFinite(confidence))) &&
     (location === null || typeof location === 'string') &&
-    typeof detection.detected_at === 'string'
+    typeof detection.detected_at === 'string' &&
+    // direction은 값 집합 검사까지 하지 않는다. 서버가 값을 늘려도 getDirectionLabel이
+    // 모르는 값을 null(미표시)로 처리하므로 문자열이기만 하면 안전하다.
+    typeof detection.direction === 'string' &&
+    typeof detection.ondevice_vibrated === 'boolean'
   );
 };
 

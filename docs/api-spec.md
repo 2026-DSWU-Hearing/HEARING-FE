@@ -504,6 +504,8 @@ WS `detection` 메시지의 `data`와 필드·타입이 완전히 동일하다.
 | `confidence`     | number \| null    | required(널 허용). `0.0`~`1.0`. **알림에서는 화면 미표시**                |
 | `location`       | string \| null    | required(널 허용). 사람이 읽는 문자열. **알림에서는 화면 미표시**         |
 | `detected_at`    | string (datetime) | required. **ISO 8601 + 타임존 오프셋**. 예: `"2026-04-09T13:01:22+09:00"` |
+| `direction`      | string            | required. `"FRONT" \| "BACK" \| "LEFT" \| "RIGHT" \| "UNKNOWN"`. 판별 실패 시 `UNKNOWN`. 프론트는 `UNKNOWN`이면 방향을 표시하지 않는다 |
+| `ondevice_vibrated` | boolean        | required. 넥밴드가 서버 판정 전에 먼저 진동한(온디바이스 긴급 판정) 감지인지. 현재 화면 미표시 |
 
 `source`·`confidence`·`location`은 지금 알림 화면에서 표시 X
 응답에 포함하는 이유는 프론트가 WS 타입(`DetectionTypes`)을 목록 아이템 타입으로 **그대로 재사용**해 실시간 수신분과 목록 조회분을 한 배열에 섞기 위해서다. 필드를 빼면 두 타입이 갈라진다.

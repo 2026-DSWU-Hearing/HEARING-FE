@@ -10,11 +10,13 @@ import {
 import type { ReactNode } from 'react';
 
 import ToastViewport from '@/shared/components/toast/ToastViewport';
+import type { DetectionDirectionTypes } from '@/shared/types/detectionTypes';
 
 export interface ToastItemTypes {
   id: number;
   soundName: string;
   categoryName: string;
+  direction: DetectionDirectionTypes;
 }
 
 // 토스트에 띄울 감지 정보. id를 제외한 토스트 표시 데이터.

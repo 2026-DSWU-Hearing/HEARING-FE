@@ -47,6 +47,7 @@ const App = () => {
       showToast({
         soundName: detection.sound_name,
         categoryName: detection.sound_category,
+        direction: detection.direction,
       });
       pushDetection(detection);
 
