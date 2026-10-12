@@ -4,6 +4,7 @@ import {
   formatNotificationRelativeTime,
 } from '@/pages/home/utils/formatNotificationTime';
 import SoundIconView from '@/shared/components/icons/sounds/SoundIconView';
+import { getDirectionLabel } from '@/shared/utils/getDirectionLabel';
 
 import type { DetectionTypes } from '@/shared/types/detectionTypes';
 
@@ -29,9 +30,12 @@ const NotificationBar = ({
     sound_name: soundName,
     sound_category: category,
     detected_at: detectedAt,
+    direction,
   } = notification;
   const relativeTime = formatNotificationRelativeTime(detectedAt, currentTime);
   const absoluteTime = formatNotificationAbsoluteTime(detectedAt);
+  // UNKNOWN(방향 판별 실패)이면 null이라 방향 문구를 그리지 않는다.
+  const directionLabel = getDirectionLabel(direction);
 
   const handleSelectClick = () => {
     onSelect?.(id);
@@ -60,10 +64,17 @@ const NotificationBar = ({
         />
       </span>
 
-      {/* 가운데: 소리명 + 카테고리 배지 */}
+      {/* 가운데: 소리명(+방향) + 카테고리 배지 */}
       <div className="flex min-w-0 flex-1 flex-col gap-xxs">
-        <span className="body-lg-regular truncate text-primary">
-          {soundName}
+        <span className="flex min-w-0 items-baseline gap-xs">
+          <span className="body-lg-regular truncate text-primary">
+            {soundName}
+          </span>
+          {directionLabel && (
+            <span className="body-sm-regular shrink-0 text-neutral-400">
+              {directionLabel}
+            </span>
+          )}
         </span>
         <span
           className={`caption-xs-medium w-fit whitespace-nowrap rounded-full px-xs py-xxxs shadow-chip ${getCategoryColor(
