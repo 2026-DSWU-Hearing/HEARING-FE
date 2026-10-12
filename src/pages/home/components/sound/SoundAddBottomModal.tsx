@@ -9,6 +9,7 @@ import ConfirmModal from '@/shared/components/ConfirmModal';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'motion/react';
+import type { MouseEvent } from 'react';
 import { SkeletonTheme } from 'react-loading-skeleton';
 
 const SKELETON_SOUND_COUNT = 9;
@@ -40,9 +41,18 @@ const SoundAddBottomModal = ({
     handleCancelConfirm,
   } = useSoundAddModal({ onComplete, onClose });
 
+  // 바텀시트 바깥(어두운 배경) 클릭은 X 버튼과 같은 동작을 한다.
+  // 시트 내부·중첩된 취소 확인 모달의 클릭도 이 요소까지 버블링되므로,
+  // 배경 자체를 직접 눌렀을 때(target === currentTarget)만 반응한다.
+  const handleBackdropClick = (event: MouseEvent<HTMLDivElement>) => {
+    if (event.target !== event.currentTarget) return;
+    handleCloseClick();
+  };
+
   return (
     <motion.div
       className="fixed inset-0 z-50 flex items-end justify-center bg-[#000000]/50"
+      onClick={handleBackdropClick}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
