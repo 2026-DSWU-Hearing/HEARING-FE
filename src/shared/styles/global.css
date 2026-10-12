@@ -17,7 +17,8 @@ body {
   font-family: var(--font-base);
   font-size: var(--font-size-base);
   font-synthesis: none;
-  background-color: var(--color-neutral-700);
+  /* 앱 컨테이너 밖·오버스크롤 시 드러나는 색. 노치(theme-color)와 같은 배경색으로 통일한다. */
+  background-color: var(--color-neutral-950);
   color: var(--color-primary);
 }
 

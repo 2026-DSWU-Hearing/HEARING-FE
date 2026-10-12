@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'motion/react';
 
 import type { ToastItemTypes } from '@/shared/components/toast/ToastContext';
 import SoundIconView from '@/shared/components/icons/sounds/SoundIconView';
+import { getDirectionLabel } from '@/shared/utils/getDirectionLabel';
 import CategoryBlock from '@/pages/home/components/sound/CategoryBlock';
 
 interface ToastViewportPropTypes {
@@ -15,34 +16,46 @@ const ToastViewport = ({ toasts, onClose }: ToastViewportPropTypes) => {
   return (
     <div className="pointer-events-none fixed inset-x-0 top-0 z-50 mx-auto flex w-full max-w-[430px] flex-col items-center gap-2 px-lg pt-4">
       <AnimatePresence>
-        {toasts.map(({ id, soundName, categoryName }) => (
-          <motion.button
-            key={id}
-            type="button"
-            onClick={() => onClose(id)}
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.2 }}
-            className="pointer-events-auto flex w-full items-center gap-3 rounded-xl bg-neutral-800 px-lg py-base text-left shadow-[0px_0px_4px_0px_rgba(0,0,0,0.25)]"
-          >
-            {/* 소리 아이콘: 소리명으로 SVG/FontAwesome을 자동 매핑. currentColor라 흰색을 따른다.
+        {toasts.map(({ id, soundName, categoryName, direction }) => {
+          // UNKNOWN(방향 판별 실패)이면 null이라 방향 문구를 그리지 않는다.
+          const directionLabel = getDirectionLabel(direction);
+
+          return (
+            <motion.button
+              key={id}
+              type="button"
+              onClick={() => onClose(id)}
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.2 }}
+              className="pointer-events-auto flex w-full items-center gap-3 rounded-xl bg-neutral-800 px-lg py-base text-left shadow-[0px_0px_4px_0px_rgba(0,0,0,0.25)]"
+            >
+              {/* 소리 아이콘: 소리명으로 SVG/FontAwesome을 자동 매핑. currentColor라 흰색을 따른다.
                 직접 그린 SVG는 w/h를, FontAwesome은 font-size를 따르므로 둘을 같은 값(24px)으로 준다. */}
-            <SoundIconView
-              soundName={soundName}
-              categoryName={categoryName}
-              className="h-icon-md w-icon-md shrink-0 text-[1.5rem] leading-none text-white"
-            />
-            <span className="flex min-w-0 flex-col items-start gap-1">
-              <span className="body-base-medium truncate text-white">
-                {soundName}
-              </span>
-              {/* 카테고리 색 배지: 소리 카드와 동일한 CategoryBlock을 재사용해 디자인을 통일.
+              <SoundIconView
+                soundName={soundName}
+                categoryName={categoryName}
+                className="h-icon-md w-icon-md shrink-0 text-[1.5rem] leading-none text-white"
+              />
+              <span className="flex min-w-0 flex-col items-start gap-1">
+                <span className="flex min-w-0 items-baseline gap-xs">
+                  <span className="body-base-medium truncate text-white">
+                    {soundName}
+                  </span>
+                  {directionLabel && (
+                    <span className="body-sm-regular shrink-0 text-neutral-400">
+                      {directionLabel}
+                    </span>
+                  )}
+                </span>
+                {/* 카테고리 색 배지: 소리 카드와 동일한 CategoryBlock을 재사용해 디자인을 통일.
                   onClick 없이 쓰면 <span>으로 렌더되고 카테고리 고유색(긴급=빨강 등)을 따른다. */}
-              <CategoryBlock categoryName={categoryName} />
-            </span>
-          </motion.button>
-        ))}
+                <CategoryBlock categoryName={categoryName} />
+              </span>
+            </motion.button>
+          );
+        })}
       </AnimatePresence>
     </div>
   );

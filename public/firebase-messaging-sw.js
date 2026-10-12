@@ -17,16 +17,28 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
+// 감지 방향 표시 문구. src/shared/constants/detectionDirection.ts와 같은 표다
+// (서비스워커는 번들 밖이라 import할 수 없어 복제한다). 문구를 바꾸면 양쪽을 함께 고친다.
+// UNKNOWN은 표시하지 않으므로 항목을 두지 않는다.
+const DETECTION_DIRECTION_LABEL = {
+  FRONT: '앞',
+  BACK: '뒤',
+  LEFT: '왼쪽',
+  RIGHT: '오른쪽',
+};
+
 // 앱이 백그라운드(탭 비활성/닫힘) 상태일 때 도착하는 푸시 메시지를 처리한다.
 // notification 페이로드는 브라우저가 자동 표시하므로 수동으로 다시 띄우지 않는다.
 // data-only 페이로드만 직접 표시해 두 형식을 모두 지원하면서 중복 알림을 방지한다.
+// 서버는 방향을 body 문장에 섞지 않고 data.direction으로 따로 내리며, 문구 조립은 여기서 한다.
 messaging.onBackgroundMessage((payload) => {
   if (payload.notification) return;
 
-  const { title, body } = payload.data ?? {};
+  const { title, body, direction } = payload.data ?? {};
+  const directionLabel = DETECTION_DIRECTION_LABEL[direction];
   self.registration.showNotification(title ?? '알림', {
-    body,
-    icon: '/icons/android-chrome-192x192.png',
+    body: directionLabel ? `${body} · ${directionLabel}` : body,
+    icon: '/icons/web-app-manifest-192x192.png',
   });
 });
 

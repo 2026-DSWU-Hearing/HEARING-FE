@@ -26,24 +26,27 @@ export default defineConfig({
         start_url: '/',
         scope: '/',
         display: 'standalone',
-        background_color: '#21221e',
-        theme_color: '#21221e',
+        // 앱 배경(--color-neutral-950)과 동일. index.html의 theme-color와 함께 맞춘다.
+        background_color: '#11120f',
+        theme_color: '#11120f',
         icons: [
           {
-            src: '/icons/android-chrome-192x192.png',
+            src: '/icons/web-app-manifest-192x192.png',
             sizes: '192x192',
             type: 'image/png',
+            purpose: 'any',
           },
           {
-            src: '/icons/android-chrome-512x512.png',
+            src: '/icons/web-app-manifest-512x512.png',
             sizes: '512x512',
             type: 'image/png',
+            purpose: 'any',
           },
           {
-            src: '/icons/android-chrome-512x512.png',
+            src: '/icons/web-app-manifest-512x512.png',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'any maskable',
+            purpose: 'maskable',
           },
         ],
       },
