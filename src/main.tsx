@@ -8,12 +8,15 @@ import { queryClient } from '@/shared/apis/queryClient.ts';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import { registerSW } from 'virtual:pwa-register';
+import { preventIosInputZoom } from '@/shared/utils/preventIosInputZoom';
 import '@/shared/firebase/settingFCM';
 import 'react-loading-skeleton/dist/skeleton.css';
 
 registerSW({
   immediate: true,
 });
+
+preventIosInputZoom();
 
 createRoot(document.getElementById('root')!).render(
   <QueryClientProvider client={queryClient}>
