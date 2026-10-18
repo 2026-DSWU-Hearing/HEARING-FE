@@ -18,6 +18,7 @@ import { useFcmForegroundMessage } from '@/shared/hooks/useFcmForegroundMessage'
 import { useFcmTokenSync } from '@/shared/hooks/useFcmTokenSync';
 import { useDetectionStore } from '@/shared/stores/useDetectionStore';
 import { useLocationConsentStore } from '@/shared/stores/useLocationConsentStore';
+import { useBottomNavigationStore } from '@/shared/stores/useBottomNavigationStore';
 import '@/App.css';
 
 import type { NotificationInfiniteDataTypes } from '@/pages/home/types/notificationTypes';
@@ -25,6 +26,9 @@ import type { UserTypes } from '@/shared/types/userTypes';
 
 const App = () => {
   const { pathname } = useLocation();
+  const isHiddenByModal = useBottomNavigationStore(
+    (state) => state.isHiddenByModal,
+  );
   const { showToast } = useToast();
   const queryClient = useQueryClient();
 
@@ -127,6 +131,9 @@ const App = () => {
   // (어떤 탭도 active가 되지 않는 어정쩡한 상태를 방지).
   // 404 페이지도 같은 이유(active 탭 없음)로 숨기고, 자체 "홈으로" 버튼으로 복귀시킨다.
   const hideNavigation =
+    isHiddenByModal ||
+    pathname === '/communication/histories' ||
+    pathname.startsWith('/communication/histories/') ||
     pathname.startsWith('/modes/') ||
     pathname.startsWith('/setting/') ||
     pathname.startsWith('/onboarding') ||

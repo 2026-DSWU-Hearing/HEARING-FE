@@ -35,7 +35,10 @@ const ConversationHistoryDetailPage = () => {
 
   return (
     <main className="flex h-dvh flex-col overflow-hidden bg-neutral-950">
-      <TopNavigation title={CONVERSATION_HISTORY_MESSAGE.TITLE} />
+      <TopNavigation
+        title={CONVERSATION_HISTORY_MESSAGE.TITLE}
+        bottomSpacing="compact"
+      />
 
       <section className="hide-scrollbar flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto pb-[6.1875rem]">
         {conversation && (

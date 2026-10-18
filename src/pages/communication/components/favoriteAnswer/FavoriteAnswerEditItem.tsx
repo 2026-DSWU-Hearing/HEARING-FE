@@ -37,7 +37,7 @@ const FavoriteAnswerEditItem = ({
   };
 
   return (
-    <div className="relative flex h-[2.9375rem] w-full shrink-0 items-center gap-xs overflow-hidden rounded-lg bg-neutral-700 px-sm py-xs">
+    <div className="relative flex min-h-[2.9375rem] w-full shrink-0 items-center gap-xs overflow-hidden rounded-lg bg-neutral-700 px-sm py-xs">
       <textarea
         ref={textareaRef}
         value={content}
@@ -47,7 +47,7 @@ const FavoriteAnswerEditItem = ({
         readOnly={!isContentEditable}
         aria-label={FAVORITE_ANSWER_MESSAGE.EDIT}
         rows={1}
-        className="body-lg-regular max-w-full resize-none overflow-hidden bg-transparent p-0 text-primary outline-none"
+        className="body-lg-regular min-w-0 flex-1 [overflow-wrap:anywhere] resize-none overflow-hidden bg-transparent p-0 text-primary outline-none"
       />
 
       <button
