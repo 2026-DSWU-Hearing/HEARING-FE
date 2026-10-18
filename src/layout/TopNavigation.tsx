@@ -14,6 +14,7 @@ interface RightIconButtonTypes {
 
 interface TopNavigationPropTypes {
   title?: string;
+  bottomSpacing?: 'default' | 'compact';
   titleAlign?: 'center' | 'left';
   rightText?: string;
   onRightClick?: () => void;
@@ -27,6 +28,7 @@ interface TopNavigationPropTypes {
 
 const TopNavigation = ({
   title = '',
+  bottomSpacing = 'default',
   titleAlign = 'center',
   rightText,
   onRightClick,
@@ -53,7 +55,9 @@ const TopNavigation = ({
   }[rightVariant];
 
   return (
-    <header className="mb-2xl grid w-full grid-cols-[64px_1fr_64px] items-center px-[1.03rem] pt-[2.75rem]">
+    <header
+      className={`${bottomSpacing === 'compact' ? 'mb-xs' : 'mb-2xl'} grid w-full grid-cols-[64px_1fr_64px] items-center px-[1.03rem] pt-[2.75rem]`}
+    >
       <button
         type="button"
         onClick={handleBackClick}
