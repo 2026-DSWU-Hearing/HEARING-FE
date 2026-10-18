@@ -1,3 +1,4 @@
+import { useLayoutEffect } from 'react';
 import type { MouseEvent } from 'react';
 
 import { motion } from 'motion/react';
@@ -9,6 +10,7 @@ import { FAVORITE_ANSWER_MESSAGE } from '@/pages/communication/constants/favorit
 import { useFavoriteAnswerModal } from '@/pages/communication/hooks/useFavoriteAnswerModal';
 import AlertModal from '@/shared/components/AlertModal';
 import { useEscapeKey } from '@/shared/hooks/useEscapeKey';
+import { useBottomNavigationStore } from '@/shared/stores/useBottomNavigationStore';
 
 interface FavoriteAnswerModalPropTypes {
   onClose: () => void;
@@ -19,6 +21,15 @@ const FavoriteAnswerModal = ({
   onClose,
   onSelect,
 }: FavoriteAnswerModalPropTypes) => {
+  const setHiddenByModal = useBottomNavigationStore(
+    (state) => state.setHiddenByModal,
+  );
+
+  useLayoutEffect(() => {
+    setHiddenByModal(true);
+    return () => setHiddenByModal(false);
+  }, [setHiddenByModal]);
+
   const {
     draftAnswers,
     isAdding,
@@ -114,7 +125,7 @@ const FavoriteAnswerModal = ({
           )}
         </div>
 
-        <div className="hide-scrollbar flex w-full flex-1 flex-col gap-sm overflow-y-auto">
+        <div className="hide-scrollbar flex min-h-0 w-full flex-1 flex-col gap-sm overflow-y-auto">
           {isEditing ? (
             draftAnswers.map((draftAnswer) => (
               <FavoriteAnswerEditItem
@@ -138,7 +149,7 @@ const FavoriteAnswerModal = ({
                 key={answer.id}
                 type="button"
                 onClick={() => handleAnswerClick(answer.content)}
-                className="body-lg-regular flex h-[2.9375rem] w-full shrink-0 items-center rounded-lg bg-neutral-700 px-sm py-xs text-left text-primary transition-colors active:bg-neutral-600"
+                className="body-lg-regular flex min-h-[2.9375rem] w-full shrink-0 items-center whitespace-pre-wrap [overflow-wrap:anywhere] rounded-lg bg-neutral-700 px-sm py-xs text-left text-primary transition-colors active:bg-neutral-600"
               >
                 {answer.content}
               </button>
