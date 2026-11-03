@@ -1,10 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useGetSoundCategories } from '@/pages/home/hooks/useGetSoundCategories';
 import { useGetSounds } from '@/pages/home/hooks/useGetSounds';
-import type {
-  CategoryTypes,
-  SoundTypes,
-} from '@/pages/home/types/soundTypes';
+import type { CategoryTypes, SoundTypes } from '@/pages/home/types/soundTypes';
 import {
   filterVisibleCategories,
   filterVisibleSounds,
@@ -35,11 +32,15 @@ export const useModeSoundSelectSection = () => {
     data: soundsData,
     isLoading: isSoundsLoading,
     isError: isSoundsError,
+    isFetching: isSoundsFetching,
+    refetch: refetchSounds,
   } = useGetSounds();
   const {
     data: categoriesData,
     isLoading: isCategoriesLoading,
     isError: isCategoriesError,
+    isFetching: isCategoriesFetching,
+    refetch: refetchCategories,
   } = useGetSoundCategories();
   const [searchKeyword, setSearchKeyword] = useState('');
   const [openedCategoryId, setOpenedCategoryId] = useState<number | null>(null);
@@ -78,7 +79,12 @@ export const useModeSoundSelectSection = () => {
       .filter(({ sounds: groupSounds }) => !isSearching || groupSounds.length);
   }, [categories, isSearching, sounds, trimmedSearchKeyword]);
 
-  const hasNoSearchResult = isSearching && categorySoundGroups.length === 0;
+  const isLoading = isSoundsLoading || (!hasSounds && isCategoriesLoading);
+  const isError =
+    (isSoundsError && !soundsData) ||
+    (!hasSounds && isCategoriesError && !categoriesData);
+  const hasNoSearchResult =
+    !isLoading && !isError && isSearching && categorySoundGroups.length === 0;
 
   const handleSearchKeywordChange = useCallback((keyword: string) => {
     setSearchKeyword(keyword);
@@ -95,8 +101,13 @@ export const useModeSoundSelectSection = () => {
     hasNoSearchResult,
     // 소리 목록만 있으면 카테고리는 합성 폴백으로 대체되므로,
     // 소리가 없을 때에만 카테고리 에러/로딩을 섹션 차단 사유로 본다.
-    isError: isSoundsError || (!hasSounds && isCategoriesError),
-    isLoading: isSoundsLoading || (!hasSounds && isCategoriesLoading),
+    isError,
+    isLoading,
+    isFetching: isSoundsFetching || isCategoriesFetching,
+    handleRetryClick: () => {
+      void refetchSounds();
+      void refetchCategories();
+    },
     isSearching,
     openedCategoryId,
     searchKeyword,

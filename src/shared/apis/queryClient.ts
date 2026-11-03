@@ -1,9 +1,12 @@
 import { QueryClient } from '@tanstack/react-query';
+import { shouldRetryQuery } from '@/shared/utils/shouldRetryQuery';
 
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 1,
+      // 오프라인에서도 요청을 실행해 오류로 끝낸다. 기본 online 모드는 pending 상태로 멈춘다.
+      networkMode: 'always',
+      retry: shouldRetryQuery,
       staleTime: 1000 * 60, // 1분 후 stale 상태로 간주
       refetchOnWindowFocus: false, // 브라우저 창이 다시 focus될 때 자동으로 refetch하지 않도록 설정
     },

@@ -4,6 +4,7 @@ import { useModeEditPage } from '@/pages/home/hooks/useModeEditPage';
 import AlertModal from '@/shared/components/AlertModal';
 import ConfirmModal from '@/shared/components/ConfirmModal';
 import LoadingSpinner from '@/shared/components/LoadingSpinner';
+import QueryErrorState from '@/shared/components/QueryErrorState';
 
 const ModeEditPage = () => {
   const {
@@ -12,6 +13,11 @@ const ModeEditPage = () => {
     isValidModeId,
     isModeDetailLoading,
     isModeDetailError,
+    isModeDetailFetching,
+    isModesError,
+    isModesFetching,
+    handleDetailRetryClick,
+    handleModesRetryClick,
     isUpdatingMode,
     isDeletingMode,
     isModesReady,
@@ -35,12 +41,32 @@ const ModeEditPage = () => {
     return <LoadingSpinner />;
   }
 
-  if (isModeDetailError || !modeDetailData) {
-    return <div className="p-6">모드 정보를 불러오지 못했습니다</div>;
+  if (!modeDetailData) {
+    return (
+      <QueryErrorState
+        message="모드 정보를 불러오지 못했습니다"
+        isRetrying={isModeDetailFetching}
+        onRetry={handleDetailRetryClick}
+      />
+    );
   }
 
   return (
     <>
+      {isModeDetailError && (
+        <QueryErrorState
+          message="모드 정보를 갱신하지 못했습니다"
+          isRetrying={isModeDetailFetching}
+          onRetry={handleDetailRetryClick}
+        />
+      )}
+      {isModesError && (
+        <QueryErrorState
+          message="모드 목록을 불러오지 못해 삭제할 수 없습니다"
+          isRetrying={isModesFetching}
+          onRetry={handleModesRetryClick}
+        />
+      )}
       <ModeForm
         pageType="edit"
         initialName={modeDetailData.name}

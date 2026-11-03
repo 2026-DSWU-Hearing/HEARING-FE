@@ -51,11 +51,15 @@ export const useModeEditPage = () => {
     data: modeDetailData,
     isLoading: isModeDetailLoading,
     isError: isModeDetailError,
+    isFetching: isModeDetailFetching,
+    refetch: refetchModeDetail,
   } = useGetModeDetail(isValidModeId ? parsedModeId : null);
   const {
     data: modesData,
     isLoading: isModesLoading,
     isError: isModesError,
+    isFetching: isModesFetching,
+    refetch: refetchModes,
   } = useGetModes();
   const { mutateAsync: updateMode, isPending: isUpdatingMode } = usePutMode();
   const { mutateAsync: deleteMode, isPending: isDeletingMode } =
@@ -194,6 +198,11 @@ export const useModeEditPage = () => {
     isValidModeId,
     isModeDetailLoading,
     isModeDetailError,
+    isModeDetailFetching,
+    isModesError,
+    isModesFetching,
+    handleDetailRetryClick: () => void refetchModeDetail(),
+    handleModesRetryClick: () => void refetchModes(),
     isUpdatingMode,
     // 삭제 또는 다른 모드 활성화가 진행 중이면 버튼을 비활성화한다.
     isDeletingMode: isDeletingMode || isActivatingMode,

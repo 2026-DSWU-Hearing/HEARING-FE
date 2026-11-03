@@ -14,9 +14,12 @@ import { useModal } from '@/shared/hooks/useModal';
 // 선택된 모드의 "담은 소리" 섹션 전체를 총괄하는 훅. 상세 조회 + 편집/모달 UI 상태 + 소리 추가/삭제 로직을 한곳에 모은다.
 export const useSoundSection = () => {
   const { selectedModeId, isDoNotDisturb } = useHomeModeContext();
-  const { data, isLoading, isError } = useGetModeDetail(selectedModeId);
-  const { mutate: patchModeSoundActive, isPending: isPatchModeSoundActivePending } =
-    usePatchModeSoundActive();
+  const { data, isLoading, isError, isFetching, refetch } =
+    useGetModeDetail(selectedModeId);
+  const {
+    mutate: patchModeSoundActive,
+    isPending: isPatchModeSoundActivePending,
+  } = usePatchModeSoundActive();
   // 추가·삭제는 둘 다 "남길 소리 전체"를 PUT한다. 앞 요청이 끝나기 전에 다음 요청을 보내면
   // 아직 반영 안 된 캐시로 목록을 만들어 앞선 변경을 덮어쓰므로, 진행 중에는 목록 조작을 막는다.
   const { mutate: putModeSounds, isPending: isSoundListUpdating } =
@@ -85,9 +88,7 @@ export const useSoundSection = () => {
     }
 
     // 담긴 소리를 전부 지우려 하면 모드에 소리가 0개가 되므로 차단한다(최소 1개 유지).
-    if (
-      state.selectedRemoveSoundIds.length >= (data?.sounds.length ?? 0)
-    ) {
+    if (state.selectedRemoveSoundIds.length >= (data?.sounds.length ?? 0)) {
       setAlertMessage(MODE_MESSAGE.MIN_SOUND_COUNT);
       return;
     }
@@ -109,9 +110,7 @@ export const useSoundSection = () => {
     if (selectedModeId === null || !data || isSoundListUpdating) return;
 
     const nextSounds = data.sounds
-      .filter(
-        (sound) => !state.selectedRemoveSoundIds.includes(sound.sound_id),
-      )
+      .filter((sound) => !state.selectedRemoveSoundIds.includes(sound.sound_id))
       .map((sound) => ({ sound_id: sound.sound_id, name: sound.name }));
 
     putModeSounds(
@@ -219,6 +218,9 @@ export const useSoundSection = () => {
     sounds: data?.sounds ?? [],
     isLoading,
     isError,
+    hasModeDetail: data !== undefined,
+    isFetching,
+    handleRetryClick: () => void refetch(),
     isSoundListUpdating,
     isEditMode: state.isEditMode,
     isAddSoundModalOpen: state.isAddSoundModalOpen,

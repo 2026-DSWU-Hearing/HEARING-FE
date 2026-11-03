@@ -1,6 +1,7 @@
 import { faMicrochip } from '@fortawesome/free-solid-svg-icons';
 
 import ConfirmModal from '@/shared/components/ConfirmModal';
+import QueryErrorState from '@/shared/components/QueryErrorState';
 import SettingSectionTitle from '@/pages/setting/components/SettingSectionTitle';
 import SettingCard from '@/pages/setting/components/SettingCard';
 import DeviceStatusGrid from '@/pages/setting/components/device/DeviceStatusGrid';
@@ -26,6 +27,8 @@ const DeviceSection = () => {
     isActiveUser,
     isLoading,
     isError,
+    isFetching,
+    handleRetryClick,
     isMutating,
     isConnecting,
     isUpdating,
@@ -54,9 +57,11 @@ const DeviceSection = () => {
     return (
       <section className="flex flex-col gap-sm">
         <SettingSectionTitle title="나의 디바이스" />
-        <div className="flex items-center rounded-xl bg-neutral-900 px-base py-base body-base-regular text-secondary">
-          기기 정보를 불러오지 못했습니다
-        </div>
+        <QueryErrorState
+          message="기기 정보를 불러오지 못했습니다"
+          isRetrying={isFetching}
+          onRetry={handleRetryClick}
+        />
       </section>
     );
   }

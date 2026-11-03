@@ -1,4 +1,5 @@
 import { useParams } from 'react-router-dom';
+import { isAxiosError } from 'axios';
 
 import ChatHistoryList from '@/pages/communication/components/chat/ChatHistoryList';
 import ConversationHistoryInfo from '@/pages/communication/components/history/ConversationHistoryInfo';
@@ -6,6 +7,7 @@ import { CONVERSATION_HISTORY_MESSAGE } from '@/pages/communication/constants/co
 import { useGetConversation } from '@/pages/communication/hooks/useGetConversation';
 import type { ChatBubbleTypes } from '@/pages/communication/types/communicationTypes';
 import TopNavigation from '@/layout/TopNavigation';
+import QueryErrorState from '@/shared/components/QueryErrorState';
 
 const MESSAGE_CLASSNAME = 'body-sm-regular mt-lg text-center text-neutral-500';
 
@@ -18,6 +20,9 @@ const ConversationHistoryDetailPage = () => {
     data: conversation,
     isPending,
     isError,
+    error,
+    isFetching,
+    refetch,
   } = useGetConversation(conversationId);
 
   const bubbles: ChatBubbleTypes[] =
@@ -30,7 +35,8 @@ const ConversationHistoryDetailPage = () => {
       }),
     ) ?? [];
 
-  const isNotFound = !isValidId || isError;
+  const isNotFound =
+    !isValidId || (isAxiosError(error) && error.response?.status === 404);
   const isLoading = isValidId && isPending;
 
   return (
@@ -62,6 +68,13 @@ const ConversationHistoryDetailPage = () => {
           <p className={MESSAGE_CLASSNAME}>
             {CONVERSATION_HISTORY_MESSAGE.NOT_FOUND}
           </p>
+        )}
+        {isError && !isNotFound && (
+          <QueryErrorState
+            message="대화 기록을 불러오지 못했습니다"
+            isRetrying={isFetching}
+            onRetry={() => void refetch()}
+          />
         )}
       </section>
     </main>

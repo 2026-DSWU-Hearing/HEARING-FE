@@ -17,7 +17,7 @@ import {
  * 3. 실패 복구: 저장에 실패하면 마지막으로 저장 확인된 값으로 슬라이더를 되돌리고 안내한다.
  */
 export const useHapticStrength = () => {
-  const { data: user, isLoading } = useGetUsers();
+  const { data: user, isLoading, isError, isFetching, refetch } = useGetUsers();
   const { mutateAsync: updateHaptic } = usePatchHaptic();
 
   const [hapticStrength, setHapticStrength] = useState(0);
@@ -106,6 +106,9 @@ export const useHapticStrength = () => {
     hapticStrength,
     saveErrorMessage,
     isLoading,
+    isLoadError: isError && !user,
+    isFetching,
+    handleRetryClick: () => void refetch(),
     handleStrengthChange,
     handleStrengthChangeEnd,
   };

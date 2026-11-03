@@ -15,7 +15,7 @@ export const useSoundAddModal = ({
   onComplete,
   onClose,
 }: UseSoundAddModalParamTypes) => {
-  const { data, isLoading, isError } = useGetSounds();
+  const { data, isLoading, isError, isFetching, refetch } = useGetSounds();
   const [searchKeyword, setSearchKeyword] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSoundIds, setSelectedSoundIds] = useState<number[]>([]);
@@ -55,13 +55,14 @@ export const useSoundAddModal = ({
   }, []);
 
   const handleCompleteClick = useCallback(() => {
+    if (!data) return;
     const selectedSounds =
       data?.sounds.filter((sound) =>
         selectedSoundIds.includes(sound.sound_id),
       ) ?? [];
 
     onComplete(selectedSounds);
-  }, [data?.sounds, onComplete, selectedSoundIds]);
+  }, [data, onComplete, selectedSoundIds]);
 
   // X(닫기) 클릭: 선택한 소리가 있으면 취소 확인 모달을 먼저 띄우고, 없으면 즉시 닫는다.
   const handleCloseClick = useCallback(() => {
@@ -86,6 +87,9 @@ export const useSoundAddModal = ({
     hasNoSearchResult,
     isLoading,
     isError,
+    isFetching,
+    canComplete: data !== undefined,
+    handleRetryClick: () => void refetch(),
     isCancelConfirmOpen: cancelConfirmModal.isOpen,
     closeCancelConfirm: cancelConfirmModal.close,
     handleSearchKeywordChange,

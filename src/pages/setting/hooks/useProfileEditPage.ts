@@ -17,7 +17,7 @@ import {
 export const useProfileEditPage = () => {
   const navigate = useNavigate();
 
-  const { data: user, isLoading } = useGetUsers();
+  const { data: user, isLoading, isError, isFetching, refetch } = useGetUsers();
   const { mutateAsync: updateUsers, isPending: isUpdatingUsers } =
     usePatchUsers();
 
@@ -56,7 +56,12 @@ export const useProfileEditPage = () => {
         : undefined;
 
   // 닉네임이 비어있거나 길이가 기준을 넘거나 저장 중이면 완료(저장)를 막는다.
-  const isDoneDisabled = isNicknameEmpty || isNicknameTooLong || isUpdatingUsers;
+  const isDoneDisabled =
+    !isInitialized ||
+    !user ||
+    isNicknameEmpty ||
+    isNicknameTooLong ||
+    isUpdatingUsers;
 
   const handleNicknameChange = (value: string) => {
     setNickname(value);
@@ -95,6 +100,9 @@ export const useProfileEditPage = () => {
     saveErrorMessage,
     isDoneDisabled,
     isLoading,
+    isLoadError: isError && !user,
+    isFetching,
+    handleRetryClick: () => void refetch(),
     handleNicknameChange,
     handleDisabilityTypeSelect,
     handleDoneClick,

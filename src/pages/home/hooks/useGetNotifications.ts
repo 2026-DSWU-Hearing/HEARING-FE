@@ -18,8 +18,6 @@ export const useGetNotifications = () => {
       hasNext && nextCursor ? nextCursor : undefined,
     staleTime: 60_000,
     gcTime: 5 * 60_000,
-    retry: (failureCount, error) =>
-      !isInvalidCursorError(error) && failureCount < 1,
   });
 
   const { error, isFetchNextPageError } = notificationsQuery;

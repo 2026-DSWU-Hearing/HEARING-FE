@@ -19,10 +19,16 @@ export const useDeviceSection = () => {
   const [connectErrorMessage, setConnectErrorMessage] = useState('');
   const [nameEditErrorMessage, setNameEditErrorMessage] = useState('');
   const [deleteErrorMessage, setDeleteErrorMessage] = useState('');
-  const { device, isConnected, isActiveUser, isLoading, isError } =
-    useDeviceConnection();
-  const { mutateAsync: updateDevice, isPending: isUpdating } =
-    usePatchDevice();
+  const {
+    device,
+    isConnected,
+    isActiveUser,
+    isLoading,
+    isError,
+    isFetching,
+    refetch,
+  } = useDeviceConnection();
+  const { mutateAsync: updateDevice, isPending: isUpdating } = usePatchDevice();
   const { mutateAsync: connectDevice, isPending: isConnecting } =
     useDevicesConnect();
   const { mutate: removeDevice, isPending: isDeleting } = useDeleteDevice();
@@ -96,6 +102,8 @@ export const useDeviceSection = () => {
     isActiveUser,
     isLoading,
     isError,
+    isFetching,
+    handleRetryClick: () => void refetch(),
     isMutating,
     isConnecting,
     isUpdating,
