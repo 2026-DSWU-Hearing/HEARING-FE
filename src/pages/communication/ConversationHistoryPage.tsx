@@ -8,6 +8,7 @@ import { useGetConversations } from '@/pages/communication/hooks/useGetConversat
 import TopNavigation from '@/layout/TopNavigation';
 import AlertModal from '@/shared/components/AlertModal';
 import ConfirmModal from '@/shared/components/ConfirmModal';
+import QueryErrorState from '@/shared/components/QueryErrorState';
 
 const MESSAGE_CLASSNAME = 'body-sm-regular mt-lg text-center text-neutral-500';
 
@@ -23,6 +24,7 @@ const ConversationHistoryPage = () => {
     isFetchNextPageError,
     isFetchingNextPage,
     isPending,
+    isFetching,
     refetch,
   } = useGetConversations();
   const { mutate: deleteConversation, isPending: isDeleting } =
@@ -98,20 +100,13 @@ const ConversationHistoryPage = () => {
       );
     }
 
-    if (isError && !isFetchNextPageError) {
+    if (isError && !data) {
       return (
-        <div role="alert" className="mt-lg flex flex-col items-center gap-sm">
-          <p className="body-sm-regular text-neutral-500">
-            {CONVERSATION_HISTORY_MESSAGE.LOAD_FAILED}
-          </p>
-          <button
-            type="button"
-            onClick={handleRetryClick}
-            className="body-sm-medium rounded-lg border border-neutral-600 px-base py-xs text-primary"
-          >
-            {CONVERSATION_HISTORY_MESSAGE.RETRY}
-          </button>
-        </div>
+        <QueryErrorState
+          message={CONVERSATION_HISTORY_MESSAGE.LOAD_FAILED}
+          isRetrying={isFetching}
+          onRetry={handleRetryClick}
+        />
       );
     }
 
@@ -143,6 +138,13 @@ const ConversationHistoryPage = () => {
         onRightClick={handleToggleDeleteMode}
       />
 
+      {isError && data && !isFetchNextPageError && (
+        <QueryErrorState
+          message={CONVERSATION_HISTORY_MESSAGE.LOAD_FAILED}
+          isRetrying={isFetching}
+          onRetry={handleRetryClick}
+        />
+      )}
       {renderContent()}
 
       <ConfirmModal

@@ -5,7 +5,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { CONVERSATION_LIST_QUERY_KEY } from '@/pages/communication/constants/conversationQueryKeys';
 import { LOCATION_MESSAGE } from '@/pages/communication/constants/locationMessages';
 
-import { useGetCommunicationMock } from '@/pages/communication/hooks/useGetCommunicationMock';
 import { useGetCurrentLocationName } from '@/pages/communication/hooks/useGetCurrentLocationName';
 import { useSttSocket } from '@/pages/communication/hooks/useSttSocket';
 import { useActiveConversationStore } from '@/pages/communication/stores/useActiveConversationStore';
@@ -20,8 +19,6 @@ const SAVED_NOTICE_DURATION = 2000;
 export const useCommunicationPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { data } = useGetCommunicationMock();
-  const conversation = data?.conversation ?? null;
   const isLocationAgreed = useLocationConsentStore(
     (state) => state.isLocationAgreed,
   );
@@ -96,9 +93,9 @@ export const useCommunicationPage = () => {
     onPartialText: (text) => {
       setDraftListening(text);
     },
-    onFinalText: (text) => {
+    onFinalText: (text, isCurrentSession) => {
       submitBubble('left', text, 'stt');
-      setDraftListening('');
+      if (isCurrentSession) setDraftListening('');
     },
     onConversationUnavailable: resetConversation,
   });
@@ -210,7 +207,6 @@ export const useCommunicationPage = () => {
   };
 
   return {
-    conversation,
     locationName,
     isLocationConsentOpen,
     bubbles,

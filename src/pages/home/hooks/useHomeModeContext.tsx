@@ -63,7 +63,7 @@ export const HomeModeProvider = ({ children }: HomeModeProviderPropTypes) => {
   const isDoNotDisturb = user?.do_not_disturb ?? false;
   // 서버 값을 아직 못 받았을 때 토글하면 캐시가 비어 낙관적 업데이트가 건너뛰어지므로,
   // 첫 조회가 끝날 때까지도 버튼을 잠근다.
-  const isDoNotDisturbPending = isPatchPending || isUserLoading;
+  const isDoNotDisturbPending = isPatchPending || isUserLoading || !user;
 
   // 카드 클릭: 화면 선택을 즉시 바꾸고 서버 활성 모드를 맞춘다. 실패하면 선택을 되돌리고 안내한다.
   // 요청이 진행 중이면 연속 클릭을 무시한다. 응답 순서가 뒤바뀌어 화면과 서버가 어긋나는 것을 막는다.

@@ -15,6 +15,8 @@ const CategoryBar = ({
     categories,
     isLoading,
     isError,
+    isFetching,
+    handleRetryClick,
     handleAllCategoryClick,
     handleCategoryChange,
   } = useCategoryBar({ onCategoryChange });
@@ -52,9 +54,16 @@ const CategoryBar = ({
       )}
 
       {isError && (
-        <span className="whitespace-nowrap text-sm text-neutral-400">
-          카테고리 없음
-        </span>
+        <button
+          type="button"
+          disabled={isFetching}
+          onClick={handleRetryClick}
+          className="whitespace-nowrap text-sm text-neutral-400 disabled:text-disabled"
+        >
+          {isFetching
+            ? '다시 불러오는 중...'
+            : '카테고리 조회 실패 · 다시 시도'}
+        </button>
       )}
 
       {categories.map((category) => (

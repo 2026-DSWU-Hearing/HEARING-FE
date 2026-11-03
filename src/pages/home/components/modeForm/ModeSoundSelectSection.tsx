@@ -8,6 +8,7 @@ import ModeSoundSelectBlock from '@/pages/home/components/modeForm/ModeSoundSele
 import ModeSoundSelectSkeleton from '@/pages/home/components/modeForm/ModeSoundSelectSkeleton';
 import { useModeFormContext } from '@/pages/home/components/modeForm/ModeFormContext';
 import { useModeSoundSelectSection } from '@/pages/home/hooks/useModeSoundSelectSection';
+import QueryErrorState from '@/shared/components/QueryErrorState';
 
 const ModeSoundSelectSection = () => {
   const { selectedSoundIds, handleSoundToggle } = useModeFormContext();
@@ -16,6 +17,8 @@ const ModeSoundSelectSection = () => {
     hasNoSearchResult,
     isError,
     isLoading,
+    isFetching,
+    handleRetryClick,
     isSearching,
     openedCategoryId,
     searchKeyword,
@@ -45,9 +48,11 @@ const ModeSoundSelectSection = () => {
 
       {isLoading && <ModeSoundSelectSkeleton />}
       {isError && (
-        <p className="body-sm-regular text-state-alert">
-          소리 목록을 불러오지 못했습니다
-        </p>
+        <QueryErrorState
+          message="소리 목록을 불러오지 못했습니다"
+          isRetrying={isFetching}
+          onRetry={handleRetryClick}
+        />
       )}
       {hasNoSearchResult && (
         <p className="body-sm-regular text-secondary text-center">

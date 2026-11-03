@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { refreshAccessToken } from '@/shared/apis/axios';
+import { SOCKET_CONNECTION_TIMEOUT_MS } from '@/shared/constants/networkConstants';
 import { getWebSocketBaseUrl } from '@/shared/utils/getWebSocketBaseUrl';
 import { isTokenExpired } from '@/shared/utils/jwt';
 import { getAccessToken } from '@/pages/login/utils/tokenStorage';
@@ -26,8 +27,6 @@ import { getMicrophoneErrorMessage } from '../utils/getMicrophoneErrorMessage';
 // 값이 달라도 기본 분기로 떨어져 동작은 한다(안내 문구와 토큰 재시도만 덜 정확해진다).
 const AUTH_FAILED_CLOSE_CODE = 4401;
 const NORMAL_CLOSE_CODE = 1000;
-// 소켓은 열렸는데 서버가 응답하지 않을 때 connecting에 영원히 머무는 것을 막는다.
-const READY_TIMEOUT_MS = 5000;
 const MAX_AUTH_REFRESH_ATTEMPTS = 1;
 
 interface UseLiveSoundSocketParamsTypes {
@@ -98,28 +97,30 @@ export const useLiveSoundSocket = ({
       droppedChunkCountRef.current = 0;
     }
 
-    // 마이크를 먼저 끈다. 소켓을 먼저 닫으면 남은 청크가 닫힌 소켓에 send되어 예외가 난다.
-    try {
-      await audioCaptureRef.current?.stop();
-    } catch (error) {
-      console.error('[LiveSound] 마이크 정리 중 오류:', error);
-    }
-    audioCaptureRef.current = null;
-
+    // 정리 중 새 세션이 시작되어도 새 참조를 비우거나 닫지 않도록 먼저 분리한다.
+    const capture = audioCaptureRef.current;
     const socket = socketRef.current;
+    audioCaptureRef.current = null;
+    socketRef.current = null;
     if (socket) {
-      // 의도적 종료가 onclose의 에러 경로를 타지 않도록 핸들러를 먼저 떼어낸다.
       socket.onopen = null;
       socket.onmessage = null;
       socket.onerror = null;
       socket.onclose = null;
+    }
 
+    // 마이크를 먼저 끈다. 소켓을 먼저 닫으면 남은 청크가 닫힌 소켓에 send되어 예외가 난다.
+    try {
+      await capture?.stop();
+    } catch (error) {
+      console.error('[LiveSound] 마이크 정리 중 오류:', error);
+    }
+    if (socket) {
       if (socket.readyState === WebSocket.OPEN) {
         socket.send(buildStopMessage());
       }
       socket.close(NORMAL_CLOSE_CODE);
     }
-    socketRef.current = null;
 
     return releasedSessionId;
   }, []);
@@ -182,10 +183,23 @@ export const useLiveSoundSocket = ({
 
       // 토큰의 쿼리스트링 예약 문자(+, /, =)가 깨지지 않도록 인코딩한다.
       const encodedToken = encodeURIComponent(validToken);
-      const socket = new WebSocket(
-        `${getWebSocketBaseUrl()}/ws/users/me/livesound?token=${encodedToken}`,
-      );
+      let socket: WebSocket;
+      try {
+        socket = new WebSocket(
+          `${getWebSocketBaseUrl()}/ws/users/me/livesound?token=${encodedToken}`,
+        );
+      } catch {
+        void stopSessionInternal('error', LIVE_SOUND_MESSAGE.CONNECT_FAILED);
+        return;
+      }
       socketRef.current = socket;
+      let hasReceivedReady = false;
+
+      // onopen 이전의 핸드셰이크 대기부터 ready 응답까지 모두 제한한다.
+      readyTimerRef.current = setTimeout(() => {
+        if (isStaleSession() || socketRef.current !== socket) return;
+        void stopSessionInternal('error', LIVE_SOUND_MESSAGE.CONNECT_FAILED);
+      }, SOCKET_CONNECTION_TIMEOUT_MS);
 
       const startCapture = async () => {
         try {
@@ -227,17 +241,12 @@ export const useLiveSoundSocket = ({
       };
 
       socket.onopen = () => {
+        if (isStaleSession() || socketRef.current !== socket) return;
         socket.send(buildStartMessage());
-
-        readyTimerRef.current = setTimeout(() => {
-          console.error(
-            '[LiveSound] ready 응답이 오지 않아 연결을 중단합니다.',
-          );
-          void stopSessionInternal('error', LIVE_SOUND_MESSAGE.CONNECT_FAILED);
-        }, READY_TIMEOUT_MS);
       };
 
       socket.onmessage = (event) => {
+        if (isStaleSession() || socketRef.current !== socket) return;
         if (typeof event.data !== 'string') return;
 
         const message = parseLiveSoundMessage(event.data);
@@ -245,6 +254,8 @@ export const useLiveSoundSocket = ({
 
         switch (message.type) {
           case 'ready':
+            if (hasReceivedReady) return;
+            hasReceivedReady = true;
             if (readyTimerRef.current) {
               clearTimeout(readyTimerRef.current);
               readyTimerRef.current = null;
@@ -267,11 +278,17 @@ export const useLiveSoundSocket = ({
       };
 
       socket.onerror = (error) => {
+        if (isStaleSession() || socketRef.current !== socket) return;
         console.error('[LiveSound] 소켓 오류:', error);
+        void stopSessionInternal('error', LIVE_SOUND_MESSAGE.CONNECT_FAILED);
       };
 
       socket.onclose = (event) => {
-        if (isStaleSession()) return;
+        if (isStaleSession() || socketRef.current !== socket) return;
+        if (readyTimerRef.current) {
+          clearTimeout(readyTimerRef.current);
+          readyTimerRef.current = null;
+        }
 
         // 캡처가 있다는 건 ready까지 성공했다는 뜻이다.
         const hasStartedCapture = audioCaptureRef.current !== null;
@@ -311,7 +328,10 @@ export const useLiveSoundSocket = ({
 
     // 이전 세션이 정리되지 않은 채(예: onerror만 나고 close가 없는 경우) 다시 시작하면
     // 소켓/마이크 참조를 잃어 영영 못 닫는다. 새로 열기 전에 반드시 해제한다.
-    void releaseSession().then(connect);
+    void releaseSession().then((releasedSessionId) => {
+      if (sessionIdRef.current !== releasedSessionId) return;
+      return connect();
+    });
   }, [releaseSession, stopSessionInternal]);
 
   const stopSession = useCallback(() => {

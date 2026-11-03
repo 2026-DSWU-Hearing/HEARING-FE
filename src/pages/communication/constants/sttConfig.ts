@@ -17,6 +17,8 @@ export const STT_FINAL_WAIT_MS = 3000;
 export const STT_MAX_BUFFERED_AMOUNT = 32000;
 
 export const STT_MESSAGE = {
+  CONNECT_TIMEOUT:
+    '음성 인식 서버 연결 시간이 초과되었습니다. 다시 시도해 주세요.',
   TOKEN_FAILED: '음성 인식 서버에 연결하지 못했습니다.',
   SOCKET_FAILED: '음성 인식 연결이 끊어졌습니다.',
   SERVER_CLOSED: '음성 인식이 중단되었습니다. 다시 시도해 주세요.',

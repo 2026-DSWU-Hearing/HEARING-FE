@@ -7,6 +7,7 @@ import { useHomeModeContext } from '@/pages/home/hooks/useHomeModeContext';
 import { useSoundSection } from '@/pages/home/hooks/useSoundSection';
 import AlertModal from '@/shared/components/AlertModal';
 import ConfirmModal from '@/shared/components/ConfirmModal';
+import QueryErrorState from '@/shared/components/QueryErrorState';
 import { AnimatePresence } from 'motion/react';
 
 const SKELETON_SOUND_COUNT = 6;
@@ -30,6 +31,9 @@ const SoundSectionContent = () => {
     sounds,
     isLoading,
     isError,
+    hasModeDetail,
+    isFetching,
+    handleRetryClick,
     isSoundListUpdating,
     isEditMode,
     isAddSoundModalOpen,
@@ -79,14 +83,20 @@ const SoundSectionContent = () => {
             type="button"
             onClick={toggleEditMode}
             className="body-base-regular text-tertiary"
-            disabled={isDoNotDisturb || isSoundListUpdating}
+            disabled={isDoNotDisturb || isSoundListUpdating || !hasModeDetail}
           >
             편집
           </button>
         )}
       </div>
 
-      {isError && <p>모드에 담긴 소리를 불러오지 못했습니다</p>}
+      {isError && (
+        <QueryErrorState
+          message="모드에 담긴 소리를 불러오지 못했습니다"
+          isRetrying={isFetching}
+          onRetry={handleRetryClick}
+        />
+      )}
 
       {isLoading ? (
         <SoundCardSkeletonGrid />
@@ -113,9 +123,9 @@ const SoundSectionContent = () => {
         <AddBtn
           label="소리 추가하기"
           onClick={openAddSoundModal}
-          disabled={isDoNotDisturb || isSoundListUpdating}
+          disabled={isDoNotDisturb || isSoundListUpdating || !hasModeDetail}
           className={
-            isDoNotDisturb || isSoundListUpdating
+            isDoNotDisturb || isSoundListUpdating || !hasModeDetail
               ? 'cursor-not-allowed opacity-60'
               : undefined
           }

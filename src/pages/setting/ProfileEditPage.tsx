@@ -1,6 +1,7 @@
 import TopNavigation from '@/layout/TopNavigation';
 import TextInput from '@/shared/components/TextInput';
 import LoadingSpinner from '@/shared/components/LoadingSpinner';
+import QueryErrorState from '@/shared/components/QueryErrorState';
 import AlertModal from '@/shared/components/AlertModal';
 import DisabilityTypeSelector from '@/pages/setting/components/profile/DisabilityTypeSelector';
 import { useProfileEditPage } from '@/pages/setting/hooks/useProfileEditPage';
@@ -14,6 +15,9 @@ const ProfileEditPage = () => {
     saveErrorMessage,
     isDoneDisabled,
     isLoading,
+    isLoadError,
+    isFetching,
+    handleRetryClick,
     handleNicknameChange,
     handleDisabilityTypeSelect,
     handleDoneClick,
@@ -34,6 +38,12 @@ const ProfileEditPage = () => {
         <div className="flex-1">
           <LoadingSpinner />
         </div>
+      ) : isLoadError ? (
+        <QueryErrorState
+          message="프로필을 불러오지 못했습니다"
+          isRetrying={isFetching}
+          onRetry={handleRetryClick}
+        />
       ) : (
         <div className="flex flex-col gap-base px-[1.03rem]">
           <TextInput
