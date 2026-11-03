@@ -5,7 +5,7 @@ import { useHomeModeContext } from '@/pages/home/hooks/useHomeModeContext';
 // 기본 선택(활성 모드)은 HomeModeProvider가 목록 데이터에서 파생값으로 정하므로 여기서는 effect로 맞추지 않는다.
 export const useModeList = () => {
   const { selectedModeId, isDoNotDisturb } = useHomeModeContext();
-  const { data, isLoading, isError } = useGetModes();
+  const { data, isLoading, isError, isFetching, refetch } = useGetModes();
 
   return {
     modes: data?.modes ?? [],
@@ -13,5 +13,7 @@ export const useModeList = () => {
     isDoNotDisturb,
     isLoading,
     isError,
+    isFetching,
+    handleRetryClick: () => void refetch(),
   };
 };

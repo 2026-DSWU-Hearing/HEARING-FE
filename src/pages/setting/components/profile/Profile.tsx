@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 
 import { useGetUsers } from '@/shared/hooks/useGetUsers';
+import QueryErrorState from '@/shared/components/QueryErrorState';
 import { ProfileSkeleton } from '@/pages/setting/components/SettingSkeleton';
 import { getDisabilityLabel } from '@/pages/setting/constants/disabilityType';
 import profileImage from '@/shared/assets/images/profile_image.svg';
@@ -8,7 +9,7 @@ import profileImage from '@/shared/assets/images/profile_image.svg';
 const Profile = () => {
   const navigate = useNavigate();
 
-  const { data: user, isLoading, isError } = useGetUsers();
+  const { data: user, isLoading, isFetching, refetch } = useGetUsers();
 
   const handleEditClick = () => {
     navigate('/setting/profile/edit');
@@ -18,11 +19,13 @@ const Profile = () => {
     return <ProfileSkeleton />;
   }
 
-  if (isError || !user) {
+  if (!user) {
     return (
-      <div className="flex items-center rounded-xl bg-neutral-900 px-base py-base body-base-regular text-secondary">
-        프로필을 불러오지 못했습니다
-      </div>
+      <QueryErrorState
+        message="프로필을 불러오지 못했습니다"
+        isRetrying={isFetching}
+        onRetry={() => void refetch()}
+      />
     );
   }
 

@@ -2,19 +2,30 @@ import AddBtn from '@/pages/home/components/AddButton';
 import ModeCard from '@/pages/home/components/mode/ModeCard';
 import ModeCardSkeleton from '@/pages/home/components/mode/ModeCardSkeleton';
 import { useModeList } from '@/pages/home/hooks/useModeList';
+import QueryErrorState from '@/shared/components/QueryErrorState';
 
 const SKELETON_MODE_COUNT = 3;
 
 const ModeList = () => {
-  const { modes, selectedModeId, isDoNotDisturb, isLoading, isError } =
-    useModeList();
-
-  if (isError) {
-    return <div>모드 목록을 불러오지 못했습니다</div>;
-  }
+  const {
+    modes,
+    selectedModeId,
+    isDoNotDisturb,
+    isLoading,
+    isError,
+    isFetching,
+    handleRetryClick,
+  } = useModeList();
 
   return (
     <section className="mt-8">
+      {isError && (
+        <QueryErrorState
+          message="모드 목록을 불러오지 못했습니다"
+          isRetrying={isFetching}
+          onRetry={handleRetryClick}
+        />
+      )}
       <div className="grid grid-cols-3 gap-base">
         {isLoading
           ? Array.from({ length: SKELETON_MODE_COUNT }).map((_, index) => (

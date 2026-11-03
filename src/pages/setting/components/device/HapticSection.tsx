@@ -6,6 +6,7 @@ import HapticSlider from '@/pages/setting/components/device/HapticSlider';
 import { SettingCardSkeleton } from '@/pages/setting/components/SettingSkeleton';
 import { useDeviceConnection } from '@/pages/setting/hooks/useDeviceConnection';
 import { useHapticStrength } from '@/pages/setting/hooks/useHapticStrength';
+import QueryErrorState from '@/shared/components/QueryErrorState';
 
 /**
  * 진동 강도 설정 섹션.
@@ -19,6 +20,9 @@ const HapticSection = () => {
     hapticStrength,
     saveErrorMessage,
     isLoading,
+    isLoadError,
+    isFetching,
+    handleRetryClick,
     handleStrengthChange,
     handleStrengthChangeEnd,
   } = useHapticStrength();
@@ -33,6 +37,19 @@ const HapticSection = () => {
       <section className="flex flex-col gap-sm">
         <SettingSectionTitle title="진동 강도 설정" />
         <SettingCardSkeleton />
+      </section>
+    );
+  }
+
+  if (isLoadError) {
+    return (
+      <section className="flex flex-col gap-sm">
+        <SettingSectionTitle title="진동 강도 설정" />
+        <QueryErrorState
+          message="진동 설정을 불러오지 못했습니다"
+          isRetrying={isFetching}
+          onRetry={handleRetryClick}
+        />
       </section>
     );
   }

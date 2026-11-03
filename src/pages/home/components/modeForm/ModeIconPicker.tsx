@@ -1,5 +1,6 @@
 import ModeIcon from '@/pages/home/components/modeForm/ModeIcon';
 import { useGetModeIcons } from '@/pages/home/hooks/useGetModeIcons';
+import QueryErrorState from '@/shared/components/QueryErrorState';
 
 interface ModeIconPickerPropTypes {
   selectedIcon: string;
@@ -10,7 +11,7 @@ const IconPicker = ({
   selectedIcon,
   onIconSelect,
 }: ModeIconPickerPropTypes) => {
-  const { data, isLoading, isError } = useGetModeIcons();
+  const { data, isLoading, isFetching, refetch } = useGetModeIcons();
 
   if (isLoading) {
     return (
@@ -25,11 +26,13 @@ const IconPicker = ({
     );
   }
 
-  if (isError || !data) {
+  if (!data) {
     return (
-      <p className="text-center text-sm font-bold text-neutral-400">
-        아이콘 목록을 불러오지 못했습니다
-      </p>
+      <QueryErrorState
+        message="아이콘 목록을 불러오지 못했습니다"
+        isRetrying={isFetching}
+        onRetry={() => void refetch()}
+      />
     );
   }
 

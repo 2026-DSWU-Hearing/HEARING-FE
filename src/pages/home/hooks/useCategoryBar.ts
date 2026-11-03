@@ -10,7 +10,8 @@ interface UseCategoryBarParamTypes {
 export const useCategoryBar = ({
   onCategoryChange,
 }: UseCategoryBarParamTypes) => {
-  const { data, isLoading, isError } = useGetSoundCategories();
+  const { data, isLoading, isError, isFetching, refetch } =
+    useGetSoundCategories();
   const categories = useMemo(
     () => filterVisibleCategories(data?.categories ?? []),
     [data?.categories],
@@ -31,6 +32,8 @@ export const useCategoryBar = ({
     categories,
     isLoading,
     isError,
+    isFetching,
+    handleRetryClick: () => void refetch(),
     handleAllCategoryClick,
     handleCategoryChange,
   };

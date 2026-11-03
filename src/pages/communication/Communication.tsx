@@ -12,7 +12,6 @@ import ConfirmModal from '@/shared/components/ConfirmModal';
 
 const Communication = () => {
   const {
-    conversation,
     locationName,
     isLocationConsentOpen,
     bubbles,
@@ -46,14 +45,6 @@ const Communication = () => {
 
     historyScroll.scrollTop = historyScroll.scrollHeight;
   }, [bubbles]);
-
-  if (!conversation) {
-    return (
-      <div className="body-base-medium flex min-h-dvh items-center justify-center bg-neutral-950 text-secondary">
-        로딩 중...
-      </div>
-    );
-  }
 
   return (
     <main className="flex h-dvh flex-col overflow-hidden bg-neutral-950">

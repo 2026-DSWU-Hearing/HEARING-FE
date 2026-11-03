@@ -19,32 +19,37 @@ import type { AudioCaptureTypes } from '@/pages/liveSound/utils/createAudioCaptu
 import { getMicrophoneErrorMessage } from '@/pages/liveSound/utils/getMicrophoneErrorMessage';
 import { getAccessToken } from '@/pages/login/utils/tokenStorage';
 import { refreshAccessToken } from '@/shared/apis/axios';
+import { SOCKET_CONNECTION_TIMEOUT_MS } from '@/shared/constants/networkConstants';
 import { isTokenExpired } from '@/shared/utils/jwt';
 
 interface UseSttSocketParamsTypes {
-  // 인식 중인 중간 결과. 말하는 동안 계속 갱신된다.
   onPartialText: (text: string) => void;
-  // 한 문장이 확정된 결과. 화면에는 이 시점에 버블로 쌓는다.
-  onFinalText: (text: string) => void;
+  onFinalText: (text: string, isCurrentSession: boolean) => void;
   onConversationUnavailable?: () => void;
 }
 
-// 소켓 주소에 토큰을 실어 보내야 해서, 만료된 토큰은 미리 갱신한다.
-// (감지 소켓 useDetectionSocket과 같은 방식)
+interface PendingSocketTypes {
+  timer: ReturnType<typeof setTimeout>;
+  sessionId: number;
+  notifyIfNoSpeech: () => void;
+}
+
 const getValidAccessToken = async (): Promise<string | null> => {
   const storedToken = getAccessToken();
   if (!storedToken) return null;
   if (!isTokenExpired(storedToken)) return storedToken;
-
   return refreshAccessToken();
 };
 
-// 실시간 STT 소켓 훅.
-// 마이크를 열어 16kHz PCM int16 청크를 서버로 흘려보내고, 내려오는 인식 결과를
-// 중간(partial) / 확정(final)으로 나눠 콜백으로 넘긴다.
-//
-// RTZR 인증/중계는 백엔드가 담당한다. 프론트는 대화 id로 소켓만 붙이면 된다.
-// 마이크 캡처는 실시간 소리 화면과 규격이 같아서 createAudioCapture를 그대로 재사용한다.
+// 정리한 소켓의 늦은 이벤트가 다음 세션의 상태나 마이크를 변경하지 못하게 한다.
+const closeSocket = (socket: WebSocket) => {
+  socket.onopen = null;
+  socket.onmessage = null;
+  socket.onerror = null;
+  socket.onclose = null;
+  socket.close();
+};
+
 export const useSttSocket = ({
   onPartialText,
   onFinalText,
@@ -52,14 +57,14 @@ export const useSttSocket = ({
 }: UseSttSocketParamsTypes) => {
   const [status, setStatus] = useState<SttStatusTypes>('idle');
   const [errorMessage, setErrorMessage] = useState('');
-
   const socketRef = useRef<WebSocket | null>(null);
   const captureRef = useRef<AudioCaptureTypes | null>(null);
-  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const connectionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // 종료한 녹음은 새 녹음과 별개로 최대 3초 동안 마지막 확정 문장을 받는다.
+  const pendingSocketsRef = useRef(new Map<WebSocket, PendingSocketTypes>());
+  const notifyIfNoSpeechRef = useRef<() => void>(() => {});
   const isStartingRef = useRef(false);
   const sessionIdRef = useRef(0);
-
-  // 콜백이 매 렌더 새로 만들어져도 start/stop이 다시 만들어지지 않도록 ref로 들고 있는다.
   const handlersRef = useRef({
     onPartialText,
     onFinalText,
@@ -73,204 +78,237 @@ export const useSttSocket = ({
     };
   });
 
-  const clearCloseTimer = () => {
-    if (!closeTimerRef.current) return;
-
-    clearTimeout(closeTimerRef.current);
-    closeTimerRef.current = null;
-  };
-
-  const stopCapture = () => {
-    // stop()은 멱등이라 여러 번 불려도 안전하다.
-    void captureRef.current?.stop();
-    captureRef.current = null;
-  };
-
-  // 대화 id가 있어야 소켓 주소가 만들어지므로, 반드시 대화 생성 후에 호출한다.
-  const start = useCallback(async (conversationId: number) => {
-    // 이미 열려 있으면 중복 연결하지 않는다(StrictMode 이중 실행 포함).
-    if (socketRef.current || isStartingRef.current) return;
-
-    isStartingRef.current = true;
-    sessionIdRef.current += 1;
-    const sessionId = sessionIdRef.current;
-
-    setStatus('connecting');
-    setErrorMessage('');
-
-    const accessToken = await getValidAccessToken();
-    isStartingRef.current = false;
-    if (sessionIdRef.current !== sessionId) return;
-
-    if (!accessToken) {
-      console.error(
-        '[STT] 유효한 토큰이 없어 연결을 중단합니다. (재로그인 필요)',
-      );
-      setErrorMessage(STT_MESSAGE.TOKEN_FAILED);
-      setStatus('error');
-      return;
+  const clearConnectionTimer = useCallback(() => {
+    if (connectionTimerRef.current !== null) {
+      clearTimeout(connectionTimerRef.current);
+      connectionTimerRef.current = null;
     }
+  }, []);
 
-    const socket = new WebSocket(
-      buildSttStreamUrl(conversationId, accessToken),
-    );
-    socket.binaryType = 'arraybuffer';
-    socketRef.current = socket;
+  const finishPendingSocket = useCallback(
+    (socket: WebSocket, message?: string) => {
+      const pending = pendingSocketsRef.current.get(socket);
+      if (!pending) return;
+      clearTimeout(pending.timer);
+      pendingSocketsRef.current.delete(socket);
+      closeSocket(socket);
 
-    let hasStartedListening = false;
-    let hasReceivedText = false;
-    let hasFailed = false;
+      // 이전 녹음의 종료 이벤트가 새 녹음의 상태나 안내를 덮어쓰지 않는다.
+      if (sessionIdRef.current !== pending.sessionId) return;
+      if (message) {
+        setErrorMessage(message);
+        setStatus('error');
+      } else {
+        pending.notifyIfNoSpeech();
+      }
+    },
+    [],
+  );
 
-    const notifyIfNoSpeech = () => {
-      if (!hasStartedListening || hasReceivedText || hasFailed) return;
+  const stopCapture = useCallback(() => {
+    const capture = captureRef.current;
+    captureRef.current = null;
+    void capture?.stop().catch((error) => {
+      console.error('[STT] 마이크 정리 실패:', error);
+    });
+  }, []);
 
-      setErrorMessage(STT_MESSAGE.NO_SPEECH);
-    };
+  const start = useCallback(
+    async (conversationId: number) => {
+      if (socketRef.current || isStartingRef.current) return;
+      isStartingRef.current = true;
+      sessionIdRef.current += 1;
+      const sessionId = sessionIdRef.current;
+      setStatus('connecting');
+      setErrorMessage('');
 
-    socket.onopen = async () => {
+      const accessToken = await getValidAccessToken();
+      if (sessionIdRef.current !== sessionId) return;
+      isStartingRef.current = false;
+      if (!accessToken) {
+        setErrorMessage(STT_MESSAGE.TOKEN_FAILED);
+        setStatus('error');
+        return;
+      }
+
+      let socket: WebSocket;
       try {
-        const capture = await createAudioCapture({
-          onChunk: (chunk) => {
-            if (socket.readyState !== WebSocket.OPEN) return;
-            // 전송이 밀리면 최신 오디오를 우선하고 밀린 청크는 버린다.
-            if (socket.bufferedAmount > STT_MAX_BUFFERED_AMOUNT) return;
+        socket = new WebSocket(buildSttStreamUrl(conversationId, accessToken));
+      } catch {
+        setErrorMessage(STT_MESSAGE.SOCKET_FAILED);
+        setStatus('error');
+        return;
+      }
+      socket.binaryType = 'arraybuffer';
+      socketRef.current = socket;
+      const isCurrentSocket = () =>
+        socketRef.current === socket && sessionIdRef.current === sessionId;
+      let hasStartedListening = false;
+      let hasReceivedText = false;
+      let hasFailed = false;
 
-            // convertFloat32ToInt16이 청크마다 새 Int16Array를 만들어 주므로
-            // buffer 전체가 곧 이 청크다(offset 0, 길이 동일). 복사 없이 그대로 보낸다.
-            socket.send(chunk.buffer as ArrayBuffer);
-          },
-        });
+      const notifyIfNoSpeech = () => {
+        if (hasStartedListening && !hasReceivedText && !hasFailed) {
+          setErrorMessage(STT_MESSAGE.NO_SPEECH);
+        }
+      };
 
-        // 권한 팝업 때문에 여기서 한참 멈출 수 있다. 그 사이에 stop()이나 언마운트가
-        // 일어났다면 captureRef는 아직 비어 있어서 아무도 이 마이크를 꺼주지 못한다.
-        // 돌아온 시점에 이 소켓이 여전히 현재 세션인지 확인하고, 아니면 직접 끈다.
-        if (
-          socketRef.current !== socket ||
-          socket.readyState !== WebSocket.OPEN
-        ) {
-          await capture.stop();
+      notifyIfNoSpeechRef.current = notifyIfNoSpeech;
+
+      const failConnection = (message: string) => {
+        if (!isCurrentSocket()) return;
+        hasFailed = true;
+        clearConnectionTimer();
+        socketRef.current = null;
+        stopCapture();
+        closeSocket(socket);
+        setErrorMessage(message);
+        setStatus('error');
+      };
+
+      connectionTimerRef.current = setTimeout(() => {
+        failConnection(STT_MESSAGE.CONNECT_TIMEOUT);
+      }, SOCKET_CONNECTION_TIMEOUT_MS);
+
+      socket.onopen = async () => {
+        if (!isCurrentSocket()) return;
+        clearConnectionTimer();
+        try {
+          const capture = await createAudioCapture({
+            onChunk: (chunk) => {
+              if (socket.readyState !== WebSocket.OPEN) return;
+              if (socket.bufferedAmount > STT_MAX_BUFFERED_AMOUNT) return;
+              socket.send(chunk.buffer as ArrayBuffer);
+            },
+          });
+          // 마이크 권한을 기다리는 동안 취소/이동했다면 늦게 열린 마이크도 즉시 끈다.
+          if (!isCurrentSocket() || socket.readyState !== WebSocket.OPEN) {
+            await capture.stop();
+            return;
+          }
+          captureRef.current = capture;
+          hasStartedListening = true;
+          setStatus('listening');
+        } catch (error) {
+          failConnection(getMicrophoneErrorMessage(error));
+        }
+      };
+
+      socket.onmessage = (event: MessageEvent<string>) => {
+        const pending = pendingSocketsRef.current.get(socket);
+        if (!isCurrentSocket() && !pending) return;
+        const isCurrentSession =
+          isCurrentSocket() || pending?.sessionId === sessionIdRef.current;
+        if (typeof event.data !== 'string') return;
+        let message: SttResultMessageTypes;
+        try {
+          message = JSON.parse(event.data) as SttResultMessageTypes;
+        } catch {
           return;
         }
+        const text = message.content?.trim() ?? '';
+        if (!text) return;
+        hasReceivedText = true;
+        if (message.isFinal)
+          handlersRef.current.onFinalText(text, isCurrentSession);
+        else if (isCurrentSession) handlersRef.current.onPartialText(text);
+      };
 
-        captureRef.current = capture;
-        hasStartedListening = true;
-        setStatus('listening');
-      } catch (error) {
-        console.error('[STT] 마이크 시작 실패:', error);
-        hasFailed = true;
-        setErrorMessage(getMicrophoneErrorMessage(error));
-        setStatus('error');
-        socket.close();
-      }
-    };
-
-    socket.onmessage = (event: MessageEvent<string>) => {
-      if (typeof event.data !== 'string') return;
-
-      let message: SttResultMessageTypes;
-      try {
-        message = JSON.parse(event.data) as SttResultMessageTypes;
-      } catch {
-        return;
-      }
-
-      const text = message.content?.trim() ?? '';
-      if (!text) return;
-
-      hasReceivedText = true;
-
-      if (message.isFinal) {
-        handlersRef.current.onFinalText(text);
-        return;
-      }
-
-      handlersRef.current.onPartialText(text);
-    };
-
-    socket.onerror = () => {
-      hasFailed = true;
-      setErrorMessage(STT_MESSAGE.SOCKET_FAILED);
-      setStatus('error');
-    };
-
-    socket.onclose = (event) => {
-      clearCloseTimer();
-
-      // EOS 후 늦게 닫히는 동안 사용자가 다시 시작했을 수 있다. 그때 이 핸들러가
-      // stopCapture()를 부르면 새 세션의 마이크가 꺼지고, setStatus는 'listening'을
-      // 'idle'로 덮어쓴다. 현재 세션의 소켓일 때만 정리한다.
-      if (socketRef.current !== socket) {
-        if (!socketRef.current) notifyIfNoSpeech();
-        return;
-      }
-
-      socketRef.current = null;
-      stopCapture();
-
-      if (event.code >= STT_SERVER_CLOSE_CODE_MIN) {
-        hasFailed = true;
-        console.error(
-          '[STT] 서버가 연결을 종료했습니다:',
-          event.code,
-          event.reason,
-        );
-        setErrorMessage(
-          STT_CLOSE_MESSAGE[event.code] ?? STT_MESSAGE.SERVER_CLOSED,
-        );
-        setStatus('error');
-
-        if (STT_CONVERSATION_UNAVAILABLE_CLOSE_CODES.includes(event.code)) {
-          handlersRef.current.onConversationUnavailable?.();
+      socket.onerror = () => {
+        if (pendingSocketsRef.current.has(socket)) {
+          hasFailed = true;
+          finishPendingSocket(socket, STT_MESSAGE.SOCKET_FAILED);
+          return;
         }
-        return;
-      }
+        failConnection(STT_MESSAGE.SOCKET_FAILED);
+      };
 
-      // 에러로 닫힌 경우에는 사용자에게 보여줄 문구를 지우지 않는다.
-      setStatus((prevStatus) => (prevStatus === 'error' ? 'error' : 'idle'));
-      notifyIfNoSpeech();
-    };
-  }, []);
+      socket.onclose = (event) => {
+        if (pendingSocketsRef.current.has(socket)) {
+          finishPendingSocket(
+            socket,
+            event.code === 1000
+              ? undefined
+              : (STT_CLOSE_MESSAGE[event.code] ?? STT_MESSAGE.SOCKET_FAILED),
+          );
+          return;
+        }
+        if (!isCurrentSocket()) return;
+        clearConnectionTimer();
+        socketRef.current = null;
+        stopCapture();
+        closeSocket(socket);
+
+        if (event.code >= STT_SERVER_CLOSE_CODE_MIN) {
+          hasFailed = true;
+          setErrorMessage(
+            STT_CLOSE_MESSAGE[event.code] ?? STT_MESSAGE.SERVER_CLOSED,
+          );
+          setStatus('error');
+          if (STT_CONVERSATION_UNAVAILABLE_CLOSE_CODES.includes(event.code)) {
+            handlersRef.current.onConversationUnavailable?.();
+          }
+          return;
+        }
+        if (event.code !== 1000 || !hasStartedListening) {
+          setErrorMessage(STT_MESSAGE.SOCKET_FAILED);
+          setStatus('error');
+          return;
+        }
+        setStatus('idle');
+        notifyIfNoSpeech();
+      };
+    },
+    [clearConnectionTimer, finishPendingSocket, stopCapture],
+  );
 
   const stop = useCallback(() => {
     const socket = socketRef.current;
     sessionIdRef.current += 1;
     isStartingRef.current = false;
-
-    // 마이크는 기다리지 않고 바로 끈다(녹음 표시가 남지 않도록).
+    clearConnectionTimer();
     stopCapture();
-
-    // 소켓 참조를 먼저 비워서, 마지막 결과를 기다리는 동안에도 바로 다시 시작할 수 있게 한다.
     socketRef.current = null;
     setStatus('idle');
-
     if (!socket) return;
-
     if (socket.readyState !== WebSocket.OPEN) {
-      socket.close();
+      closeSocket(socket);
       return;
     }
 
-    // EOS를 보내야 마지막 문장의 final이 내려온다. 그 결과를 받고 나서 닫는다.
-    socket.send(STT_EOS_MESSAGE);
+    // 마지막 확정 문장을 최대 3초 기다린다. 서버가 닫지 않아도 직접 닫는다.
+    const timer = setTimeout(
+      () => finishPendingSocket(socket),
+      STT_FINAL_WAIT_MS,
+    );
+    pendingSocketsRef.current.set(socket, {
+      timer,
+      sessionId: sessionIdRef.current,
+      notifyIfNoSpeech: notifyIfNoSpeechRef.current,
+    });
+    try {
+      socket.send(STT_EOS_MESSAGE);
+    } catch {
+      finishPendingSocket(socket, STT_MESSAGE.SOCKET_FAILED);
+    }
+  }, [clearConnectionTimer, finishPendingSocket, stopCapture]);
 
-    clearCloseTimer();
-    closeTimerRef.current = setTimeout(() => {
-      closeTimerRef.current = null;
-      socket.close();
-    }, STT_FINAL_WAIT_MS);
-  }, []);
-
-  // 페이지를 떠날 때 마이크와 소켓을 확실히 정리한다.
   useEffect(() => {
+    const pendingSockets = pendingSocketsRef.current;
     return () => {
       sessionIdRef.current += 1;
       isStartingRef.current = false;
-      clearCloseTimer();
+      clearConnectionTimer();
+      for (const [socket, pending] of pendingSockets) {
+        clearTimeout(pending.timer);
+        closeSocket(socket);
+      }
+      pendingSockets.clear();
       stopCapture();
-      socketRef.current?.close();
+      if (socketRef.current) closeSocket(socketRef.current);
       socketRef.current = null;
     };
-  }, []);
+  }, [clearConnectionTimer, stopCapture]);
 
   return { status, errorMessage, start, stop };
 };

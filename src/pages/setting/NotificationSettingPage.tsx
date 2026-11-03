@@ -6,6 +6,7 @@ import NotificationToggleBar from '@/pages/setting/components/NotificationToggle
 import { NotificationToggleBarSkeleton } from '@/pages/setting/components/SettingSkeleton';
 import { NOTIFICATION_MESSAGE } from '@/pages/setting/constants/notificationMessages';
 import AlertModal from '@/shared/components/AlertModal';
+import QueryErrorState from '@/shared/components/QueryErrorState';
 import { isNotificationSupported } from '@/shared/firebase/settingFCM';
 import { useFcmToken } from '@/shared/hooks/useFcmToken';
 import { useGetUsers } from '@/shared/hooks/useGetUsers';
@@ -15,7 +16,13 @@ import { usePatchEmergencyAlert } from '@/pages/setting/hooks/usePatchEmergencyA
 const NotificationSettingPage = () => {
   const navigate = useNavigate();
 
-  const { data: user, isLoading: isUserLoading } = useGetUsers();
+  const {
+    data: user,
+    isLoading: isUserLoading,
+    isError,
+    isFetching,
+    refetch,
+  } = useGetUsers();
   const { mutateAsync: updatePushEnabled, isPending: isUpdatingPushEnabled } =
     usePatchPushEnabled();
   const {
@@ -139,7 +146,7 @@ const NotificationSettingPage = () => {
           rightText="완료"
           onRightClick={handleDoneClick}
           rightVariant="default"
-          isRightDisabled={isSaving || isUserLoading}
+          isRightDisabled={isSaving || isUserLoading || !user}
         />
 
         <section className="flex flex-col gap-xs px-[1.34rem]">
@@ -150,6 +157,12 @@ const NotificationSettingPage = () => {
               <NotificationToggleBarSkeleton />
               <NotificationToggleBarSkeleton />
             </>
+          ) : isError && !user ? (
+            <QueryErrorState
+              message="알림 설정을 불러오지 못했습니다"
+              isRetrying={isFetching}
+              onRetry={() => void refetch()}
+            />
           ) : (
             <>
               <NotificationToggleBar

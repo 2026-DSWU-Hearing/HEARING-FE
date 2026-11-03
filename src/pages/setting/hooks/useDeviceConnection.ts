@@ -12,6 +12,8 @@ export const useDeviceConnection = () => {
     data: devices,
     isLoading,
     isError: isFetchError,
+    isFetching,
+    refetch,
   } = useGetDevices();
 
   const device = devices?.[0];
@@ -31,5 +33,7 @@ export const useDeviceConnection = () => {
     isMyDeviceConnected,
     isLoading,
     isError,
+    isFetching,
+    refetch,
   };
 };

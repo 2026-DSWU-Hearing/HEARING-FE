@@ -6,6 +6,7 @@ import { MODE_MESSAGE } from '@/pages/home/constants/modeMessages';
 import { useSoundAddModal } from '@/pages/home/hooks/useSoundAddModal';
 import type { SoundTypes } from '@/pages/home/types/soundTypes';
 import ConfirmModal from '@/shared/components/ConfirmModal';
+import QueryErrorState from '@/shared/components/QueryErrorState';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'motion/react';
@@ -31,6 +32,9 @@ const SoundAddBottomModal = ({
     hasNoSearchResult,
     isLoading,
     isError,
+    isFetching,
+    canComplete,
+    handleRetryClick,
     isCancelConfirmOpen,
     closeCancelConfirm,
     handleSearchKeywordChange,
@@ -78,7 +82,8 @@ const SoundAddBottomModal = ({
           <button
             type="button"
             onClick={handleCompleteClick}
-            className="heading-base-semibold "
+            disabled={!canComplete}
+            className="heading-base-semibold disabled:text-disabled"
           >
             완료
           </button>
@@ -95,16 +100,27 @@ const SoundAddBottomModal = ({
             onCategoryChange={handleCategoryChange}
           />
 
-          {isError && <p>소리 목록을 불러오지 못했습니다</p>}
+          {isError && (
+            <QueryErrorState
+              message="소리 목록을 불러오지 못했습니다"
+              isRetrying={isFetching}
+              onRetry={handleRetryClick}
+            />
+          )}
         </div>
 
         <div className="hide-scrollbar mt-5 flex-1 overflow-y-auto">
           {isLoading ? (
             <SkeletonTheme baseColor="#4a4b47" highlightColor="#5e5f5a">
               <div className="grid grid-cols-3 gap-3">
-                {Array.from({ length: SKELETON_SOUND_COUNT }).map((_, index) => (
-                  <SoundCardSkeleton key={index} bgClassName="bg-neutral-700" />
-                ))}
+                {Array.from({ length: SKELETON_SOUND_COUNT }).map(
+                  (_, index) => (
+                    <SoundCardSkeleton
+                      key={index}
+                      bgClassName="bg-neutral-700"
+                    />
+                  ),
+                )}
               </div>
             </SkeletonTheme>
           ) : hasNoSearchResult ? (
