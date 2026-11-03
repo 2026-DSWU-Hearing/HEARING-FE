@@ -15,6 +15,10 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AxiosError } from 'axios';
 
+import ConversationHistoryDetailPage from '@/pages/communication/ConversationHistoryDetailPage';
+import { getConversation } from '@/pages/communication/apis/conversationApi';
+import { CONVERSATION_DETAIL_QUERY_KEY } from '@/pages/communication/constants/conversationQueryKeys';
+import { CONVERSATION_HISTORY_MESSAGE } from '@/pages/communication/constants/conversationHistoryMessages';
 import TermsAgreedRoute from '@/routes/TermsAgreedRoute';
 import ProfileEditPage from '@/pages/setting/ProfileEditPage';
 import { getUsers } from '@/shared/apis/getUsers';
@@ -26,6 +30,9 @@ import {
 } from './fixtures/networkErrors';
 import { USER_FIXTURE } from './fixtures/userFixture';
 
+vi.mock('@/pages/communication/apis/conversationApi', () => ({
+  getConversation: vi.fn(),
+}));
 vi.mock('@/shared/apis/getUsers', () => ({ getUsers: vi.fn() }));
 vi.mock('@/shared/components/LoadingSpinner', () => ({
   default: () => <div role="status">조회 중</div>,
@@ -129,6 +136,61 @@ describe('조회 실패와 복구', () => {
     });
     expect(screen.getByText(`페이지: ${USER_FIXTURE.nickname}`)).toBeTruthy();
     expect(screen.queryByRole('status')).toBeNull();
+  });
+
+  it.each([401, 403])(
+    '캐시가 있어도 %s 응답 이후에는 하위 페이지를 숨긴다',
+    async (status) => {
+      queryClient.setQueryData(['users', 'me'], USER_FIXTURE);
+      vi.mocked(getUsers).mockRejectedValue(createServerError(status));
+      renderRoutes();
+      await act(async () => {
+        await queryClient.invalidateQueries({ queryKey: ['users', 'me'] });
+      });
+      await screen.findByRole('alert');
+      expect(screen.queryByText(`페이지: ${USER_FIXTURE.nickname}`)).toBeNull();
+      vi.mocked(getUsers).mockResolvedValue(USER_FIXTURE);
+      fireEvent.click(screen.getByRole('button', { name: '다시 시도' }));
+      await screen.findByText(`페이지: ${USER_FIXTURE.nickname}`);
+    },
+  );
+
+  it('캐시된 대화가 재조회에서 404이면 이전 기록을 숨긴다', async () => {
+    const queryKey = CONVERSATION_DETAIL_QUERY_KEY(1);
+    queryClient.setQueryData(queryKey, {
+      conversation_id: 1,
+      created_at: '2026-11-03T00:00:00Z',
+      ended_at: null,
+      latitude: null,
+      longitude: null,
+      bubbles: [
+        {
+          bubble_id: 1,
+          direction: 'left',
+          inputType: 'text',
+          content: '삭제된 대화 내용',
+        },
+      ],
+    });
+    vi.mocked(getConversation).mockRejectedValue(createServerError(404));
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={['/communication/histories/1']}>
+          <Routes>
+            <Route
+              path="/communication/histories/:historyId"
+              element={<ConversationHistoryDetailPage />}
+            />
+          </Routes>
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+    expect(screen.getByText('삭제된 대화 내용')).toBeTruthy();
+    await act(async () => {
+      await queryClient.invalidateQueries({ queryKey });
+    });
+    await screen.findByText(CONVERSATION_HISTORY_MESSAGE.NOT_FOUND);
+    expect(screen.queryByText('삭제된 대화 내용')).toBeNull();
   });
 
   it('정상 응답이 미동의 상태이면 온보딩으로 이동한다', async () => {

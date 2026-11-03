@@ -47,7 +47,7 @@ const ConversationHistoryDetailPage = () => {
       />
 
       <section className="hide-scrollbar flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto pb-[6.1875rem]">
-        {conversation && (
+        {conversation && !isNotFound && (
           <>
             <ConversationHistoryInfo
               startedAt={conversation.created_at}

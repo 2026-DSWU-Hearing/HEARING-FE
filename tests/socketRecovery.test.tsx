@@ -6,13 +6,18 @@ import { useSttSocket } from '@/pages/communication/hooks/useSttSocket';
 import { createAudioCapture } from '@/pages/liveSound/utils/createAudioCapture';
 import type { AudioCaptureTypes } from '@/pages/liveSound/utils/createAudioCapture';
 import { SOCKET_CONNECTION_TIMEOUT_MS } from '@/shared/constants/networkConstants';
-import { STT_FINAL_WAIT_MS } from '@/pages/communication/constants/sttConfig';
+import {
+  STT_FINAL_WAIT_MS,
+  STT_MESSAGE,
+} from '@/pages/communication/constants/sttConfig';
+import { refreshAccessToken } from '@/shared/apis/axios';
+import { isTokenExpired } from '@/shared/utils/jwt';
 import { MockWebSocket } from './fixtures/mockWebSocket';
 
 vi.mock('@/pages/login/utils/tokenStorage', () => ({
   getAccessToken: () => 'test-token',
 }));
-vi.mock('@/shared/utils/jwt', () => ({ isTokenExpired: () => false }));
+vi.mock('@/shared/utils/jwt', () => ({ isTokenExpired: vi.fn(() => false) }));
 vi.mock('@/shared/utils/getWebSocketBaseUrl', () => ({
   getWebSocketBaseUrl: () => 'ws://localhost',
 }));
@@ -55,6 +60,10 @@ const renderStt = () =>
 beforeEach(() => {
   vi.useFakeTimers();
   MockWebSocket.instances = [];
+  vi.mocked(isTokenExpired).mockReturnValue(false);
+  vi.mocked(refreshAccessToken)
+    .mockReset()
+    .mockResolvedValue('refreshed-test-token');
   vi.stubGlobal('WebSocket', MockWebSocket);
   vi.mocked(createAudioCapture)
     .mockReset()
@@ -251,9 +260,97 @@ describe('양방향 소통 연결', () => {
     act(() => result.current.stop());
     expect(socket.send).toHaveBeenCalledWith('EOS');
     act(() => socket.receive({ content: '마지막 문장', isFinal: true }));
-    expect(onFinalText).toHaveBeenCalledWith('마지막 문장');
+    expect(onFinalText).toHaveBeenCalledWith('마지막 문장', true);
     await act(async () => vi.advanceTimersByTimeAsync(STT_FINAL_WAIT_MS));
     expect(socket.close).toHaveBeenCalled();
+  });
+
+  it.each(['server-close', 'timeout'])(
+    '최종 결과가 없으면 %s 이후 무음 안내를 표시하고 직접 정리한다',
+    async (phase) => {
+      const { result } = renderStt();
+      await act(async () => result.current.start(1));
+      const socket = MockWebSocket.instances[0];
+      await act(async () => socket.open());
+      act(() => result.current.stop());
+      if (phase === 'server-close') act(() => socket.serverClose(1000));
+      else
+        await act(async () => vi.advanceTimersByTimeAsync(STT_FINAL_WAIT_MS));
+      expect(result.current.errorMessage).toBe(STT_MESSAGE.NO_SPEECH);
+      expect(socket.onmessage).toBeNull();
+      expect(socket.close).toHaveBeenCalledTimes(1);
+      expect(vi.getTimerCount()).toBe(0);
+    },
+  );
+
+  it('EOS 이후 소켓 오류를 사용자에게 알리고 직접 정리한다', async () => {
+    const { result } = renderStt();
+    await act(async () => result.current.start(1));
+    const socket = MockWebSocket.instances[0];
+    await act(async () => socket.open());
+    act(() => result.current.stop());
+    act(() => socket.onerror?.(new Event('error')));
+    expect(result.current.errorMessage).toBe(STT_MESSAGE.SOCKET_FAILED);
+    expect(result.current.status).toBe('error');
+    expect(socket.onmessage).toBeNull();
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it.each(['error', 'timeout'])(
+    '빠른 재시작 후 이전 final은 보존하고 이전 %s는 새 녹음에 영향을 주지 않는다',
+    async (phase) => {
+      const onPartialText = vi.fn();
+      const onFinalText = vi.fn();
+      const { result } = renderHook(() =>
+        useSttSocket({ onPartialText, onFinalText }),
+      );
+      await act(async () => result.current.start(1));
+      const previousSocket = MockWebSocket.instances[0];
+      await act(async () => previousSocket.open());
+      act(() => result.current.stop());
+      await act(async () => result.current.start(1));
+      const currentSocket = MockWebSocket.instances[1];
+      await act(async () => currentSocket.open());
+      expect(previousSocket.close).not.toHaveBeenCalled();
+      act(() => {
+        currentSocket.receive({
+          content: '새 녹음의 중간 문장',
+          isFinal: false,
+        });
+        previousSocket.receive({ content: '이전 중간 문장', isFinal: false });
+        previousSocket.receive({ content: '이전 마지막 문장', isFinal: true });
+      });
+      expect(onPartialText).toHaveBeenCalledExactlyOnceWith(
+        '새 녹음의 중간 문장',
+      );
+      expect(onFinalText).toHaveBeenCalledExactlyOnceWith(
+        '이전 마지막 문장',
+        false,
+      );
+      if (phase === 'error')
+        act(() => previousSocket.onerror?.(new Event('error')));
+      else
+        await act(async () => vi.advanceTimersByTimeAsync(STT_FINAL_WAIT_MS));
+      expect(previousSocket.onmessage).toBeNull();
+      expect(result.current.status).toBe('listening');
+      expect(result.current.errorMessage).toBe('');
+      expect(currentSocket.close).not.toHaveBeenCalled();
+    },
+  );
+
+  it('여러 번 중지한 녹음도 언마운트 때 모두 정리한다', async () => {
+    const { result, unmount } = renderStt();
+    for (let index = 0; index < 3; index += 1) {
+      await act(async () => result.current.start(1));
+      await act(async () => MockWebSocket.instances[index].open());
+      act(() => result.current.stop());
+    }
+    unmount();
+    for (const socket of MockWebSocket.instances) {
+      expect(socket.close).toHaveBeenCalledTimes(1);
+      expect(socket.onmessage).toBeNull();
+    }
+    expect(vi.getTimerCount()).toBe(0);
   });
 
   it('페이지 이탈 시 마지막 결과를 기다리는 소켓과 타이머도 해제한다', async () => {
@@ -266,5 +363,52 @@ describe('양방향 소통 연결', () => {
     expect(socket.close).toHaveBeenCalled();
     expect(socket.onmessage).toBeNull();
     expect(vi.getTimerCount()).toBe(0);
+  });
+});
+
+describe.each(['liveSound', 'stt'] as const)('%s 토큰 갱신', (feature) => {
+  it('HTTP 갱신 타임아웃 결과를 오류로 처리하고 다시 시작할 수 있다', async () => {
+    vi.mocked(isTokenExpired).mockReturnValue(true);
+    // refreshAccessToken의 실제 HTTP 타임아웃은 httpTimeout.test.ts에서 검증한다.
+    vi.mocked(refreshAccessToken).mockImplementationOnce(
+      () => new Promise((resolve) => setTimeout(() => resolve(null), 5000)),
+    );
+    const { result } = renderHook(() => {
+      const liveSound = useLiveSoundSocket({
+        onClassification: vi.fn(),
+        onSessionStart: vi.fn(),
+      });
+      const stt = useSttSocket({
+        onPartialText: vi.fn(),
+        onFinalText: vi.fn(),
+      });
+      return feature === 'liveSound'
+        ? {
+            start: liveSound.startSession,
+            status: liveSound.status,
+            message: liveSound.alertMessage,
+          }
+        : {
+            start: () => stt.start(1),
+            status: stt.status,
+            message: stt.errorMessage,
+          };
+    });
+    act(() => {
+      void result.current.start();
+    });
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(result.current.status).toBe('connecting');
+    await act(async () => vi.advanceTimersByTimeAsync(5000));
+    expect(refreshAccessToken).toHaveBeenCalledOnce();
+    expect(result.current.status).toBe('error');
+    expect(result.current.message).not.toBe('');
+    expect(MockWebSocket.instances).toHaveLength(0);
+    vi.mocked(isTokenExpired).mockReturnValue(false);
+    await act(async () => result.current.start());
+    expect(result.current.status).toBe('connecting');
+    expect(MockWebSocket.instances).toHaveLength(1);
   });
 });

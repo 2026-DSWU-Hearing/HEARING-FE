@@ -24,8 +24,14 @@ import { isTokenExpired } from '@/shared/utils/jwt';
 
 interface UseSttSocketParamsTypes {
   onPartialText: (text: string) => void;
-  onFinalText: (text: string) => void;
+  onFinalText: (text: string, isCurrentSession: boolean) => void;
   onConversationUnavailable?: () => void;
+}
+
+interface PendingSocketTypes {
+  timer: ReturnType<typeof setTimeout>;
+  sessionId: number;
+  notifyIfNoSpeech: () => void;
 }
 
 const getValidAccessToken = async (): Promise<string | null> => {
@@ -54,9 +60,9 @@ export const useSttSocket = ({
   const socketRef = useRef<WebSocket | null>(null);
   const captureRef = useRef<AudioCaptureTypes | null>(null);
   const connectionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // 종료 시 EOS의 마지막 결과를 기다리는 소켓. 새 세션 시작·언마운트 시 함께 정리한다.
-  const closingSocketRef = useRef<WebSocket | null>(null);
+  // 종료한 녹음은 새 녹음과 별개로 최대 3초 동안 마지막 확정 문장을 받는다.
+  const pendingSocketsRef = useRef(new Map<WebSocket, PendingSocketTypes>());
+  const notifyIfNoSpeechRef = useRef<() => void>(() => {});
   const isStartingRef = useRef(false);
   const sessionIdRef = useRef(0);
   const handlersRef = useRef({
@@ -79,16 +85,25 @@ export const useSttSocket = ({
     }
   }, []);
 
-  const closePendingSocket = useCallback(() => {
-    if (closeTimerRef.current !== null) {
-      clearTimeout(closeTimerRef.current);
-      closeTimerRef.current = null;
-    }
-    if (closingSocketRef.current) {
-      closeSocket(closingSocketRef.current);
-      closingSocketRef.current = null;
-    }
-  }, []);
+  const finishPendingSocket = useCallback(
+    (socket: WebSocket, message?: string) => {
+      const pending = pendingSocketsRef.current.get(socket);
+      if (!pending) return;
+      clearTimeout(pending.timer);
+      pendingSocketsRef.current.delete(socket);
+      closeSocket(socket);
+
+      // 이전 녹음의 종료 이벤트가 새 녹음의 상태나 안내를 덮어쓰지 않는다.
+      if (sessionIdRef.current !== pending.sessionId) return;
+      if (message) {
+        setErrorMessage(message);
+        setStatus('error');
+      } else {
+        pending.notifyIfNoSpeech();
+      }
+    },
+    [],
+  );
 
   const stopCapture = useCallback(() => {
     const capture = captureRef.current;
@@ -101,7 +116,6 @@ export const useSttSocket = ({
   const start = useCallback(
     async (conversationId: number) => {
       if (socketRef.current || isStartingRef.current) return;
-      closePendingSocket();
       isStartingRef.current = true;
       sessionIdRef.current += 1;
       const sessionId = sessionIdRef.current;
@@ -138,6 +152,8 @@ export const useSttSocket = ({
           setErrorMessage(STT_MESSAGE.NO_SPEECH);
         }
       };
+
+      notifyIfNoSpeechRef.current = notifyIfNoSpeech;
 
       const failConnection = (message: string) => {
         if (!isCurrentSocket()) return;
@@ -179,7 +195,10 @@ export const useSttSocket = ({
       };
 
       socket.onmessage = (event: MessageEvent<string>) => {
-        if (!isCurrentSocket() && closingSocketRef.current !== socket) return;
+        const pending = pendingSocketsRef.current.get(socket);
+        if (!isCurrentSocket() && !pending) return;
+        const isCurrentSession =
+          isCurrentSocket() || pending?.sessionId === sessionIdRef.current;
         if (typeof event.data !== 'string') return;
         let message: SttResultMessageTypes;
         try {
@@ -190,23 +209,28 @@ export const useSttSocket = ({
         const text = message.content?.trim() ?? '';
         if (!text) return;
         hasReceivedText = true;
-        if (message.isFinal) handlersRef.current.onFinalText(text);
-        else handlersRef.current.onPartialText(text);
+        if (message.isFinal)
+          handlersRef.current.onFinalText(text, isCurrentSession);
+        else if (isCurrentSession) handlersRef.current.onPartialText(text);
       };
 
       socket.onerror = () => {
-        if (closingSocketRef.current === socket) {
+        if (pendingSocketsRef.current.has(socket)) {
           hasFailed = true;
-          closePendingSocket();
+          finishPendingSocket(socket, STT_MESSAGE.SOCKET_FAILED);
           return;
         }
         failConnection(STT_MESSAGE.SOCKET_FAILED);
       };
 
       socket.onclose = (event) => {
-        if (closingSocketRef.current === socket) {
-          closePendingSocket();
-          notifyIfNoSpeech();
+        if (pendingSocketsRef.current.has(socket)) {
+          finishPendingSocket(
+            socket,
+            event.code === 1000
+              ? undefined
+              : (STT_CLOSE_MESSAGE[event.code] ?? STT_MESSAGE.SOCKET_FAILED),
+          );
           return;
         }
         if (!isCurrentSocket()) return;
@@ -235,7 +259,7 @@ export const useSttSocket = ({
         notifyIfNoSpeech();
       };
     },
-    [clearConnectionTimer, closePendingSocket, stopCapture],
+    [clearConnectionTimer, finishPendingSocket, stopCapture],
   );
 
   const stop = useCallback(() => {
@@ -253,25 +277,38 @@ export const useSttSocket = ({
     }
 
     // 마지막 확정 문장을 최대 3초 기다린다. 서버가 닫지 않아도 직접 닫는다.
-    closingSocketRef.current = socket;
-    socket.send(STT_EOS_MESSAGE);
-    closeTimerRef.current = setTimeout(() => {
-      closeTimerRef.current = null;
-      socket.close();
-    }, STT_FINAL_WAIT_MS);
-  }, [clearConnectionTimer, stopCapture]);
+    const timer = setTimeout(
+      () => finishPendingSocket(socket),
+      STT_FINAL_WAIT_MS,
+    );
+    pendingSocketsRef.current.set(socket, {
+      timer,
+      sessionId: sessionIdRef.current,
+      notifyIfNoSpeech: notifyIfNoSpeechRef.current,
+    });
+    try {
+      socket.send(STT_EOS_MESSAGE);
+    } catch {
+      finishPendingSocket(socket, STT_MESSAGE.SOCKET_FAILED);
+    }
+  }, [clearConnectionTimer, finishPendingSocket, stopCapture]);
 
   useEffect(() => {
+    const pendingSockets = pendingSocketsRef.current;
     return () => {
       sessionIdRef.current += 1;
       isStartingRef.current = false;
       clearConnectionTimer();
-      closePendingSocket();
+      for (const [socket, pending] of pendingSockets) {
+        clearTimeout(pending.timer);
+        closeSocket(socket);
+      }
+      pendingSockets.clear();
       stopCapture();
       if (socketRef.current) closeSocket(socketRef.current);
       socketRef.current = null;
     };
-  }, [clearConnectionTimer, closePendingSocket, stopCapture]);
+  }, [clearConnectionTimer, stopCapture]);
 
   return { status, errorMessage, start, stop };
 };

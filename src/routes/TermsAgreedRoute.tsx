@@ -1,4 +1,5 @@
 import { Navigate, Outlet } from 'react-router-dom';
+import { isAxiosError } from 'axios';
 
 import LoadingSpinner from '@/shared/components/LoadingSpinner';
 import QueryErrorState from '@/shared/components/QueryErrorState';
@@ -7,10 +8,20 @@ import { useGetUsers } from '@/shared/hooks/useGetUsers';
 const ONBOARDING_START_PATH = '/onboarding/nickname';
 
 const TermsAgreedRoute = () => {
-  const { data: user, isPending, isFetching, isError, refetch } = useGetUsers();
+  const {
+    data: user,
+    isPending,
+    isFetching,
+    isError,
+    error,
+    refetch,
+  } = useGetUsers();
+  const isAccessDenied =
+    isAxiosError(error) &&
+    (error.response?.status === 401 || error.response?.status === 403);
 
   // 이미 확인한 동의 정보가 있으면 백그라운드 조회 실패로 페이지를 제거하지 않는다.
-  if (user?.terms_agreed) return <Outlet />;
+  if (user?.terms_agreed && !isAccessDenied) return <Outlet />;
 
   if (isPending || isFetching) {
     return (

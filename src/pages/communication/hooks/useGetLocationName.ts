@@ -30,5 +30,6 @@ export const useGetLocationName = ({
     enabled: roundedLatitude !== null && roundedLongitude !== null,
     staleTime: Infinity,
     gcTime: LOCATION_NAME_GC_TIME,
+    retry: 1,
   });
 };

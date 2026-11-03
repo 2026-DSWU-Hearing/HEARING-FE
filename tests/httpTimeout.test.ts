@@ -47,3 +47,18 @@ it('응답하지 않는 HTTP 서버 요청을 실제 5초 타임아웃으로 종
     queryClient.clear();
   }
 }, 10000);
+
+it('토큰 갱신 서버도 실제 5초 타임아웃 후 실패를 반환한다', async () => {
+  const { port } = server.address() as AddressInfo;
+  const previousRequestCount = requestCount;
+  vi.stubEnv('VITE_APP_BASE_URL', `http://127.0.0.1:${port}`);
+  vi.stubGlobal('localStorage', { getItem: () => 'test-refresh-token' });
+  vi.resetModules();
+  try {
+    const { refreshAccessToken } = await import('@/shared/apis/axios');
+    await expect(refreshAccessToken()).resolves.toBeNull();
+    expect(requestCount).toBe(previousRequestCount + 1);
+  } finally {
+    vi.unstubAllEnvs();
+  }
+}, 10000);
