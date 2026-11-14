@@ -1,8 +1,11 @@
 import ConversationEndButton from '@/pages/communication/components/control/ConversationEndButton';
+import { CONVERSATION_HISTORY_MESSAGE } from '@/pages/communication/constants/conversationHistoryMessages';
 import MicrophoneIcon from '@/shared/components/icons/MicrophoneIcon';
 
 interface RecordingButtonPropTypes {
   isRecording: boolean;
+  // 대화 종료 후 마지막 문장을 기다리고 서버에 저장하는 중. 마이크를 잠그고 저장 중 안내를 보여준다.
+  isEnding?: boolean;
   onToggle: () => void;
   onEndConversation: () => void;
   // 마이크 권한 거부, STT 연결 실패 등의 안내 문구. 있으면 라벨 자리에 대신 보여준다.
@@ -16,18 +19,22 @@ interface RecordingButtonPropTypes {
 // 대화 종료 버튼은 그 옆에(양옆으로) 같은 행에서 렌더링해 세로 위치를 맞춘다.
 const RecordingButton = ({
   isRecording,
+  isEnding = false,
   onToggle,
   onEndConversation,
   errorMessage = '',
 }: RecordingButtonPropTypes) => {
   // 에러가 있으면 라벨 자리를 에러 안내로 쓴다. 라벨 높이는 그대로라 레이아웃이 흔들리지 않는다.
-  const label = errorMessage || '말해주세요!';
+  // 저장 중에는 같은 자리를 저장 중 안내로 쓴다(에러가 있으면 에러가 우선).
+  const label =
+    errorMessage ||
+    (isEnding ? CONVERSATION_HISTORY_MESSAGE.SAVING : '말해주세요!');
   const labelLines = label
     .replace(/\.\s+/g, '.\n')
     .split('\n')
     .map((line) => line.trim())
     .filter(Boolean);
-  const isLabelVisible = Boolean(errorMessage) || isRecording;
+  const isLabelVisible = Boolean(errorMessage) || isRecording || isEnding;
 
   return (
     <div className="flex items-center justify-center gap-xl">
@@ -35,9 +42,10 @@ const RecordingButton = ({
         <button
           type="button"
           onClick={onToggle}
+          disabled={isEnding}
           aria-pressed={isRecording}
           aria-label={isRecording ? '녹음 중' : '녹음 시작'}
-          className={`flex h-[4rem] w-[4rem] items-center justify-center rounded-pill p-sm transition-all active:scale-[0.98] ${
+          className={`flex h-[4rem] w-[4rem] items-center justify-center rounded-pill p-sm transition-all active:scale-[0.98] disabled:opacity-50 ${
             isRecording
               ? 'shadow-[0_0_30px_0_rgba(255,253,240,0.80)] bg-neutral-50 text-primary-500'
               : 'card-false text-primary'

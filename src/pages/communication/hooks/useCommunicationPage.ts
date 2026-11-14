@@ -64,6 +64,9 @@ export const useCommunicationPage = () => {
   // 마이크를 쓰지 않을 때는 직접 타이핑해서 확정할 수도 있다.
   const [draftListening, setDraftListening] = useState('');
   const [isSavedNoticeOpen, setIsSavedNoticeOpen] = useState(false);
+  // 대화 종료를 눌러 마지막 확정 문장을 기다리는 중 ~ 서버 저장이 끝날 때까지 true.
+  // 이 동안 마이크를 다시 켜면 아직 끝나지 않은 대화에 새 녹음이 붙으므로 막는다.
+  const [isEndingConversation, setIsEndingConversation] = useState(false);
 
   const isStartingRecordingRef = useRef(false);
   const savedNoticeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
@@ -120,10 +123,10 @@ export const useCommunicationPage = () => {
   };
 
   const handleToggleRecording = async () => {
-    if (isStartingRecordingRef.current) return;
+    if (isStartingRecordingRef.current || isEndingConversation) return;
 
     if (isListening) {
-      stopStt();
+      void stopStt();
       return;
     }
 
@@ -171,39 +174,50 @@ export const useCommunicationPage = () => {
   };
 
   const handleEndConversation = async () => {
-    if (isSavingConversation) return;
+    if (isSavingConversation || isEndingConversation) return;
 
-    stopStt();
-    setDraftListening('');
+    setIsEndingConversation(true);
+    try {
+      setDraftListening('');
 
-    // 대화 전체를 여기서 한 번에 서버로 올린다.
-    // 버블이 없으면(마이크만 켰다 끈 경우) 스토어가 만들어둔 빈 대화를 지운다.
-    const savedBubbles = bubbles;
-    const result = await endConversation(
-      savedBubbles.map(({ direction, inputType, content }) => ({
-        direction,
-        inputType,
-        content,
-      })),
-    );
+      // 녹음 중지는 즉시 끝나지 않는다. 말하던 문장의 확정 결과(final)가 최대 3초 뒤에
+      // 도착해 버블로 쌓이므로, 그 전에 저장하면 마지막 문장이 빠지거나(버블이 비어 있으면
+      // 대화가 삭제되고) 늦게 온 문장만 화면에 남는다. 수신이 끝난 뒤에 저장한다.
+      await stopStt();
 
-    if (!result) return;
+      // await를 지나면 렌더 시점의 bubbles 클로저는 낡은 값이라 스토어에서 직접 읽는다.
+      const savedBubbles = useActiveConversationStore.getState().bubbles;
 
-    void queryClient.invalidateQueries({
-      queryKey: CONVERSATION_LIST_QUERY_KEY,
-    });
+      // 대화 전체를 여기서 한 번에 서버로 올린다.
+      // 버블이 없으면(마이크만 켰다 끈 경우) 스토어가 만들어둔 빈 대화를 지운다.
+      const result = await endConversation(
+        savedBubbles.map(({ direction, inputType, content }) => ({
+          direction,
+          inputType,
+          content,
+        })),
+      );
 
-    // 화면을 비워 다음 대화를 새로 시작한다.
-    removeSavedBubbles(savedBubbles.length);
+      if (!result) return;
 
-    if (savedNoticeTimerRef.current) {
-      clearTimeout(savedNoticeTimerRef.current);
+      void queryClient.invalidateQueries({
+        queryKey: CONVERSATION_LIST_QUERY_KEY,
+      });
+
+      // 화면을 비워 다음 대화를 새로 시작한다.
+      removeSavedBubbles(savedBubbles.length);
+
+      if (savedNoticeTimerRef.current) {
+        clearTimeout(savedNoticeTimerRef.current);
+      }
+
+      setIsSavedNoticeOpen(true);
+      savedNoticeTimerRef.current = setTimeout(() => {
+        setIsSavedNoticeOpen(false);
+      }, SAVED_NOTICE_DURATION);
+    } finally {
+      setIsEndingConversation(false);
     }
-
-    setIsSavedNoticeOpen(true);
-    savedNoticeTimerRef.current = setTimeout(() => {
-      setIsSavedNoticeOpen(false);
-    }, SAVED_NOTICE_DURATION);
   };
 
   return {
@@ -211,6 +225,7 @@ export const useCommunicationPage = () => {
     isLocationConsentOpen,
     bubbles,
     isListening,
+    isEndingConversation,
     // 대화 생성 실패도 같은 자리에 보여준다(마이크를 못 켠 이유는 사용자 입장에선 하나다).
     sttErrorMessage: sttErrorMessage || conversationError,
     draftReply,
