@@ -16,6 +16,7 @@ const Communication = () => {
     isLocationConsentOpen,
     bubbles,
     isListening,
+    isEndingConversation,
     sttErrorMessage,
     draftReply,
     draftListening,
@@ -87,6 +88,7 @@ const Communication = () => {
       <div className="flex shrink-0 items-center justify-center px-base pb-[6.1875rem] pt-xs">
         <RecordingButton
           isRecording={isListening}
+          isEnding={isEndingConversation}
           onToggle={handleToggleRecording}
           onEndConversation={handleEndConversation}
           errorMessage={sttErrorMessage}

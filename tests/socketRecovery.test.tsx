@@ -218,7 +218,7 @@ describe('양방향 소통 연결', () => {
   it('연결 취소 후 타임아웃이 오류 상태를 만들지 않는다', async () => {
     const { result } = renderStt();
     await act(async () => result.current.start(1));
-    act(() => result.current.stop());
+    act(() => void result.current.stop());
     await act(async () =>
       vi.advanceTimersByTimeAsync(SOCKET_CONNECTION_TIMEOUT_MS),
     );
@@ -237,7 +237,7 @@ describe('양방향 소통 연결', () => {
     const { result } = renderStt();
     await act(async () => result.current.start(1));
     const openingCapture = MockWebSocket.instances[0].open();
-    act(() => result.current.stop());
+    act(() => void result.current.stop());
     await act(async () => result.current.start(2));
     await act(async () => MockWebSocket.instances[1].open());
     await act(async () => {
@@ -257,12 +257,58 @@ describe('양방향 소통 연결', () => {
     await act(async () => result.current.start(1));
     const socket = MockWebSocket.instances[0];
     await act(async () => socket.open());
-    act(() => result.current.stop());
+    act(() => void result.current.stop());
     expect(socket.send).toHaveBeenCalledWith('EOS');
     act(() => socket.receive({ content: '마지막 문장', isFinal: true }));
     expect(onFinalText).toHaveBeenCalledWith('마지막 문장', true);
     await act(async () => vi.advanceTimersByTimeAsync(STT_FINAL_WAIT_MS));
     expect(socket.close).toHaveBeenCalled();
+  });
+
+  it.each(['server-close', 'error', 'timeout', 'unmount'] as const)(
+    'stop()이 돌려준 Promise는 %s 시점에 마지막 결과 수신을 마치고 완료된다',
+    async (phase) => {
+      const onFinalText = vi.fn();
+      const { result, unmount } = renderHook(() =>
+        useSttSocket({ onPartialText: vi.fn(), onFinalText }),
+      );
+      await act(async () => result.current.start(1));
+      const socket = MockWebSocket.instances[0];
+      await act(async () => socket.open());
+      let isStopped = false;
+      let stopPromise!: Promise<void>;
+      act(() => {
+        stopPromise = result.current.stop().then(() => {
+          isStopped = true;
+        });
+      });
+      // EOS 이후 도착한 확정 문장은 Promise가 끝나기 전에 전달된다.
+      act(() => socket.receive({ content: '마지막 문장', isFinal: true }));
+      await act(async () => Promise.resolve());
+      expect(onFinalText).toHaveBeenCalledWith('마지막 문장', true);
+      expect(isStopped).toBe(false);
+      if (phase === 'server-close') act(() => socket.serverClose(1000));
+      else if (phase === 'error')
+        act(() => socket.onerror?.(new Event('error')));
+      else if (phase === 'timeout')
+        await act(async () => vi.advanceTimersByTimeAsync(STT_FINAL_WAIT_MS));
+      else unmount();
+      await stopPromise;
+      expect(isStopped).toBe(true);
+      expect(socket.close).toHaveBeenCalledTimes(1);
+      expect(vi.getTimerCount()).toBe(0);
+    },
+  );
+
+  it('열린 소켓이 없으면 stop()은 즉시 완료된다', async () => {
+    const { result } = renderStt();
+    let isStopped = false;
+    await act(async () => {
+      await result.current.stop().then(() => {
+        isStopped = true;
+      });
+    });
+    expect(isStopped).toBe(true);
   });
 
   it.each(['server-close', 'timeout'])(
@@ -272,7 +318,7 @@ describe('양방향 소통 연결', () => {
       await act(async () => result.current.start(1));
       const socket = MockWebSocket.instances[0];
       await act(async () => socket.open());
-      act(() => result.current.stop());
+      act(() => void result.current.stop());
       if (phase === 'server-close') act(() => socket.serverClose(1000));
       else
         await act(async () => vi.advanceTimersByTimeAsync(STT_FINAL_WAIT_MS));
@@ -288,7 +334,7 @@ describe('양방향 소통 연결', () => {
     await act(async () => result.current.start(1));
     const socket = MockWebSocket.instances[0];
     await act(async () => socket.open());
-    act(() => result.current.stop());
+    act(() => void result.current.stop());
     act(() => socket.onerror?.(new Event('error')));
     expect(result.current.errorMessage).toBe(STT_MESSAGE.SOCKET_FAILED);
     expect(result.current.status).toBe('error');
@@ -307,7 +353,7 @@ describe('양방향 소통 연결', () => {
       await act(async () => result.current.start(1));
       const previousSocket = MockWebSocket.instances[0];
       await act(async () => previousSocket.open());
-      act(() => result.current.stop());
+      act(() => void result.current.stop());
       await act(async () => result.current.start(1));
       const currentSocket = MockWebSocket.instances[1];
       await act(async () => currentSocket.open());
@@ -343,7 +389,7 @@ describe('양방향 소통 연결', () => {
     for (let index = 0; index < 3; index += 1) {
       await act(async () => result.current.start(1));
       await act(async () => MockWebSocket.instances[index].open());
-      act(() => result.current.stop());
+      act(() => void result.current.stop());
     }
     unmount();
     for (const socket of MockWebSocket.instances) {
@@ -358,7 +404,7 @@ describe('양방향 소통 연결', () => {
     await act(async () => result.current.start(1));
     const socket = MockWebSocket.instances[0];
     await act(async () => socket.open());
-    act(() => result.current.stop());
+    act(() => void result.current.stop());
     unmount();
     expect(socket.close).toHaveBeenCalled();
     expect(socket.onmessage).toBeNull();
