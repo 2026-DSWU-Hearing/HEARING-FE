@@ -32,7 +32,8 @@ interface PendingSocketTypes {
   timer: ReturnType<typeof setTimeout>;
   sessionId: number;
   notifyIfNoSpeech: () => void;
-  // stop()이 돌려준 Promise를 끝낸다. 마지막 확정 문장 수신이 끝났음을 호출자에게 알린다.
+  // 이 소켓의 마지막 확정 문장 수신이 끝나면 완료되는 Promise와, 그것을 끝내는 함수.
+  done: Promise<void>;
   resolve: () => void;
 }
 
@@ -278,14 +279,21 @@ export const useSttSocket = ({
     stopCapture();
     socketRef.current = null;
     setStatus('idle');
-    if (!socket) return Promise.resolve();
-    if (socket.readyState !== WebSocket.OPEN) {
-      closeSocket(socket);
-      return Promise.resolve();
-    }
 
-    // 마지막 확정 문장을 최대 3초 기다린다. 서버가 닫지 않아도 직접 닫는다.
-    return new Promise<void>((resolve) => {
+    // 직전 녹음을 끄고 3초 안에 다시 켠 뒤 종료하면, 이전 소켓도 아직 마지막 문장을
+    // 기다리는 중이다. 그 문장도 버블로 쌓이므로 열린 소켓 전부가 끝난 뒤에 완료를 알린다.
+    const waits = Array.from(pendingSocketsRef.current.values()).map(
+      (pending) => pending.done,
+    );
+
+    if (socket && socket.readyState !== WebSocket.OPEN) {
+      closeSocket(socket);
+    } else if (socket) {
+      // 마지막 확정 문장을 최대 3초 기다린다. 서버가 닫지 않아도 직접 닫는다.
+      let resolve!: () => void;
+      const done = new Promise<void>((resolveDone) => {
+        resolve = resolveDone;
+      });
       const timer = setTimeout(
         () => finishPendingSocket(socket),
         STT_FINAL_WAIT_MS,
@@ -294,14 +302,18 @@ export const useSttSocket = ({
         timer,
         sessionId: sessionIdRef.current,
         notifyIfNoSpeech: notifyIfNoSpeechRef.current,
+        done,
         resolve,
       });
+      waits.push(done);
       try {
         socket.send(STT_EOS_MESSAGE);
       } catch {
         finishPendingSocket(socket, STT_MESSAGE.SOCKET_FAILED);
       }
-    });
+    }
+
+    return Promise.all(waits).then(() => undefined);
   }, [clearConnectionTimer, finishPendingSocket, stopCapture]);
 
   useEffect(() => {

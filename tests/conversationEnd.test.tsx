@@ -190,4 +190,46 @@ describe('STT 중 대화 종료', () => {
     expect(postConversation).toHaveBeenCalledTimes(2);
     expect(MockWebSocket.instances).toHaveLength(2);
   });
+
+  it('마이크를 껐다가 3초 안에 다시 켜고 종료해도 이전 녹음의 마지막 문장까지 함께 저장한다', async () => {
+    const { result } = renderPage();
+    const previousSocket = await startListening(result);
+    act(() => previousSocket.receive({ content: '첫 문장', isFinal: true }));
+
+    // 마이크 끄기(이전 소켓은 마지막 문장을 기다리는 중) → 바로 다시 켜기
+    await act(async () => result.current.handleToggleRecording());
+    await act(async () => result.current.handleToggleRecording());
+    const currentSocket = MockWebSocket.instances[1];
+    await act(async () => currentSocket.open());
+    expect(postConversation).toHaveBeenCalledTimes(1);
+
+    let endPromise!: Promise<void>;
+    act(() => {
+      endPromise = result.current.handleEndConversation();
+    });
+    // 새 녹음이 먼저 닫혀도 이전 녹음이 남아 있으면 아직 저장하지 않는다.
+    await act(async () => {
+      currentSocket.serverClose(1000);
+      await Promise.resolve();
+    });
+    expect(postConversationEnd).not.toHaveBeenCalled();
+
+    act(() =>
+      previousSocket.receive({ content: '이전 마지막 문장', isFinal: true }),
+    );
+    await act(async () => {
+      previousSocket.serverClose(1000);
+      await endPromise;
+    });
+
+    expect(postConversationEnd).toHaveBeenCalledExactlyOnceWith(
+      CONVERSATION_ID,
+      [
+        { direction: 'left', inputType: 'stt', content: '첫 문장' },
+        { direction: 'left', inputType: 'stt', content: '이전 마지막 문장' },
+      ],
+    );
+    expect(result.current.bubbles).toHaveLength(0);
+    expect(result.current.isSavedNoticeOpen).toBe(true);
+  });
 });

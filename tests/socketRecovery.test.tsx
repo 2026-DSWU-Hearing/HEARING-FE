@@ -311,6 +311,46 @@ describe('양방향 소통 연결', () => {
     expect(isStopped).toBe(true);
   });
 
+  it.each(['open', 'connecting'] as const)(
+    '빠른 재시작 후 %s 상태의 새 녹음을 중지하면 이전 녹음의 마지막 결과까지 기다린 뒤 완료된다',
+    async (phase) => {
+      const onFinalText = vi.fn();
+      const { result } = renderHook(() =>
+        useSttSocket({ onPartialText: vi.fn(), onFinalText }),
+      );
+      await act(async () => result.current.start(1));
+      const previousSocket = MockWebSocket.instances[0];
+      await act(async () => previousSocket.open());
+      act(() => void result.current.stop());
+      await act(async () => result.current.start(1));
+      const currentSocket = MockWebSocket.instances[1];
+      if (phase === 'open') await act(async () => currentSocket.open());
+
+      let isStopped = false;
+      let stopPromise!: Promise<void>;
+      act(() => {
+        stopPromise = result.current.stop().then(() => {
+          isStopped = true;
+        });
+      });
+      // 새 녹음은 끝났지만 이전 녹음이 아직 마지막 문장을 기다리고 있다.
+      if (phase === 'open') act(() => currentSocket.serverClose(1000));
+      await act(async () => Promise.resolve());
+      expect(isStopped).toBe(false);
+
+      act(() =>
+        previousSocket.receive({ content: '이전 마지막 문장', isFinal: true }),
+      );
+      expect(onFinalText).toHaveBeenCalledWith('이전 마지막 문장', false);
+      act(() => previousSocket.serverClose(1000));
+      await stopPromise;
+      expect(isStopped).toBe(true);
+      expect(previousSocket.close).toHaveBeenCalledTimes(1);
+      expect(currentSocket.close).toHaveBeenCalledTimes(1);
+      expect(vi.getTimerCount()).toBe(0);
+    },
+  );
+
   it.each(['server-close', 'timeout'])(
     '최종 결과가 없으면 %s 이후 무음 안내를 표시하고 직접 정리한다',
     async (phase) => {
